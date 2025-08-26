@@ -40,6 +40,8 @@ android {
 }
 
 dependencies {
+    // https://mvnrepository.com/artifact/androidx.compose.material/material-icons-extended
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

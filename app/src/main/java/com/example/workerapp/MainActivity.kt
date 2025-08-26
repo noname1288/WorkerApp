@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.workerapp.ui.theme.WorkerAppTheme
+import com.example.workerapp.view.login.LoginScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,10 +21,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             WorkerAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    LoginScreen(Modifier.padding(innerPadding))
                 }
             }
         }

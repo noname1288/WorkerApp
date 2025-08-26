@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">WorkerApp</string>
+    <string name="login_title">Đăng nhập</string>
+    <string name="login_body">*Vui lòng đăng nhập</string>
+    <string name="type_here_1">"Vui lòng nhập email... "</string>
+    <string name="forgot_password_title">Quên mật khẩu?</string>
+    <string name="register_title">Bạn chưa có tài khoản?</string>
+    <string name="register_action">Đăng ký</string>
 </resources>
+
