@@ -42,7 +42,8 @@ android {
 dependencies {
     // https://mvnrepository.com/artifact/androidx.compose.material/material-icons-extended
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
-
+    implementation("io.coil-kt:coil-compose:2.7.0")
+    implementation("io.coil-kt:coil-svg:2.7.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

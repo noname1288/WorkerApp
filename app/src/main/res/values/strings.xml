@@ -6,5 +6,8 @@
     <string name="forgot_password_title">Quên mật khẩu?</string>
     <string name="register_title">Bạn chưa có tài khoản?</string>
     <string name="register_action">Đăng ký</string>
+    <string name="search_hint">Tìm kiếm công việc</string>
+    <string name="category_title">Danh mục</string>
+    <string name="job_list_title">Công việc mới</string>
 </resources>
 
