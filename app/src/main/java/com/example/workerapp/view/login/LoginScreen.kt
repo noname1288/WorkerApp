@@ -5,7 +5,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -51,13 +50,14 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.workerapp.R
+import com.example.workerapp.navigation.AppRoutes
 
 @Composable
-fun LoginScreen(modifier: Modifier = Modifier) {
+fun LoginScreen(modifier: Modifier = Modifier, navController: NavController) {
     val context = LocalContext.current
 
     Column(
@@ -110,6 +110,7 @@ fun LoginScreen(modifier: Modifier = Modifier) {
         Button(
             onClick = {
                 Toast.makeText(context, "clicked login", Toast.LENGTH_SHORT).show()
+                navController.navigate(AppRoutes.HOME)
             },
             shape = RoundedCornerShape(10.dp),
             colors = ButtonColors(
@@ -260,18 +261,4 @@ fun GoogleSignInButton(
         }
     }
 }
-
-
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenPreview() {
-    LoginScreen()
-}
-
-//@Preview(showBackground = true)
-//@Composable
-//fun LoginScreenPreview() {
-//    CustomEditTextField()
-//}
-
 

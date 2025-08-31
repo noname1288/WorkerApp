@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -55,9 +54,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.decode.SvgDecoder
 import coil.request.ImageRequest
@@ -76,7 +75,7 @@ sealed class HomeSection {
 }
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier) {
+fun HomeScreen(modifier: Modifier = Modifier, navController: NavController) {
 
 
     val currentTime = System.currentTimeMillis()
@@ -231,6 +230,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                     }
                     is HomeSection.JobList -> {
                         JobListSection(section.jobs)
+                        Spacer(Modifier.height(32.dp))
                     }
                 }
             }
@@ -501,7 +501,7 @@ fun CustomAvatarRow(modifier: Modifier = Modifier) {
             painter = painterResource(R.drawable.avt),
             contentDescription = null,
             modifier = Modifier
-                .size(56.dp)
+                .size(48.dp)
                 .clip(CircleShape),
             contentScale = ContentScale.Crop
         )
@@ -517,10 +517,4 @@ fun CustomAvatarRow(modifier: Modifier = Modifier) {
         ) { Icon(Icons.Default.Notifications, null, tint = colorResource(R.color.orange)) }
 
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenPreview() {
-    HomeScreen()
 }

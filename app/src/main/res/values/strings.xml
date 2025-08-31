@@ -9,5 +9,9 @@
     <string name="search_hint">Tìm kiếm công việc</string>
     <string name="category_title">Danh mục</string>
     <string name="job_list_title">Công việc mới</string>
+    <string name="home_title">Trang chủ</string>
+    <string name="income_title">Thu nhập</string>
+    <string name="notification_title">Thông báo</string>
+    <string name="profile_title">Hồ sơ</string>
 </resources>
 
