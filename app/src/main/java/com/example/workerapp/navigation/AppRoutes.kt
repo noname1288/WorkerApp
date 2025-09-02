@@ -7,4 +7,6 @@ object AppRoutes {
     const val PROFILE = "profile"
 
     const val LOGIN = "login"
+
+    const val DETAIL = "detail"
 }

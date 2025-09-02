@@ -4,6 +4,7 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.Duration
+import java.util.concurrent.TimeUnit
 
 object TimeUtils{
 
@@ -36,6 +37,13 @@ object TimeUtils{
             minutes >= 1 -> "Còn $minutes phút"
             else -> "Ngay bây giờ"
         }
+    }
+
+    fun calculateDuration(startTime: Long, endTime: Long): String {
+        val durationMillis = endTime - startTime
+        val hours = TimeUnit.MILLISECONDS.toHours(durationMillis)
+        val minutes = TimeUnit.MILLISECONDS.toMinutes(durationMillis) % 60
+        return "%02d:%02d".format(hours, minutes)
     }
 }
 

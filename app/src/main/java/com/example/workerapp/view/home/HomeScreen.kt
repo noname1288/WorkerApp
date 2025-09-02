@@ -62,6 +62,7 @@ import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import com.example.workerapp.R
 import com.example.workerapp.data.repository.remote.dto.JobResponseDto
+import com.example.workerapp.navigation.AppRoutes
 import com.example.workerapp.utils.TimeUtils
 
 /**
@@ -229,7 +230,9 @@ fun HomeScreen(modifier: Modifier = Modifier, navController: NavController) {
                         Spacer(Modifier.height(16.dp))
                     }
                     is HomeSection.JobList -> {
-                        JobListSection(section.jobs)
+                        JobListSection(section.jobs){
+                            navController.navigate(AppRoutes.DETAIL)
+                        }
                         Spacer(Modifier.height(32.dp))
                     }
                 }
@@ -239,7 +242,7 @@ fun HomeScreen(modifier: Modifier = Modifier, navController: NavController) {
 }
 
 @Composable
-fun JobListSection(jobs: List<JobResponseDto>) {
+fun JobListSection(jobs: List<JobResponseDto>, onClickItem: (String)-> Unit) {
     val context = LocalContext.current
     Column {
         Text(
@@ -252,6 +255,7 @@ fun JobListSection(jobs: List<JobResponseDto>) {
 
         jobs.forEachIndexed { index, job ->
             ServiceItemCard(job){
+                onClickItem(index.toString())
                 Toast.makeText(context, "Click job id: $it", Toast.LENGTH_SHORT).show()
             }
             if (index < jobs.size - 1) {

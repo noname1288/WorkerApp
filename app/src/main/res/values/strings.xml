@@ -13,5 +13,10 @@
     <string name="income_title">Thu nhập</string>
     <string name="notification_title">Thông báo</string>
     <string name="profile_title">Hồ sơ</string>
+    <string name="history_title">Lịch sử</string>
+    <string name="job_detail_title">Chi tiết công việc</string>
+    <string name="user_info_title">Thông tin khách hàng</string>
+    <string name="job_detail_title_2">Thông tin công việc</string>
+    <string name="weekly_title">"Lặp lại trong tuần: "</string>
 </resources>
 

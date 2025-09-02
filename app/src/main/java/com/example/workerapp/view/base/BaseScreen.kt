@@ -1,7 +1,6 @@
 package com.example.workerapp.view.base
 
 import android.widget.Toast
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,15 +20,14 @@ import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Work
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -54,29 +52,37 @@ fun BaseScreen(modifier: Modifier = Modifier) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     var currentRoute = navBackStackEntry?.destination?.route
 
-    var startDestination = AppRoutes.LOGIN
-    var showBottomBar = listOf(
+    val startDestination = AppRoutes.LOGIN
+    val showBottomBar = listOf(
         AppRoutes.HOME,
         AppRoutes.INCOME,
         AppRoutes.NOTIFICATION,
         AppRoutes.PROFILE
     )
+    val showTopAppBar = emptyList<String>()
 
 
     Scaffold(
+        topBar = {
+            val isShowTopAppBar = currentRoute != null && showTopAppBar.contains(currentRoute)
+            if (isShowTopAppBar) {
+
+            }
+        },
         bottomBar = {
             val isShowBottomBar = currentRoute != null && showBottomBar.contains(currentRoute)
             if (isShowBottomBar)
                 CustomNavigationBar(
                     selectedRoute = currentRoute ?: AppRoutes.HOME,
                     onItemSelected = { route ->
-                        currentRoute = route
-                        Toast.makeText(context, route, Toast.LENGTH_SHORT).show() }
+                        navController.navigate(route)
+                    }
                 )
         },
         floatingActionButton = {
 
-        }
+        },
+        containerColor = Color.White
     ) { innerPadding ->
         AppNavHost(
             Modifier.padding(innerPadding),
@@ -148,11 +154,21 @@ fun CustomNavigationBar(
                             onItemSelected(item.route)
                         }
                 ) {
-                    Icon(
-                        imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
-                        tint = colorResource(R.color.orange),
-                        contentDescription = null
-                    )
+                    BadgedBox(
+                        badge = {
+                            if (item.badgeCount != 0) {
+                                Badge { Text(item.badgeCount.toString()) }
+                            } else if (item.hasNews) {
+                                Badge()
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
+                            tint = colorResource(R.color.orange),
+                            contentDescription = null
+                        )
+                    }
                     Spacer(Modifier.height(2.dp))
                     Text(
                         item.label, fontSize = 12.sp,
