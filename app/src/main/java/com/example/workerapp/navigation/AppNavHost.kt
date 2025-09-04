@@ -9,6 +9,7 @@ import com.example.workerapp.view.detail.CleaningJobDetailScreen
 import com.example.workerapp.view.home.HomeScreen
 import com.example.workerapp.view.income.IncomeScreen
 import com.example.workerapp.view.login.LoginScreen
+import com.example.workerapp.view.login.AuthViewModel
 import com.example.workerapp.view.notification.NotificationScreen
 import com.example.workerapp.view.profile.ProfileScreen
 
@@ -16,6 +17,7 @@ import com.example.workerapp.view.profile.ProfileScreen
 fun AppNavHost(
     modifier: Modifier = Modifier,
     navHostController: NavHostController,
+    authViewModel: AuthViewModel,
     startDestination: String
 ) {
     NavHost(
@@ -24,7 +26,7 @@ fun AppNavHost(
         startDestination = startDestination,
     ) {
         composable(AppRoutes.LOGIN) {
-            LoginScreen(navController = navHostController)
+            LoginScreen(navController = navHostController, viewModel = authViewModel)
         }
 
         composable(AppRoutes.HOME) {

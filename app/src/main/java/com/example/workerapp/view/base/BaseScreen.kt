@@ -1,6 +1,5 @@
 package com.example.workerapp.view.base
 
-import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -37,21 +36,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.workerapp.R
 import com.example.workerapp.navigation.AppNavHost
 import com.example.workerapp.navigation.AppRoutes
 import com.example.workerapp.navigation.NavItem
+import com.example.workerapp.view.login.AuthViewModel
 
 @Composable
-fun BaseScreen(modifier: Modifier = Modifier) {
+fun BaseScreen() {
     val context = LocalContext.current
-
-    val navController = rememberNavController()
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    var currentRoute = navBackStackEntry?.destination?.route
-
     val startDestination = AppRoutes.LOGIN
     val showBottomBar = listOf(
         AppRoutes.HOME,
@@ -61,10 +57,15 @@ fun BaseScreen(modifier: Modifier = Modifier) {
     )
     val showTopAppBar = emptyList<String>()
 
+    val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    val authViewModel: AuthViewModel = viewModel ()
 
     Scaffold(
         topBar = {
-            val isShowTopAppBar = currentRoute != null && showTopAppBar.contains(currentRoute)
+             val isShowTopAppBar = currentRoute != null && showTopAppBar.contains(currentRoute)
             if (isShowTopAppBar) {
 
             }
@@ -73,7 +74,7 @@ fun BaseScreen(modifier: Modifier = Modifier) {
             val isShowBottomBar = currentRoute != null && showBottomBar.contains(currentRoute)
             if (isShowBottomBar)
                 CustomNavigationBar(
-                    selectedRoute = currentRoute ?: AppRoutes.HOME,
+                    selectedRoute = currentRoute,
                     onItemSelected = { route ->
                         navController.navigate(route)
                     }
@@ -87,6 +88,7 @@ fun BaseScreen(modifier: Modifier = Modifier) {
         AppNavHost(
             Modifier.padding(innerPadding),
             navController,
+            authViewModel,
             startDestination
         )
     }

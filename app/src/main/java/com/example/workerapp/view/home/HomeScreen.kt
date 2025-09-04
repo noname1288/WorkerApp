@@ -22,15 +22,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -54,6 +53,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -92,7 +92,7 @@ fun HomeScreen(modifier: Modifier = Modifier, navController: NavController) {
             serviceType = "Cleaning",
             startTime = currentTime + 3600000, // 1 hour from now
             endTime = currentTime + 5400000, // 1.5 hours from now
-            price = 150.0
+            price = 150.000
         ),
         JobResponseDto(
             id = "2",
@@ -103,7 +103,7 @@ fun HomeScreen(modifier: Modifier = Modifier, navController: NavController) {
             serviceType = "Plumbing",
             startTime = currentTime + 10800000, // 3 hours from now
             endTime = currentTime + 14400000, // 4 hours from now
-            price = 200.0
+            price = 200.000
         ),
         JobResponseDto(
             id = "3",
@@ -114,7 +114,7 @@ fun HomeScreen(modifier: Modifier = Modifier, navController: NavController) {
             serviceType = "Electrical",
             startTime = currentTime + 18000000, // 5 hours from now
             endTime = currentTime + 21600000, // 6 hours from now
-            price = 180.0
+            price = 180.000
         ),
         JobResponseDto(
             id = "4",
@@ -125,7 +125,7 @@ fun HomeScreen(modifier: Modifier = Modifier, navController: NavController) {
             serviceType = "Painting",
             startTime = currentTime + 25200000, // 7 hours from now
             endTime = currentTime + 86400000, // 1 day from now
-            price = 250.0
+            price = 250.000
         ),
         JobResponseDto(
             id = "5",
@@ -136,7 +136,7 @@ fun HomeScreen(modifier: Modifier = Modifier, navController: NavController) {
             serviceType = "Landscaping",
             startTime = currentTime + 43200000, // 12 hours from now
             endTime = currentTime + 129600000, // 1.5 days from now
-            price = 300.0
+            price = 300.000
         ),
         JobResponseDto(
             id = "6",
@@ -147,7 +147,7 @@ fun HomeScreen(modifier: Modifier = Modifier, navController: NavController) {
             serviceType = "Carpentry",
             startTime = currentTime + 72000000, // 20 hours from now
             endTime = currentTime + 172800000, // 2 days from now
-            price = 120.0
+            price = 120.000
         ),
         JobResponseDto(
             id = "7",
@@ -158,7 +158,7 @@ fun HomeScreen(modifier: Modifier = Modifier, navController: NavController) {
             serviceType = "Moving",
             startTime = currentTime + 90000000, // 25 hours from now
             endTime = currentTime + 259200000, // 3 days from now
-            price = 220.0
+            price = 220.000
         ),
         // Present endTime
         JobResponseDto(
@@ -170,7 +170,7 @@ fun HomeScreen(modifier: Modifier = Modifier, navController: NavController) {
             serviceType = "Repair",
             startTime = currentTime - 3600000, // 1 hour ago
             endTime = currentTime, // Now
-            price = 140.0
+            price = 140.000
         ),
         // Past endTime
         JobResponseDto(
@@ -182,7 +182,7 @@ fun HomeScreen(modifier: Modifier = Modifier, navController: NavController) {
             serviceType = "Installation",
             startTime = currentTime - 36000000, // 10 hours ago
             endTime = currentTime - 32400000, // 9 hours ago
-            price = 260.0
+            price = 260.000
         ),
         JobResponseDto(
             id = "10",
@@ -221,16 +221,19 @@ fun HomeScreen(modifier: Modifier = Modifier, navController: NavController) {
                         CustomAvatarRow()
                         Spacer(Modifier.height(24.dp))
                     }
+
                     is HomeSection.Search -> {
                         SearchRow()
                         Spacer(Modifier.height(24.dp))
                     }
+
                     is HomeSection.Category -> {
                         CustomCategoryListRow()
                         Spacer(Modifier.height(16.dp))
                     }
+
                     is HomeSection.JobList -> {
-                        JobListSection(section.jobs){
+                        JobListSection(section.jobs) {
                             navController.navigate(AppRoutes.DETAIL)
                         }
                         Spacer(Modifier.height(32.dp))
@@ -242,7 +245,7 @@ fun HomeScreen(modifier: Modifier = Modifier, navController: NavController) {
 }
 
 @Composable
-fun JobListSection(jobs: List<JobResponseDto>, onClickItem: (String)-> Unit) {
+fun JobListSection(jobs: List<JobResponseDto>, onClickItem: (String) -> Unit) {
     val context = LocalContext.current
     Column {
         Text(
@@ -254,7 +257,7 @@ fun JobListSection(jobs: List<JobResponseDto>, onClickItem: (String)-> Unit) {
         Spacer(Modifier.height(16.dp))
 
         jobs.forEachIndexed { index, job ->
-            ServiceItemCard(job){
+            ServiceItemCard(job) {
                 onClickItem(index.toString())
                 Toast.makeText(context, "Click job id: $it", Toast.LENGTH_SHORT).show()
             }
@@ -270,7 +273,8 @@ fun JobListSection(jobs: List<JobResponseDto>, onClickItem: (String)-> Unit) {
 fun ServiceItemCard(job: JobResponseDto, onClick: (String) -> Unit) {
     Card(
         modifier = Modifier
-            .fillMaxWidth().clickable{
+            .fillMaxWidth()
+            .clickable {
                 onClick(job.id)
             },
         shape = RoundedCornerShape(12.dp),
@@ -282,6 +286,32 @@ fun ServiceItemCard(job: JobResponseDto, onClick: (String) -> Unit) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
+            /* *
+            * Date - countdown
+            * */
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(24.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = TimeUtils.formatDateTimeFull(job.endTime),
+                    fontSize = 12.sp,
+                    color = Color.DarkGray
+                )
+                Text(
+                    text = "[${TimeUtils.timeRemainingText(job.endTime)}]",
+                    fontStyle = FontStyle.Italic,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 12.sp,
+                    color = colorResource(R.color.orange)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            /* *
+            * Category title and address
+            * */
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -297,7 +327,7 @@ fun ServiceItemCard(job: JobResponseDto, onClick: (String) -> Unit) {
                             colorResource(R.color.orange),
                             RoundedCornerShape(16.dp)
                         )
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .padding(horizontal = 12.dp, vertical = 4.dp)
                 ) {
                     Text(
                         text = job.serviceType,
@@ -322,52 +352,38 @@ fun ServiceItemCard(job: JobResponseDto, onClick: (String) -> Unit) {
                 )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            /* *
-            * Date - countdown
-            * */
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = TimeUtils.formatDateTimeFull(job.endTime),
-                    fontSize = 14.sp
-                )
-                Text(
-                    text = "[${TimeUtils.timeRemainingText(job.endTime)}]",
-                    fontStyle = FontStyle.Italic,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp,
-                    color = colorResource(R.color.orange)
-                )
-            }
 
-            Spacer(modifier = Modifier.height(12.dp))
 
-            /* *
-            * Customer info
-            * */
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                InfoRow(icon = Icons.Default.Person, text = job.clientName)
-                InfoRow(icon = Icons.Default.Call, text = job.phoneNumber)
-                InfoRow(icon = Icons.Default.List, text = job.workerQuantity.toString())
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             /* *
             * Price
             * */
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Bottom
+
             ) {
+                /* *
+                * Customer info
+                * */
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    InfoRow(icon = Icons.Outlined.Person, text = job.clientName)
+                    InfoRow(icon = Icons.Default.Call, text = job.phoneNumber)
+                    InfoRow(
+                        icon = Icons.Default.Group,
+                        text = "Số lượng: " + job.workerQuantity.toString()
+                    )
+                }
+
                 Text(
                     text = "${job.price} VND",
                     color = Color(0xFFFF6F00),
-                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
                 )
             }
         }
@@ -383,15 +399,15 @@ fun InfoRow(icon: ImageVector, text: String) {
             tint = Color(0xFFFF6F00),
             modifier = Modifier.size(18.dp)
         )
-        Spacer(modifier = Modifier.width(6.dp))
-        Text(text = text, style = MaterialTheme.typography.bodyMedium)
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(text = text, fontSize = 14.sp)
     }
 }
 
 
 @Composable
 fun CustomCategoryListRow() {
-    var context = LocalContext.current
+    val context = LocalContext.current
 
     val titleList = listOf("Dọn dẹp", "Vận chuyển", "Bảo trì", "Chăm sóc")
     val svgList = listOf(
@@ -444,10 +460,9 @@ fun CategoryItem(title: String = "Cleaning", svgUrl: Int = 0, callback: (String)
                 .clip(CircleShape),
             contentScale = ContentScale.Crop
         )
-        Spacer(Modifier.height(8.dp))
         Text(
             title,
-            fontSize = 14.sp,
+            fontSize = 12.sp,
             maxLines = 1
         )
 
@@ -456,21 +471,21 @@ fun CategoryItem(title: String = "Cleaning", svgUrl: Int = 0, callback: (String)
 
 @Composable
 fun SearchRow() {
-    var context = LocalContext.current
+    val context = LocalContext.current
 
-    var light_gray = colorResource(R.color.light_gray)
+    val lightGray = colorResource(R.color.light_gray)
 
     var searchInput by remember { mutableStateOf("") }
 
     OutlinedTextField(
         value = searchInput,
         onValueChange = { searchInput = it },
-        shape = RoundedCornerShape(24.dp),
+        shape = RoundedCornerShape(16.dp),
         placeholder = {
             Text(
                 stringResource(R.string.search_hint),
-                fontSize = 16.sp,
-                color = light_gray
+                fontSize = 14.sp,
+                color = lightGray
             )
         },
         trailingIcon = {
@@ -481,7 +496,7 @@ fun SearchRow() {
             ) { Icon(Icons.Default.Search, null) }
         },
         colors = OutlinedTextFieldDefaults.colors(
-            unfocusedTextColor = light_gray,
+            unfocusedTextColor = lightGray,
             focusedBorderColor = Color.Black
         ),
         singleLine = true,
@@ -521,4 +536,10 @@ fun CustomAvatarRow(modifier: Modifier = Modifier) {
         ) { Icon(Icons.Default.Notifications, null, tint = colorResource(R.color.orange)) }
 
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PrevHomeScreen() {
+    HomeScreen(navController = NavController(LocalContext.current))
 }

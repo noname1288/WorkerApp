@@ -1,6 +1,7 @@
 package com.example.workerapp.view.login
 
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -52,13 +53,23 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.credentials.CredentialManager
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import com.example.workerapp.R
 import com.example.workerapp.navigation.AppRoutes
+import kotlinx.coroutines.launch
 
 @Composable
-fun LoginScreen(modifier: Modifier = Modifier, navController: NavController) {
+fun LoginScreen(
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    viewModel: AuthViewModel
+) {
     val context = LocalContext.current
+    val activity = context as ComponentActivity
+    val credentialManager = remember { CredentialManager.create(context) }
+
 
     Column(
         modifier = modifier
@@ -119,16 +130,22 @@ fun LoginScreen(modifier: Modifier = Modifier, navController: NavController) {
                 disabledContainerColor = colorResource(R.color.light_gray),
                 disabledContentColor = Color.White
             ),
-            modifier = Modifier.fillMaxWidth().height(48.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp)
         ) {
-            Text(stringResource(R.string.login_title),
-                fontSize = 16.sp)
+            Text(
+                stringResource(R.string.login_title),
+                fontSize = 16.sp
+            )
         }
 
         Spacer(Modifier.height(16.dp))
 
-        Row( modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
             Text(
                 text = stringResource(R.string.register_title)
             )
@@ -143,9 +160,19 @@ fun LoginScreen(modifier: Modifier = Modifier, navController: NavController) {
         Spacer(Modifier.height(32.dp))
 
         GoogleSignInButton {
-            Toast.makeText(context, "clicked google sign in", Toast.LENGTH_SHORT).show()
+            val request = viewModel.request
+            activity.lifecycleScope.launch {
+                try {
+                    val result = credentialManager.getCredential(
+                        context = activity,
+                        request = request
+                    )
+                    viewModel.onGoogleSignInSuccess(result)
+                } catch (e: Exception) {
+                    viewModel.onGoogleSignInError(e)
+                }
+            }
         }
-
     }
 }
 

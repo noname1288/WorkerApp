@@ -230,7 +230,9 @@ fun CustomAdditionalJob(isCooking: Boolean = true, isIroning: Boolean = true) {
 fun CustomWeeklySchedule(selectedDays: List<Int> = emptyList(), isWeekly: Boolean = true) {
 
     Row(
-        Modifier.fillMaxWidth(),
+        Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -244,7 +246,8 @@ fun CustomWeeklySchedule(selectedDays: List<Int> = emptyList(), isWeekly: Boolea
 
     val days = listOf<String>("T2", "T3", "T4", "T5", "T6", "T7", "CN")
     Row(
-        Modifier.padding(horizontal = 8.dp)
+        Modifier
+            .padding(horizontal = 8.dp)
             .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -275,6 +278,7 @@ fun DayItem(label: String, isSelected: Boolean) {
 @Composable
 fun ActionButtons() {
     SlideToConfirmButton(
+        modifier = Modifier.padding(horizontal = 8.dp),
         onConfirmed = {
             Log.d("SlideButton", "Confirmed!")
         }
@@ -286,6 +290,7 @@ fun JobWorkflowItem() {
     Row(
         Modifier
             .height(48.dp)
+            .padding(horizontal = 8.dp)
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .background(colorResource(R.color.light_gray))
@@ -301,14 +306,18 @@ fun JobWorkflowItem() {
 @SuppressLint("DefaultLocale")
 @Composable
 fun CustomJobDetailsColumn(cleaningJob: CleaningJobModel) {
-    Column(Modifier.fillMaxWidth()) {
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp)
+    ) {
         Text(
             stringResource(R.string.job_detail_title_2),
             fontSize = 16.sp,
             fontWeight = FontWeight.W500
         )
 
-        Spacer(Modifier.height(4.dp))
+        Spacer(Modifier.height(2.dp))
 
         Row(
             Modifier.padding(horizontal = 8.dp),
@@ -321,7 +330,7 @@ fun CustomJobDetailsColumn(cleaningJob: CleaningJobModel) {
                 modifier = Modifier.size(6.dp)
             )
             Text(buildAnnotatedString {
-                withStyle(style = SpanStyle(fontSize = 14.sp)) {
+                withStyle(style = SpanStyle(fontSize = 12.sp)) {
                     append("Danh mục: ")
                 }
                 withStyle(style = SpanStyle(color = colorResource(R.color.orange))) {
@@ -330,7 +339,7 @@ fun CustomJobDetailsColumn(cleaningJob: CleaningJobModel) {
             })
         }
 
-        Spacer(Modifier.height(4.dp))
+        Spacer(Modifier.height(2.dp))
 
         Row(
             Modifier.padding(horizontal = 8.dp),
@@ -343,7 +352,7 @@ fun CustomJobDetailsColumn(cleaningJob: CleaningJobModel) {
                 modifier = Modifier.size(6.dp)
             )
             Text(buildAnnotatedString {
-                withStyle(style = SpanStyle(fontSize = 14.sp)) {
+                withStyle(style = SpanStyle(fontSize = 12.sp)) {
                     append("Thời lượng: ")
                 }
                 withStyle(style = SpanStyle(fontSize = 14.sp)) {
@@ -357,7 +366,7 @@ fun CustomJobDetailsColumn(cleaningJob: CleaningJobModel) {
             })
         }
 
-        Spacer(Modifier.height(4.dp))
+        Spacer(Modifier.height(2.dp))
 
         Row(
             Modifier.padding(horizontal = 8.dp),
@@ -370,7 +379,7 @@ fun CustomJobDetailsColumn(cleaningJob: CleaningJobModel) {
                 modifier = Modifier.size(6.dp)
             )
             Text(buildAnnotatedString {
-                withStyle(style = SpanStyle(fontSize = 14.sp)) {
+                withStyle(style = SpanStyle(fontSize = 12.sp)) {
                     append("Ngày bắt đầu: ")
                 }
                 withStyle(style = SpanStyle(fontSize = 14.sp)) {
@@ -380,7 +389,7 @@ fun CustomJobDetailsColumn(cleaningJob: CleaningJobModel) {
             })
         }
 
-        Spacer(Modifier.height(4.dp))
+        Spacer(Modifier.height(2.dp))
 
         Row(
             Modifier.padding(horizontal = 8.dp),
@@ -393,7 +402,7 @@ fun CustomJobDetailsColumn(cleaningJob: CleaningJobModel) {
                 modifier = Modifier.size(6.dp)
             )
             Text(buildAnnotatedString {
-                withStyle(style = SpanStyle(fontSize = 14.sp)) {
+                withStyle(style = SpanStyle(fontSize = 12.sp)) {
                     append("Tiền lương: ")
                 }
                 withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
@@ -453,7 +462,7 @@ fun UserInfoCard(user: UserModel) {
                 Column(
                     Modifier.weight(1f),
                     horizontalAlignment = Alignment.Start,
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
                     CustomUserInfoItemRow(Icons.Default.Phone, user.tel)
                     CustomUserInfoItemRow(Icons.Default.Email, user.email)
@@ -492,7 +501,7 @@ fun PrevJobDetail(modifier: Modifier = Modifier) {
         role = "user"
     )
 
-    val fakeCleaningJob = CleaningJobModel(
+    CleaningJobModel(
         id = "job123",
         durationID = "duration456",
         services = listOf("Floor Cleaning", "Window Washing"),
