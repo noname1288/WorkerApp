@@ -25,6 +25,8 @@ import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.Call
+import androidx.compose.material.icons.outlined.Group
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -234,7 +236,7 @@ fun HomeScreen(modifier: Modifier = Modifier, navController: NavController) {
 
                     is HomeSection.JobList -> {
                         JobListSection(section.jobs) {
-                            navController.navigate(AppRoutes.DETAIL)
+                            navController.navigate(AppRoutes.CLEANING_DETAIL)
                         }
                         Spacer(Modifier.height(32.dp))
                     }
@@ -372,16 +374,16 @@ fun ServiceItemCard(job: JobResponseDto, onClick: (String) -> Unit) {
                 * */
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     InfoRow(icon = Icons.Outlined.Person, text = job.clientName)
-                    InfoRow(icon = Icons.Default.Call, text = job.phoneNumber)
+                    InfoRow(icon = Icons.Outlined.Call, text = job.phoneNumber)
                     InfoRow(
-                        icon = Icons.Default.Group,
+                        icon = Icons.Outlined.Group,
                         text = "Số lượng: " + job.workerQuantity.toString()
                     )
                 }
 
                 Text(
                     text = "${job.price} VND",
-                    color = Color(0xFFFF6F00),
+                    color = colorResource(R.color.orange_text ),
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                 )
@@ -411,10 +413,10 @@ fun CustomCategoryListRow() {
 
     val titleList = listOf("Dọn dẹp", "Vận chuyển", "Bảo trì", "Chăm sóc")
     val svgList = listOf(
-        R.raw.cleaning_service,
-        R.raw.free_shipping_service,
-        R.raw.maintenance_service,
-        R.raw.heathcare_service
+        R.drawable.cate1,
+        R.drawable.cate2,
+        R.drawable.cate3,
+        R.drawable.cate4
     )
 
     Text(
@@ -430,7 +432,7 @@ fun CustomCategoryListRow() {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         items(titleList.size) { index ->
-            CategoryItem(titleList[index], svgUrl = svgList[index]) {
+            CategoryItem(titleList[index], painterResource = svgList[index]) {
                 Toast.makeText(context, "click ${titleList[index]}", Toast.LENGTH_SHORT).show()
             }
 
@@ -440,23 +442,29 @@ fun CustomCategoryListRow() {
 }
 
 @Composable
-fun CategoryItem(title: String = "Cleaning", svgUrl: Int = 0, callback: (String) -> Unit) {
+fun CategoryItem(title: String = "Cleaning", painterResource: Int = 0, callback: (String) -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.clickable { callback(title) }
     ) {
-        val context = LocalContext.current
-        // URI cho raw resource: android.resource://<package>/raw/<name>
-        val data = "android.resource://${context.packageName}/${svgUrl}"
+//        val context = LocalContext.current
+//        // URI cho raw resource: android.resource://<package>/raw/<name>
+//        val data = "android.resource://${context.packageName}/${painterResource}"
 
-        AsyncImage(
-            model = ImageRequest.Builder(context)
-                .data(data)
-                .decoderFactory(SvgDecoder.Factory()) // bật SVG decoder
-                .build(),
-            contentDescription = null,
-            modifier = Modifier
-                .size(64.dp)
+//        AsyncImage(
+//            model = ImageRequest.Builder(context)
+//                .data(data)
+//                .decoderFactory(SvgDecoder.Factory()) // bật SVG decoder
+//                .build(),
+//            contentDescription = null,
+//            modifier = Modifier
+//                .size(64.dp)
+//                .clip(CircleShape),
+//            contentScale = ContentScale.Crop
+//        )
+        Image(
+            painterResource(painterResource), null, modifier = Modifier
+                .size(56.dp)
                 .clip(CircleShape),
             contentScale = ContentScale.Crop
         )

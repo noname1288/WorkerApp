@@ -41,6 +41,8 @@ android {
 }
 
 dependencies {
+    // https://mvnrepository.com/artifact/com.google.accompanist/accompanist-systemuicontroller
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.36.0")
     //material-icons-extended
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
     //coil

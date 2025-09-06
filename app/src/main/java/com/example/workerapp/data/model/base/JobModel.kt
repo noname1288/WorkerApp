@@ -1,6 +1,6 @@
 package com.example.workerapp.data.model.base
 
-data class JobModel(
+data class  JobModel(
     var serviceType: String = "",
     var startTime: Long = 0L,
     var endTime: Long = 0L,

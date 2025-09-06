@@ -5,7 +5,8 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.workerapp.view.detail.CleaningJobDetailScreen
+import com.example.workerapp.view.detail.cleaning.CleaningDetailScreen
+import com.example.workerapp.view.detail.healcare.HealthcareDetailScreen
 import com.example.workerapp.view.home.HomeScreen
 import com.example.workerapp.view.income.IncomeScreen
 import com.example.workerapp.view.login.LoginScreen
@@ -42,8 +43,11 @@ fun AppNavHost(
             ProfileScreen()
         }
 
-        composable(AppRoutes.DETAIL) {
-            CleaningJobDetailScreen()
+        composable(AppRoutes.CLEANING_DETAIL) {
+            CleaningDetailScreen()
+        }
+        composable (AppRoutes.HEALTHCARE_DETAIL) {
+            HealthcareDetailScreen()
         }
     }
 }

@@ -1,6 +1,14 @@
 package com.example.workerapp.data.model.base
 
-data class ServiceModel(
-    val serviceType: String,
-    val serviceName: String
-)
+open class ServiceModel(
+    open val id: String,
+    open val duties: List<String>,
+    open val imageUrl: String,
+    open val serviceType: String,
+    open val serviceName: String
+){
+    companion object ServiceType{
+        const val CLEANING = "CLEANING"
+        const val HEALTHCARE = "HEALTHCARE"
+    }
+}

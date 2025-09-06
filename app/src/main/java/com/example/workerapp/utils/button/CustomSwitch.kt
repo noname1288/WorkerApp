@@ -26,7 +26,7 @@ fun CustomSwitch(
     onCheckedChange: (Boolean) -> Unit
 ) {
     val backgroundColor by animateColorAsState(
-        if (checked) colorResource(R.color.light_orange2) else Color.LightGray
+        if (checked) colorResource(R.color.light_orange_icon) else Color.LightGray
     )
     val alignment by animateDpAsState(
         if (checked) 20.dp else 0.dp

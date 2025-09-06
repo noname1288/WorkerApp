@@ -26,6 +26,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,11 +45,12 @@ import com.example.workerapp.navigation.AppNavHost
 import com.example.workerapp.navigation.AppRoutes
 import com.example.workerapp.navigation.NavItem
 import com.example.workerapp.view.login.AuthViewModel
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
 fun BaseScreen() {
     val context = LocalContext.current
-    val startDestination = AppRoutes.LOGIN
+    val startDestination = AppRoutes.PROFILE
     val showBottomBar = listOf(
         AppRoutes.HOME,
         AppRoutes.INCOME,
@@ -62,6 +64,16 @@ fun BaseScreen() {
     val currentRoute = navBackStackEntry?.destination?.route
 
     val authViewModel: AuthViewModel = viewModel ()
+
+    val systemUiController = rememberSystemUiController()
+    val useDarkIcons = true // vì nền trắng nên dùng icon tối
+
+    SideEffect {
+        systemUiController.setSystemBarsColor(
+            color = Color.White,
+            darkIcons = useDarkIcons
+        )
+    }
 
     Scaffold(
         topBar = {

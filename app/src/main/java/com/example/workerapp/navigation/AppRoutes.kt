@@ -8,5 +8,6 @@ object AppRoutes {
 
     const val LOGIN = "login"
 
-    const val DETAIL = "detail"
+    const val CLEANING_DETAIL = "cleaning_detail"
+    const val HEALTHCARE_DETAIL = "healthcare_detail"
 }
