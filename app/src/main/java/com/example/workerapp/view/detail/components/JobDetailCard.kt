@@ -1,139 +1,75 @@
 package com.example.workerapp.view.detail.components
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.workerapp.R
 import com.example.workerapp.data.model.CleaningJobModel
-import com.example.workerapp.utils.TimeUtils
+import com.example.workerapp.data.model.base.JobModel
+import com.example.workerapp.utils.components.InformationItem
 
 @SuppressLint("DefaultLocale")
 @Composable
 fun JobDetailCard(cleaningJob: CleaningJobModel) {
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp)
-    ) {
-        Text(
-            stringResource(R.string.job_detail_title_2),
-            fontSize = 16.sp,
-            fontWeight = FontWeight.W500
-        )
-
-        Spacer(Modifier.height(2.dp))
-
-        Row(
-            Modifier.padding(horizontal = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = colorResource(R.color.white)
+        ),
+        elevation = CardDefaults.cardElevation(3.dp),
         ) {
-            Image(
-                painter = painterResource(R.drawable.ic_black_circle_24),
-                null,
-                modifier = Modifier.size(6.dp)
-            )
-            Text(buildAnnotatedString {
-                withStyle(style = SpanStyle(fontSize = 12.sp)) {
-                    append("Danh mục: ")
-                }
-                withStyle(style = SpanStyle(color = colorResource(R.color.orange))) {
-                    append(cleaningJob.jobDetail.serviceType)
-                }
-            })
-        }
-
-        Spacer(Modifier.height(2.dp))
-
-        Row(
-            Modifier.padding(horizontal = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         ) {
-            Image(
-                painter = painterResource(R.drawable.ic_black_circle_24),
-                null,
-                modifier = Modifier.size(6.dp)
+            Text(
+                stringResource(R.string.job_detail_title_2),
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold
+                )
             )
-            Text(buildAnnotatedString {
-                withStyle(style = SpanStyle(fontSize = 12.sp)) {
-                    append("Thời lượng: ")
-                }
-                withStyle(style = SpanStyle(fontSize = 14.sp)) {
-                    val duration = TimeUtils.calculateDuration(
-                        cleaningJob.jobDetail.startTime,
-                        cleaningJob.jobDetail.endTime
-                    )
-                    append(duration)
-                    append(" giờ")
-                }
-            })
-        }
 
-        Spacer(Modifier.height(2.dp))
-
-        Row(
-            Modifier.padding(horizontal = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Image(
-                painter = painterResource(R.drawable.ic_black_circle_24),
-                null,
-                modifier = Modifier.size(6.dp)
-            )
-            Text(buildAnnotatedString {
-                withStyle(style = SpanStyle(fontSize = 12.sp)) {
-                    append("Ngày bắt đầu: ")
-                }
-                withStyle(style = SpanStyle(fontSize = 14.sp)) {
-                    val startTime = TimeUtils.formatDateTimeFull(cleaningJob.jobDetail.startTime)
-                    append(startTime)
-                }
-            })
-        }
-
-        Spacer(Modifier.height(2.dp))
-
-        Row(
-            Modifier.padding(horizontal = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Image(
-                painter = painterResource(R.drawable.ic_black_circle_24),
-                null,
-                modifier = Modifier.size(6.dp)
-            )
-            Text(buildAnnotatedString {
-                withStyle(style = SpanStyle(fontSize = 12.sp)) {
-                    append("Tiền lương: ")
-                }
-                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                    val price = String.format("%,.0f", cleaningJob.jobDetail.price) + " VND"
-                    append(price)
-                }
-            }, maxLines = 1)
+            InformationItem("Danh mục", value = "${cleaningJob.jobDetail.serviceType}")
+            InformationItem("Thời lượng", value = "08:00 - 12:00 [3 giờ]")
+            InformationItem("Ngày bắt đầu", value = "22/09/2024")
+            InformationItem("Ngày kết thúc", value = "22/09/2024")
         }
     }
+}
+
+@Preview
+@Composable
+fun PrevJobDetailCard(modifier: Modifier = Modifier) {
+    val job = CleaningJobModel(
+        id = "job123",
+        durationID = "duration456",
+        services = listOf("Floor Cleaning", "Window Washing"),
+        isCooking = true,
+        isIroning = true,
+        jobDetail = JobModel(
+            serviceType = "Cleaning",
+            startTime = 1622520000000L,
+            endTime = 1622523600000L,
+            workerQuantity = 2,
+            price = 1500000.0,
+            isWeek = false,
+            dayOfWeek = 3,
+            createdAt = 1622516400000L,
+            status = "Pending"
+        )
+    )
+    JobDetailCard(job)
 }

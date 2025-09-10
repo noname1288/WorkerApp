@@ -1,6 +1,5 @@
 package com.example.workerapp.view.profile.components
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
@@ -12,6 +11,7 @@ import androidx.compose.material.icons.filled.Face
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -20,16 +20,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.workerapp.R
 
 @Composable
 fun CustomExtendedButton(
     modifier: Modifier = Modifier,
     label: String,
-    fontSize: TextUnit = 14.sp,
     leadingIcon: ImageVector = Icons.Default.Face,
     trailingIcon: ImageVector = Icons.Default.ArrowForwardIos,
     onClick: () -> Unit
@@ -37,22 +34,23 @@ fun CustomExtendedButton(
     Button(
         onClick = { onClick() },
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color.White,
-
-            ),
-        shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(1.dp, Color.LightGray),
-        contentPadding = PaddingValues(24.dp, 12.dp)
+            containerColor = Color.White
+        ),
+        shape = RoundedCornerShape(0.dp),
+        contentPadding = PaddingValues(16.dp, 20.dp)
     ) {
-        Icon(leadingIcon,
+        Icon(
+            leadingIcon,
             null,
-            tint = colorResource(R.color.light_orange_icon),
-            modifier = Modifier.size(22 .dp))
+            tint = colorResource(R.color.color_icon),
+            modifier = Modifier.size(24.dp)
+        )
 
-        Spacer(Modifier.width(20.dp))
+        Spacer(Modifier.width(16.dp))
 
         Text(
-            label, color = Color.Black, fontSize = fontSize,
+            label, color = Color.Black,
+            style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Normal
         )
 

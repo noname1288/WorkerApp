@@ -28,7 +28,6 @@ fun JobWorkflow(onClick: () -> Unit) {
     Row(
         Modifier
             .height(48.dp)
-            .padding(horizontal = 8.dp)
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .background(colorResource(R.color.light_gray))

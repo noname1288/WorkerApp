@@ -1,36 +1,61 @@
 package com.example.workerapp.view.income
 
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForwardIos
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PrimaryTabRow
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.workerapp.R
 import com.example.workerapp.data.model.TransactionModel
-import com.example.workerapp.utils.TimeUtils
 
 sealed class IncomeSection {
-    object SwitchText : IncomeSection()
     object Turnover : IncomeSection()
     data class TransactionHistory(val transaction: List<TransactionModel>) : IncomeSection()
 }
 
+enum class IncomeDestinationType() {
+    Today, Week, Month
+}
+
+data class IncomeTabDestination(
+    val label: String,
+    val type: IncomeDestinationType
+)
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IncomeScreen(modifier: Modifier = Modifier) {
     val transactionHistory = listOf(
@@ -47,92 +72,144 @@ fun IncomeScreen(modifier: Modifier = Modifier) {
     )
 
     val incomeSection = listOf(
-        IncomeSection.SwitchText,
         IncomeSection.Turnover,
         IncomeSection.TransactionHistory(transactionHistory)
     )
 
+    val tabDestinations = listOf(
+        IncomeTabDestination("Hôm nay", IncomeDestinationType.Today),
+        IncomeTabDestination("Tuần", IncomeDestinationType.Week),
+        IncomeTabDestination("Tháng", IncomeDestinationType.Month)
+    )
+
+    var selectedDestination by rememberSaveable { mutableIntStateOf(0) }
+
     LazyColumn(
         modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp)
     ) {
         item {
-            Spacer(Modifier.height(24.dp))
+            //Top App Bar
+            CenterAlignedTopAppBar(
+                title = { Text("Thu nhập", fontWeight = FontWeight.Bold) },
+                windowInsets = WindowInsets(0, 0, 0, 0),
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
+            )
+            HorizontalDivider()
         }
 
+        item {
+            // Tabs
+            PrimaryTabRow(
+                selectedTabIndex = selectedDestination,
+                containerColor = Color.White,
+                indicator = {
+                    TabRowDefaults.PrimaryIndicator(
+                        modifier = Modifier.tabIndicatorOffset(
+                            selectedDestination,
+                            matchContentSize = true
+                        ),
+                        color = colorResource(R.color.orange_primary),
+                        width = Dp.Unspecified
+                    )
+                }
+            ) {
+                tabDestinations.forEachIndexed { index, destination ->
+                    val isSelected = selectedDestination == index
+                    Tab(
+                        selected = isSelected,
+                        onClick = { selectedDestination = index },
+                        text = {
+                            Text(
+                                destination.label,
+                                maxLines = 1,
+                                color = if (isSelected) Color.Black else colorResource(R.color.subtext)
+                            )
+                        },
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(12.dp))
+        }
+
+        // Content
         incomeSection.forEach { section ->
             when (section) {
-                is IncomeSection.SwitchText -> item {
-                    SwitchTextAnimation()
-                    Spacer(Modifier.height(24.dp))
-                }
-
                 is IncomeSection.Turnover -> item {
                     Turnover()
-                    Spacer(Modifier.height(24.dp))
                 }
 
                 is IncomeSection.TransactionHistory -> item {
-                    TransactionItem(section.transaction)
+                    Text(
+                        "Lịch sử",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = colorResource(R.color.subtext)
+                        ),
+                        modifier = Modifier.padding(16.dp)
+                    )
+                    TransactionList(section.transaction)
                     Spacer(Modifier.height(32.dp))
                 }
             }
         }
     }
 }
-
 @Composable
-fun SwitchTextAnimation(modifier: Modifier = Modifier) {
-
-}
-
-@Composable
-fun Turnover(modifier: Modifier = Modifier) {
-    Text(
-        "255.000 $",
-        modifier.fillMaxWidth(),
-        textAlign = TextAlign.Center,
-        fontSize = 24.sp,
-        color = Color.Black, maxLines = 1
-    )
-}
-
-@Composable
-fun TransactionItem(items: List<TransactionModel> = emptyList()) {
-
-
-    Column() {
+fun Turnover(modifier: Modifier = Modifier, content: String = "255.000.609 đ") {
+    Box(
+        Modifier
+            .height(100.dp)
+            .fillMaxWidth()
+            .background(colorResource(R.color.light_orange)),
+        contentAlignment = Alignment.Center
+    ) {
         Text(
-            stringResource(R.string.history_title),
-            fontSize = 18.sp,
-            color = Color.Black,
-            fontWeight = FontWeight.W500
+            content,
+            style = MaterialTheme.typography.headlineMedium.copy(
+                color = colorResource(R.color.blue),
+                fontWeight = FontWeight.Bold
+            )
         )
-        Spacer(Modifier.height(8.dp))
-        items.forEach { item ->
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 4.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(item.id, fontSize = 14.sp, modifier = Modifier.weight(0.15f))
-                Text(TimeUtils.formatDateTimeFull(item.date), fontSize = 14.sp)
-                Spacer(Modifier.width(16.dp))
-                Text(
-                    item.amount.toString(),
-                    fontSize = 14.sp,
-                    modifier = Modifier.weight(1f),
-                    color = if (item.amount < 0) Color.Red else Color(0xFF4CAF50),
-                    maxLines = 1,
-                    textAlign = TextAlign.End
-                )
-            }
-        }
     }
 
+}
+
+@Composable
+fun TransactionList(items: List<TransactionModel> = emptyList()) {
+    Column(Modifier.background(Color.White)) {
+        Spacer(Modifier.height(8.dp))
+        items.forEach { item ->
+            TransactionItem()
+        }
+    }
+}
+
+@Composable
+fun TransactionItem() {
+    Column {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("21:30, 30/04/2022",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.weight(1f))
+            Text("150.000 đ",
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = colorResource(R.color.subtext)
+                ))
+            IconButton(
+                onClick = {}
+            ) { Icon(Icons.Default.ArrowForwardIos, null, tint = colorResource(R.color.color_icon),
+                modifier = Modifier.size(16.dp)) }
+        }
+        HorizontalDivider()
+    }
 }
 
 @Preview(showBackground = true)

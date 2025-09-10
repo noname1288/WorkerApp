@@ -1,4 +1,4 @@
-package com.example.workerapp.view.detail.components
+package com.example.workerapp.utils.button
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -8,7 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.workerapp.R
 
@@ -30,10 +29,4 @@ fun FilledRoundedButton(
     ) {
         Text(label)
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PrevFilledRoundedButton(modifier: Modifier = Modifier) {
-    FilledRoundedButton(onClick = {})
 }

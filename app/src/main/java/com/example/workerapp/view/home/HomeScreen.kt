@@ -2,10 +2,8 @@ package com.example.workerapp.view.home
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,22 +16,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Call
-import androidx.compose.material.icons.filled.Group
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.Call
-import androidx.compose.material.icons.outlined.Group
-import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -43,8 +25,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -52,20 +32,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
-import coil.decode.SvgDecoder
-import coil.request.ImageRequest
 import com.example.workerapp.R
 import com.example.workerapp.data.repository.remote.dto.JobResponseDto
 import com.example.workerapp.navigation.AppRoutes
-import com.example.workerapp.utils.TimeUtils
+import com.example.workerapp.view.home.components.JobCard
+import com.example.workerapp.view.home.components.SearchOutlinedTextField
 
 /**
  * Sealed class representing different sections of the Home screen
@@ -73,7 +48,6 @@ import com.example.workerapp.utils.TimeUtils
 sealed class HomeSection {
     object Avatar : HomeSection()
     object Search : HomeSection()
-    object Category : HomeSection()
     data class JobList(val jobs: List<JobResponseDto>) : HomeSection()
 }
 
@@ -91,7 +65,7 @@ fun HomeScreen(modifier: Modifier = Modifier, navController: NavController) {
             phoneNumber = "1234567890",
             address = "123 Main St, Cityville",
             workerQuantity = 5,
-            serviceType = "Cleaning",
+            serviceType = "CLEANING",
             startTime = currentTime + 3600000, // 1 hour from now
             endTime = currentTime + 5400000, // 1.5 hours from now
             price = 150.000
@@ -102,7 +76,7 @@ fun HomeScreen(modifier: Modifier = Modifier, navController: NavController) {
             phoneNumber = "9876543210",
             address = "456 Elm St, Townsville",
             workerQuantity = 3,
-            serviceType = "Plumbing",
+            serviceType = "CLEANING",
             startTime = currentTime + 10800000, // 3 hours from now
             endTime = currentTime + 14400000, // 4 hours from now
             price = 200.000
@@ -113,7 +87,7 @@ fun HomeScreen(modifier: Modifier = Modifier, navController: NavController) {
             phoneNumber = "5551234567",
             address = "789 Oak St, Villagetown",
             workerQuantity = 2,
-            serviceType = "Electrical",
+            serviceType = "CLEANING",
             startTime = currentTime + 18000000, // 5 hours from now
             endTime = currentTime + 21600000, // 6 hours from now
             price = 180.000
@@ -124,7 +98,7 @@ fun HomeScreen(modifier: Modifier = Modifier, navController: NavController) {
             phoneNumber = "4449876543",
             address = "321 Pine St, Hamlet",
             workerQuantity = 4,
-            serviceType = "Painting",
+            serviceType = "HEALTHCARE",
             startTime = currentTime + 25200000, // 7 hours from now
             endTime = currentTime + 86400000, // 1 day from now
             price = 250.000
@@ -135,7 +109,7 @@ fun HomeScreen(modifier: Modifier = Modifier, navController: NavController) {
             phoneNumber = "3336547890",
             address = "654 Maple St, Metropolis",
             workerQuantity = 6,
-            serviceType = "Landscaping",
+            serviceType = "HEALTHCARE",
             startTime = currentTime + 43200000, // 12 hours from now
             endTime = currentTime + 129600000, // 1.5 days from now
             price = 300.000
@@ -146,7 +120,7 @@ fun HomeScreen(modifier: Modifier = Modifier, navController: NavController) {
             phoneNumber = "2227894561",
             address = "987 Birch St, Capital City",
             workerQuantity = 1,
-            serviceType = "Carpentry",
+            serviceType = "HEALTHCARE",
             startTime = currentTime + 72000000, // 20 hours from now
             endTime = currentTime + 172800000, // 2 days from now
             price = 120.000
@@ -157,7 +131,7 @@ fun HomeScreen(modifier: Modifier = Modifier, navController: NavController) {
             phoneNumber = "1114567892",
             address = "159 Cedar St, Urbania",
             workerQuantity = 3,
-            serviceType = "Moving",
+            serviceType = "HEALTHCARE",
             startTime = currentTime + 90000000, // 25 hours from now
             endTime = currentTime + 259200000, // 3 days from now
             price = 220.000
@@ -169,7 +143,7 @@ fun HomeScreen(modifier: Modifier = Modifier, navController: NavController) {
             phoneNumber = "6661237894",
             address = "753 Spruce St, Suburbia",
             workerQuantity = 2,
-            serviceType = "Repair",
+            serviceType = "MAINTENANCE",
             startTime = currentTime - 3600000, // 1 hour ago
             endTime = currentTime, // Now
             price = 140.000
@@ -181,7 +155,7 @@ fun HomeScreen(modifier: Modifier = Modifier, navController: NavController) {
             phoneNumber = "7779871234",
             address = "852 Willow St, Countryside",
             workerQuantity = 4,
-            serviceType = "Installation",
+            serviceType = "MAINTENANCE",
             startTime = currentTime - 36000000, // 10 hours ago
             endTime = currentTime - 32400000, // 9 hours ago
             price = 260.000
@@ -192,7 +166,7 @@ fun HomeScreen(modifier: Modifier = Modifier, navController: NavController) {
             phoneNumber = "8886543219",
             address = "951 Aspen St, Downtown",
             workerQuantity = 5,
-            serviceType = "Maintenance",
+            serviceType = "MAINTENANCE",
             startTime = currentTime - 43200000, // 12 hours ago
             endTime = currentTime - 39600000, // 11 hours ago
             price = 280.0
@@ -202,14 +176,13 @@ fun HomeScreen(modifier: Modifier = Modifier, navController: NavController) {
     val homeSections = listOf(
         HomeSection.Avatar,
         HomeSection.Search,
-        HomeSection.Category,
         HomeSection.JobList(mockJobResponseList)
     )
 
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(horizontal = 16.dp, vertical = 16.dp)
     ) {
         item {
             Spacer(Modifier.height(8.dp))
@@ -227,11 +200,6 @@ fun HomeScreen(modifier: Modifier = Modifier, navController: NavController) {
                     is HomeSection.Search -> {
                         SearchRow()
                         Spacer(Modifier.height(24.dp))
-                    }
-
-                    is HomeSection.Category -> {
-                        CustomCategoryListRow()
-                        Spacer(Modifier.height(16.dp))
                     }
 
                     is HomeSection.JobList -> {
@@ -259,9 +227,9 @@ fun JobListSection(jobs: List<JobResponseDto>, onClickItem: (String) -> Unit) {
         Spacer(Modifier.height(16.dp))
 
         jobs.forEachIndexed { index, job ->
-            ServiceItemCard(job) {
+            JobCard(job) {
                 onClickItem(index.toString())
-                Toast.makeText(context, "Click job id: $it", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Click job id: ", Toast.LENGTH_SHORT).show()
             }
             if (index < jobs.size - 1) {
                 Spacer(Modifier.height(12.dp))
@@ -270,142 +238,6 @@ fun JobListSection(jobs: List<JobResponseDto>, onClickItem: (String) -> Unit) {
         }
     }
 }
-
-@Composable
-fun ServiceItemCard(job: JobResponseDto, onClick: (String) -> Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                onClick(job.id)
-            },
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        ),
-        elevation = CardDefaults.cardElevation(3.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            /* *
-            * Date - countdown
-            * */
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(24.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = TimeUtils.formatDateTimeFull(job.endTime),
-                    fontSize = 12.sp,
-                    color = Color.DarkGray
-                )
-                Text(
-                    text = "[${TimeUtils.timeRemainingText(job.endTime)}]",
-                    fontStyle = FontStyle.Italic,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 12.sp,
-                    color = colorResource(R.color.orange)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            /* *
-            * Category title and address
-            * */
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                /* *
-                * Service type box
-                * */
-                Box(
-                    modifier = Modifier
-                        .border(
-                            width = 1.dp,
-                            colorResource(R.color.orange),
-                            RoundedCornerShape(16.dp)
-                        )
-                        .padding(horizontal = 12.dp, vertical = 4.dp)
-                ) {
-                    Text(
-                        text = job.serviceType,
-                        fontSize = 12.sp,
-                        color = colorResource(R.color.orange),
-                    )
-                }
-
-                Spacer(Modifier.width(16.dp))
-
-                /* *
-                * Address
-                * */
-                Text(
-                    text = job.address,
-                    fontSize = 14.sp,
-                    maxLines = 1,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    textAlign = TextAlign.End
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            /* *
-            * Price
-            * */
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Bottom
-
-            ) {
-                /* *
-                * Customer info
-                * */
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    InfoRow(icon = Icons.Outlined.Person, text = job.clientName)
-                    InfoRow(icon = Icons.Outlined.Call, text = job.phoneNumber)
-                    InfoRow(
-                        icon = Icons.Outlined.Group,
-                        text = "Số lượng: " + job.workerQuantity.toString()
-                    )
-                }
-
-                Text(
-                    text = "${job.price} VND",
-                    color = colorResource(R.color.orange_text ),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun InfoRow(icon: ImageVector, text: String) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = Color(0xFFFF6F00),
-            modifier = Modifier.size(18.dp)
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(text = text, fontSize = 14.sp)
-    }
-}
-
 
 @Composable
 fun CustomCategoryListRow() {
@@ -485,35 +317,10 @@ fun SearchRow() {
 
     var searchInput by remember { mutableStateOf("") }
 
-    OutlinedTextField(
+    SearchOutlinedTextField(
         value = searchInput,
-        onValueChange = { searchInput = it },
-        shape = RoundedCornerShape(16.dp),
-        placeholder = {
-            Text(
-                stringResource(R.string.search_hint),
-                fontSize = 14.sp,
-                color = lightGray
-            )
-        },
-        trailingIcon = {
-            IconButton(
-                onClick = {
-                    Toast.makeText(context, "search button", Toast.LENGTH_LONG).show()
-                }
-            ) { Icon(Icons.Default.Search, null) }
-        },
-        colors = OutlinedTextFieldDefaults.colors(
-            unfocusedTextColor = lightGray,
-            focusedBorderColor = Color.Black
-        ),
-        singleLine = true,
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Text,
-            imeAction = ImeAction.Done
-        ),
-        modifier = Modifier
-            .fillMaxWidth()
+        onValueChange = {searchInput = it},
+        placeholder = "Tìm kiếm công việc...",
     )
 }
 
@@ -539,9 +346,11 @@ fun CustomAvatarRow(modifier: Modifier = Modifier) {
             fontWeight = FontWeight.SemiBold, fontSize = 20.sp
         )
         Spacer(Modifier.weight(1f))
-        IconButton(
-            onClick = {}
-        ) { Icon(Icons.Default.Notifications, null, tint = colorResource(R.color.orange)) }
+        Image(
+            painterResource(R.drawable.ic_bell_2),
+            null,
+            modifier = Modifier.size(24.dp)
+        )
 
     }
 }

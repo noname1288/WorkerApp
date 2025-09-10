@@ -82,7 +82,7 @@ fun LoginScreen(
             style = TextStyle(
                 fontSize = 25.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = colorResource(R.color.orange)
+                color = colorResource(R.color.orange_primary)
             )
         )
         Spacer(Modifier.height(8.dp))
@@ -90,7 +90,7 @@ fun LoginScreen(
             text = stringResource(R.string.login_body),
             style = TextStyle(
                 fontSize = 12.sp,
-                color = colorResource(R.color.orange),
+                color = colorResource(R.color.orange_primary),
                 fontStyle = FontStyle.Italic
             ),
             modifier = Modifier.padding(top = 4.dp)
@@ -125,7 +125,7 @@ fun LoginScreen(
             },
             shape = RoundedCornerShape(10.dp),
             colors = ButtonColors(
-                containerColor = colorResource(R.color.orange),
+                containerColor = colorResource(R.color.orange_primary),
                 contentColor = Color.White,
                 disabledContainerColor = colorResource(R.color.light_gray),
                 disabledContentColor = Color.White
@@ -242,7 +242,7 @@ fun CustomEditTextField(
         shape = RoundedCornerShape(10.dp),
         colors = OutlinedTextFieldDefaults.colors(
             unfocusedTextColor = Color.Gray,
-            focusedBorderColor = colorResource(R.color.orange)
+            focusedBorderColor = colorResource(R.color.orange_primary)
         ),
 
         modifier = Modifier

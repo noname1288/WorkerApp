@@ -17,7 +17,7 @@
     <string name="job_detail_title">Chi tiết công việc</string>
     <string name="user_info_title">Thông tin khách hàng</string>
     <string name="job_detail_title_2">Thông tin công việc</string>
-    <string name="weekly_title">"Lặp lại trong tuần: "</string>
+    <string name="weekly_title">"Lặp lại trong tuần "</string>
     <string name="good_job">GOOD JOB</string>
     <string name="edit_profile_title">Chỉnh sửa hồ sơ</string>
     <string name="job_history_title">Lịch sử công việc</string>
@@ -25,5 +25,7 @@
     <string name="support_title">Trợ giúp</string>
     <string name="setting_title">"Cài đặt "</string>
     <string name="logout_title">Đăng xuất</string>
+    <string name="calendar_title">Lịch làm</string>
+    <string name="detail_information">Chi tiết</string>
 </resources>
 

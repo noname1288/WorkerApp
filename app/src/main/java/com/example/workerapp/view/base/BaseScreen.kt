@@ -1,29 +1,22 @@
 package com.example.workerapp.view.base
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Notifications
-import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.outlined.WorkOutline
-import androidx.compose.material.icons.rounded.Home
-import androidx.compose.material.icons.rounded.Notifications
-import androidx.compose.material.icons.rounded.Person
-import androidx.compose.material.icons.rounded.Work
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
@@ -33,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -50,20 +44,21 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 @Composable
 fun BaseScreen() {
     val context = LocalContext.current
-    val startDestination = AppRoutes.PROFILE
+    val startDestination = AppRoutes.HEALTHCARE_DETAIL
+
     val showBottomBar = listOf(
         AppRoutes.HOME,
+        AppRoutes.CALENDAR,
         AppRoutes.INCOME,
         AppRoutes.NOTIFICATION,
         AppRoutes.PROFILE
     )
-    val showTopAppBar = emptyList<String>()
 
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    val authViewModel: AuthViewModel = viewModel ()
+    val authViewModel: AuthViewModel = viewModel()
 
     val systemUiController = rememberSystemUiController()
     val useDarkIcons = true // vì nền trắng nên dùng icon tối
@@ -76,12 +71,6 @@ fun BaseScreen() {
     }
 
     Scaffold(
-        topBar = {
-             val isShowTopAppBar = currentRoute != null && showTopAppBar.contains(currentRoute)
-            if (isShowTopAppBar) {
-
-            }
-        },
         bottomBar = {
             val isShowBottomBar = currentRoute != null && showBottomBar.contains(currentRoute)
             if (isShowBottomBar)
@@ -92,10 +81,7 @@ fun BaseScreen() {
                     }
                 )
         },
-        floatingActionButton = {
-
-        },
-        containerColor = Color.White
+        containerColor = colorResource(R.color.bg_gray)
     ) { innerPadding ->
         AppNavHost(
             Modifier.padding(innerPadding),
@@ -114,85 +100,98 @@ fun CustomNavigationBar(
     val navItemList = listOf<NavItem>(
         NavItem(
             stringResource(R.string.home_title),
-            Icons.Rounded.Home,
-            Icons.Outlined.Home,
+            R.drawable.ic_filled_home,
+            R.drawable.ic_home,
             true,
             0,
             AppRoutes.HOME
         ),
         NavItem(
+            stringResource(R.string.calendar_title),
+            R.drawable.ic_filled_calendar,
+            R.drawable.ic_calendar,
+            false,
+            0,
+            AppRoutes.CALENDAR
+        ),
+        NavItem(
             stringResource(R.string.income_title),
-            Icons.Rounded.Work,
-            Icons.Outlined.WorkOutline,
+            R.drawable.ic_filled_money,
+            R.drawable.ic_money,
             false,
             0,
             AppRoutes.INCOME
         ),
         NavItem(
             stringResource(R.string.notification_title),
-            Icons.Rounded.Notifications,
-            Icons.Outlined.Notifications,
+            R.drawable.ic_filled_notification,
+            R.drawable.ic_notification,
             false,
             2,
             AppRoutes.NOTIFICATION
         ),
         NavItem(
             stringResource(R.string.profile_title),
-            Icons.Rounded.Person,
-            Icons.Outlined.Person,
+            R.drawable.ic_filled_person,
+            R.drawable.ic_person,
             false,
             0,
             AppRoutes.PROFILE
         ),
     )
 
-    Surface(
-        shape = RoundedCornerShape(topEnd = 20.dp, topStart = 20.dp),
-        shadowElevation = 12.dp,
-        color = Color.White
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White)
+            .padding(bottom = 16.dp, top = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            navItemList.forEach { item ->
-                val isSelected = item.route == selectedRoute
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .padding(4.dp)
-                        .clickable {
-                            onItemSelected(item.route)
-                        }
-                ) {
-                    BadgedBox(
-                        badge = {
-                            if (item.badgeCount != 0) {
-                                Badge { Text(item.badgeCount.toString()) }
-                            } else if (item.hasNews) {
-                                Badge()
-                            }
-                        }
-                    ) {
-                        Icon(
-                            imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
-                            tint = colorResource(R.color.orange),
-                            contentDescription = null
-                        )
+        navItemList.forEach { item ->
+            val isSelected = item.route == selectedRoute
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .padding(4.dp)
+                    .clickable {
+                        onItemSelected(item.route)
                     }
-                    Spacer(Modifier.height(2.dp))
-                    Text(
-                        item.label, fontSize = 12.sp,
-                        maxLines = 1,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.width(70.dp),
-                    )
+            ) {
+                BadgedBox(
+                    badge = {
+                        if (item.badgeCount != 0) {
+                            Badge { Text(item.badgeCount.toString()) }
+                        } else if (item.hasNews) {
+                            Badge()
+                        }
+                    }
+                ) {
+                    Icon(
+                        painter = if (isSelected) painterResource(item.selectedIcon) else painterResource(
+                            item.unselectedIcon
+                        ),
+                        contentDescription = null,
+                        tint = if (isSelected) colorResource(R.color.orange_primary) else colorResource(
+                            R.color.gray
+                        ),
+                        modifier = Modifier.height(24.dp),
+
+                        )
                 }
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    item.label, fontSize = 12.sp,
+                    color = if (isSelected) colorResource(R.color.orange_primary) else colorResource(
+                        R.color.gray
+                    ),
+                    maxLines = 1,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.width(65.dp),
+                )
             }
         }
     }
+
 }
 

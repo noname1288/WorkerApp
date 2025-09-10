@@ -10,4 +10,5 @@ data class JobResponseDto(
     val startTime: Long,
     val endTime: Long,
     val price: Double,
+    val isWeekly: Boolean = true
 )

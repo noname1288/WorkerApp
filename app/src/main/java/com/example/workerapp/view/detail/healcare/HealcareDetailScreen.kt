@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import com.example.workerapp.R
 import com.example.workerapp.data.model.HealthcareJobModel
 import com.example.workerapp.data.model.base.UserModel
-import com.example.workerapp.view.detail.components.ActionButtons
 import com.example.workerapp.view.detail.components.WeeklySchedule
 import com.example.workerapp.view.detail.components.JobWorkflow
 import com.example.workerapp.view.detail.components.ClientCard
@@ -106,7 +105,6 @@ fun HealthcareDetailScreen(modifier: Modifier = Modifier) {
                     }
                     is HealthcareJobSection.ActionButtons -> {
                         item {
-                            ActionButtons()
                             Spacer(Modifier.height(32.dp))
                         }
                     }

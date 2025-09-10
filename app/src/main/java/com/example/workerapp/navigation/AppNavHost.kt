@@ -5,6 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.workerapp.view.calendar.CalendarScreen
 import com.example.workerapp.view.detail.cleaning.CleaningDetailScreen
 import com.example.workerapp.view.detail.healcare.HealthcareDetailScreen
 import com.example.workerapp.view.home.HomeScreen
@@ -32,6 +33,9 @@ fun AppNavHost(
 
         composable(AppRoutes.HOME) {
             HomeScreen(navController = navHostController)
+        }
+        composable(AppRoutes.CALENDAR) {
+            CalendarScreen(navController = navHostController)
         }
         composable(AppRoutes.INCOME) {
             IncomeScreen()

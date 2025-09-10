@@ -1,26 +1,29 @@
 package com.example.workerapp.view.detail.cleaning
 
+import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -29,9 +32,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,12 +45,12 @@ import com.example.workerapp.data.model.CleaningJobModel
 import com.example.workerapp.data.model.CleaningServiceModel
 import com.example.workerapp.data.model.base.JobModel
 import com.example.workerapp.data.model.base.UserModel
-import com.example.workerapp.view.detail.components.ActionButtons
+import com.example.workerapp.utils.button.SlideToConfirmButton
+import com.example.workerapp.view.detail.components.ClientCard
 import com.example.workerapp.view.detail.components.JobDetailCard
 import com.example.workerapp.view.detail.components.JobServiceBottomSheet
-import com.example.workerapp.view.detail.components.WeeklySchedule
 import com.example.workerapp.view.detail.components.JobWorkflow
-import com.example.workerapp.view.detail.components.ClientCard
+import com.example.workerapp.view.detail.components.WeeklySchedule
 
 sealed class CleaningJobSection {
     data class UserInfo(val user: UserModel) : CleaningJobSection()
@@ -59,6 +64,8 @@ sealed class CleaningJobSection {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CleaningDetailScreen() {
+    val TAG = "CleaningDetailScreen"
+
     val fakeUser = UserModel(
         username = "Phạm Thanh Sơn",
         gender = "Male",
@@ -112,9 +119,6 @@ fun CleaningDetailScreen() {
         )
     )
 
-
-    var isShowBottomSheet by remember { mutableStateOf(false) }
-
     val sections = listOf(
         CleaningJobSection.UserInfo(fakeUser),
         CleaningJobSection.JobDetails(fakeCleaningJob),
@@ -124,17 +128,35 @@ fun CleaningDetailScreen() {
         CleaningJobSection.ActionButtons
     )
 
+    var isShowBottomSheet by remember { mutableStateOf(false) }
+    var isConfirmed by remember { mutableStateOf(false) }
+
+
+    if (isShowBottomSheet) {
+        JobServiceBottomSheet(
+            items = fakeRoomCleaningServices,
+            onDismiss = { isShowBottomSheet = false }
+        )
+    }
+
     Column(Modifier.fillMaxSize()) {
-        TopAppBar(
-            title = { Text("Chi tiết công việc") },
+        CenterAlignedTopAppBar(
+            title = {
+                Text(
+                    stringResource(R.string.job_detail_title),
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            windowInsets = WindowInsets(0, 0, 0, 0),
             navigationIcon = {
                 IconButton(onClick = {}) {
-                    Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back")
+                    Icon(
+                        Icons.Default.ArrowBackIosNew, contentDescription = "Back",
+                        modifier = Modifier.size(20.dp)
+                    )
                 }
             },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = colorResource(R.color.light_orange)
-            )
+            colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
         )
         LazyColumn(
             Modifier
@@ -149,28 +171,28 @@ fun CleaningDetailScreen() {
                     is CleaningJobSection.UserInfo -> {
                         item {
                             ClientCard(user = section.user)
-                            Spacer(Modifier.height(24.dp))
+                            Spacer(Modifier.height(12.dp))
                         }
                     }
 
                     is CleaningJobSection.JobDetails -> {
                         item {
                             JobDetailCard(cleaningJob = section.job)
-                            Spacer(Modifier.height(24.dp))
+                            Spacer(Modifier.height(12.dp))
                         }
                     }
 
                     is CleaningJobSection.WeeklySchedule -> {
                         item {
                             WeeklySchedule(section.days)
-                            Spacer(Modifier.height(48.dp))
+                            Spacer(Modifier.height(12.dp))
                         }
                     }
 
                     is CleaningJobSection.AdditionalJob -> {
                         item {
-                            CustomAdditionalJob(section.isCooking, section.isIroning)
-                            Spacer(Modifier.height(64.dp))
+                            AdditionalJob(section.isCooking, section.isIroning)
+                            Spacer(Modifier.height(12.dp))
 
                         }
                     }
@@ -184,19 +206,14 @@ fun CleaningDetailScreen() {
 
                     is CleaningJobSection.ActionButtons -> {
                         item {
-                            ActionButtons()
-                            Spacer(Modifier.height(32.dp))
+                            SlideToConfirmButton(
+                                onConfirmed = {
+                                    Log.d(TAG, "CleaningDetailScreen: Confirmed")
+                                },
+                            )
+                            Spacer(Modifier.height(24.dp))
                         }
                     }
-                }
-            }
-
-            item {
-                if (isShowBottomSheet) {
-                    JobServiceBottomSheet(
-                        items = fakeRoomCleaningServices,
-                        onDismiss = { isShowBottomSheet = false }
-                    )
                 }
             }
         }
@@ -205,47 +222,59 @@ fun CleaningDetailScreen() {
 }
 
 @Composable
-fun CustomAdditionalJob(isCooking: Boolean = true, isIroning: Boolean = true) {
+fun AdditionalJob(isCooking: Boolean = true, isIroning: Boolean = true) {
     Row(
         Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally),
     ) {
         if (isCooking) {
-            Box(
-                Modifier
-                    .size(108.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(colorResource(R.color.light_gray)),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Image(
-                        painterResource(R.drawable.ic_cooking), null,
-                        modifier = Modifier.size(48.dp)
-                    )
-                    Spacer(Modifier.height(12.dp))
-                    Text("Nấu ăn: 1 giờ", fontSize = 12.sp)
-                }
-            }
+            AdditionalJobItem(
+                Modifier.weight(1f),
+                icon = R.drawable.ic_cooking,
+                title = "Nấu ăn: 1 giờ"
+            )
         }
 
         if (isIroning) {
-            Box(
-                Modifier
-                    .size(108.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(colorResource(R.color.light_gray)),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Image(
-                        painterResource(R.drawable.ic_iron), null,
-                        modifier = Modifier.size(48.dp)
-                    )
-                    Spacer(Modifier.height(12.dp))
-                    Text("Ủi đồ: 1 giờ", fontSize = 12.sp)
-                }
-            }
+            AdditionalJobItem(
+                Modifier.weight(1f),
+                icon = R.drawable.ic_iron,
+                title = "Ủi đồ: 1 giờ"
+            )
+        }
+    }
+}
+
+@Composable
+fun AdditionalJobItem(modifier: Modifier = Modifier, icon: Int, title: String) {
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        ),
+        border = BorderStroke(1.dp, colorResource(R.color.light_gray)),
+        elevation = CardDefaults.cardElevation(3.dp),
+        modifier = modifier
+
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Image(
+                painterResource(icon),
+                null,
+                modifier = Modifier.size(48.dp)
+            )
+            Spacer(Modifier.height(12.dp))
+            Text(
+                title, fontSize = 12.sp,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                )
+            )
         }
     }
 }
@@ -282,4 +311,6 @@ fun PrevJobDetail1(modifier: Modifier = Modifier) {
             status = "Pending"
         )
     )
+
+    CleaningDetailScreen()
 }
