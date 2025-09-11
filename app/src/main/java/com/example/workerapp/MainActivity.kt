@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.example.workerapp.ui.theme.WorkerAppTheme
-import com.example.workerapp.view.base.BaseScreen
+import com.example.workerapp.ui.base.BaseScreen
 
 
 class MainActivity : ComponentActivity() {

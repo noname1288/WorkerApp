@@ -5,15 +5,15 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.workerapp.view.calendar.CalendarScreen
-import com.example.workerapp.view.detail.cleaning.CleaningDetailScreen
-import com.example.workerapp.view.detail.healcare.HealthcareDetailScreen
-import com.example.workerapp.view.home.HomeScreen
-import com.example.workerapp.view.income.IncomeScreen
-import com.example.workerapp.view.login.LoginScreen
-import com.example.workerapp.view.login.AuthViewModel
-import com.example.workerapp.view.notification.NotificationScreen
-import com.example.workerapp.view.profile.ProfileScreen
+import com.example.workerapp.ui.calendar.CalendarScreen
+import com.example.workerapp.ui.detail.cleaning.CleaningDetailScreen
+import com.example.workerapp.ui.detail.healcare.HealthcareDetailScreen
+import com.example.workerapp.ui.home.HomeScreen
+import com.example.workerapp.ui.income.IncomeScreen
+import com.example.workerapp.ui.login.LoginScreen
+import com.example.workerapp.ui.login.AuthViewModel
+import com.example.workerapp.ui.notification.NotificationScreen
+import com.example.workerapp.ui.profile.ProfileScreen
 
 @Composable
 fun AppNavHost(
