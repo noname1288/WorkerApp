@@ -1,4 +1,4 @@
-package com.example.workerapp.data.repository.remote.dto
+package com.example.workerapp.data.repository.remote.dto.response
 
 data class JobResponseDto(
     val id: String,

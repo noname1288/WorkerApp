@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.gms.google.services)
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -41,6 +42,18 @@ android {
 }
 
 dependencies {
+    // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    // https://mvnrepository.com/artifact/com.squareup.okhttp3/logging-interceptor
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    // https://mvnrepository.com/artifact/com.squareup.retrofit2/retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-moshi:2.11.0")
+
+    // Moshi
+    implementation("com.squareup.moshi:moshi:1.15.0")
+    ksp("com.squareup.moshi:moshi-kotlin-codegen:1.15.0")
+
     // https://mvnrepository.com/artifact/com.google.accompanist/accompanist-systemuicontroller
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.36.0")
     //material-icons-extended
@@ -58,6 +71,8 @@ dependencies {
     //navigation
     val nav_version = "2.9.3"
     implementation("androidx.navigation:navigation-compose:$nav_version")
+
+    ksp("androidx.room:room-compiler:2.5.0")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

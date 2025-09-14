@@ -85,12 +85,12 @@ fun InformationDialog(
                 InformationItem("Thời gian kết thúc", "12:00")
             }
         },
-        containerColor = Color.White
+        containerColor = Color.White,
     )
 }
 
 @Composable
-fun InformationItem(label: String, value: String) {
+fun InformationItem(label: String, value: String, isImportant: Boolean = false) {
     Column {
         Spacer(Modifier.height(8.dp))
         Row(
@@ -108,7 +108,10 @@ fun InformationItem(label: String, value: String) {
             Text(
                 value,
                 style = MaterialTheme.typography.bodyMedium.copy(
-                    color = colorResource(R.color.subtext)
+                    color = if (isImportant) colorResource(R.color.orange_primary) else colorResource(
+                        R.color.subtext
+                    ),
+                    fontWeight = if (isImportant) FontWeight.Bold else FontWeight.Normal
                 ),
                 maxLines = 2,
                 modifier = Modifier.weight(1f),

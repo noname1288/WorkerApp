@@ -35,13 +35,13 @@ import com.example.workerapp.R
 import com.example.workerapp.navigation.AppNavHost
 import com.example.workerapp.navigation.AppRoutes
 import com.example.workerapp.navigation.NavItem
-import com.example.workerapp.ui.login.AuthViewModel
+import com.example.workerapp.ui.authen.AuthViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
 fun BaseScreen() {
     val context = LocalContext.current
-    val startDestination = AppRoutes.HEALTHCARE_DETAIL
+    val startDestination = AppRoutes.LOGIN
 
     val showBottomBar = listOf(
         AppRoutes.HOME,

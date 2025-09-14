@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.workerapp.R
-import com.example.workerapp.data.repository.remote.dto.JobResponseDto
+import com.example.workerapp.data.repository.remote.dto.response.JobResponseDto
 import com.example.workerapp.navigation.AppRoutes
 import com.example.workerapp.ui.home.components.JobCard
 import com.example.workerapp.ui.home.components.SearchOutlinedTextField

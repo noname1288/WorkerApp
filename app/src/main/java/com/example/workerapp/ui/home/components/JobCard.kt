@@ -37,7 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.workerapp.R
-import com.example.workerapp.data.repository.remote.dto.JobResponseDto
+import com.example.workerapp.data.repository.remote.dto.response.JobResponseDto
 import com.example.workerapp.ui.theme.AppColors
 import com.example.workerapp.utils.ServiceType
 

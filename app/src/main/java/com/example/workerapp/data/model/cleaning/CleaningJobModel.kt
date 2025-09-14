@@ -1,0 +1,40 @@
+package com.example.workerapp.data.model.cleaning
+
+import com.example.workerapp.data.model.base.JobModel1
+import com.example.workerapp.data.model.base.UserModel
+import com.example.workerapp.utils.ServiceType
+import com.squareup.moshi.JsonClass
+
+@JsonClass(generateAdapter = true)
+data class CleaningJobModel1(
+    override var uid: String = "",
+
+    override var user: UserModel = UserModel(),
+    override var serviceType: String = ServiceType.CleaningType,
+
+    var services: List<CleaningServiceModel> = emptyList(),
+    override var workerQuantity: Int = 0,
+    override var price: Double = 0.0,
+    override var status: String = "",
+    override var listDays: List<String> = emptyList(),
+
+    override var createAt: String = "",
+    override var startTime: String = "",
+    override var location: String = "",
+
+    var duration: DurationModel = DurationModel(),
+
+    var isCooking: Boolean = false,
+    var isIroning: Boolean = false,
+) : JobModel1(
+    uid,
+    user,
+    serviceType,
+    workerQuantity,
+    price,
+    status,
+    listDays,
+    createAt,
+    startTime,
+    location,
+)

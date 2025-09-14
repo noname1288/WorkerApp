@@ -13,23 +13,31 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.workerapp.R
-import com.example.workerapp.data.model.CleaningJobModel
-import com.example.workerapp.data.model.base.JobModel
+import com.example.workerapp.data.model.base.JobModel1
+import com.example.workerapp.data.model.cleaning.CleaningJobModel1
+import com.example.workerapp.data.model.healthcare.HealthcareJobModel
 import com.example.workerapp.utils.components.InformationItem
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @SuppressLint("DefaultLocale")
 @Composable
-fun JobDetailCard(cleaningJob: CleaningJobModel) {
+fun JobDetailCard(job: JobModel1) {
+    val sizeOfDays = job.listDays.size
+    val sortDatesAscending: (List<String>) -> List<String> = { dates ->
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        dates.sortedBy { dateFormat.parse(it) }
+    }
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = colorResource(R.color.white)
         ),
         elevation = CardDefaults.cardElevation(3.dp),
-        ) {
+    ) {
         Column(
             Modifier
                 .fillMaxWidth()
@@ -41,35 +49,71 @@ fun JobDetailCard(cleaningJob: CleaningJobModel) {
                     fontWeight = FontWeight.Bold
                 )
             )
+            when (job){
+                is CleaningJobModel1 -> {
+                    InformationItem(
+                        "Danh mục",
+                        value = "Dọn vệ sinh"
+                    )
+                    InformationItem(
+                        "Thời lượng",
+                        value = "[${job.duration.workingHour} giờ]"
+                    )
+                    InformationItem(
+                        "Giờ làm việc",
+                        value = "${job.startTime}"
+                    )
+                    InformationItem(
+                        "Ngày bắt đầu",
+                        value = sortDatesAscending(job.listDays)[0]
+                    )
+                    InformationItem(
+                        "Ngày kết thúc",
+                        value = sortDatesAscending(job.listDays)[sizeOfDays - 1]
+                    )
+                    InformationItem(
+                        "Mô tả",
+                        value = job.duration.description
+                    )
+                    InformationItem(
+                        "Thanh toán",
+                        value = "${job.price}/người VND", isImportant = true
+                    )
 
-            InformationItem("Danh mục", value = "${cleaningJob.jobDetail.serviceType}")
-            InformationItem("Thời lượng", value = "08:00 - 12:00 [3 giờ]")
-            InformationItem("Ngày bắt đầu", value = "22/09/2024")
-            InformationItem("Ngày kết thúc", value = "22/09/2024")
+                }
+                is HealthcareJobModel -> {
+                    InformationItem(
+                        "Danh mục",
+                        value = "Chăm sóc sức khỏe"
+                    )
+                    InformationItem(
+                        "Thời lượng",
+                        value = "[${job.shift.workingHour} giờ]"
+                    )
+                    InformationItem(
+                        "Giờ làm việc",
+                        value = "${job.startTime}"
+                    )
+                    InformationItem(
+                        "Ngày bắt đầu",
+                        value = sortDatesAscending(job.listDays)[0]
+                    )
+                    InformationItem(
+                        "Ngày kết thúc",
+                        value = sortDatesAscending(job.listDays)[sizeOfDays - 1]
+                    )
+                    InformationItem(
+                        "Thanh toán",
+                        value = "${job.price}/người VND", isImportant = true
+                    )
+                }
+                else -> {
+                    // Xử lý nếu job không thuộc các loại trên
+                    Text("Unknown Job Type")
+                }
+            }
+
+
         }
     }
-}
-
-@Preview
-@Composable
-fun PrevJobDetailCard(modifier: Modifier = Modifier) {
-    val job = CleaningJobModel(
-        id = "job123",
-        durationID = "duration456",
-        services = listOf("Floor Cleaning", "Window Washing"),
-        isCooking = true,
-        isIroning = true,
-        jobDetail = JobModel(
-            serviceType = "Cleaning",
-            startTime = 1622520000000L,
-            endTime = 1622523600000L,
-            workerQuantity = 2,
-            price = 1500000.0,
-            isWeek = false,
-            dayOfWeek = 3,
-            createdAt = 1622516400000L,
-            status = "Pending"
-        )
-    )
-    JobDetailCard(job)
 }

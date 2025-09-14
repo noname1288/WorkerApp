@@ -1,9 +1,12 @@
 package com.example.workerapp.utils
 
+import com.example.workerapp.utils.components.MonthWithDays
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.Duration
+import java.time.LocalDate
+import java.time.YearMonth
 import java.util.concurrent.TimeUnit
 
 object TimeUtils{
@@ -44,6 +47,21 @@ object TimeUtils{
         val hours = TimeUnit.MILLISECONDS.toHours(durationMillis)
         val minutes = TimeUnit.MILLISECONDS.toMinutes(durationMillis) % 60
         return "%02d:%02d".format(hours, minutes)
+    }
+
+    fun groupDates(dates: List<String>): List<MonthWithDays> {
+        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+        val parsedDates = dates.map { LocalDate.parse(it, formatter) }
+
+        return parsedDates
+            .groupBy { YearMonth.from(it) }
+            .map { (month, days) ->
+                MonthWithDays(
+                    month = month,
+                    highlighted = days.map { d -> d.dayOfMonth }.toSet()
+                )
+            }
+            .sortedBy { it.month }
     }
 }
 

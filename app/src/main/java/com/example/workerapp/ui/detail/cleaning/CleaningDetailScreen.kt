@@ -1,9 +1,11 @@
 package com.example.workerapp.ui.detail.cleaning
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,115 +28,93 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.workerapp.R
-import com.example.workerapp.data.model.CleaningJobModel
-import com.example.workerapp.data.model.CleaningServiceModel
-import com.example.workerapp.data.model.base.JobModel
 import com.example.workerapp.data.model.base.UserModel
-import com.example.workerapp.utils.button.SlideToConfirmButton
+import com.example.workerapp.data.model.cleaning.CleaningJobModel1
+import com.example.workerapp.data.model.cleaning.CleaningServiceModel
+import com.example.workerapp.ui.detail.cleaning.CleaningJobSection.JobDetails
+import com.example.workerapp.ui.detail.cleaning.CleaningJobSection.UserInfo
 import com.example.workerapp.ui.detail.components.ClientCard
 import com.example.workerapp.ui.detail.components.JobDetailCard
-import com.example.workerapp.ui.detail.components.JobServiceBottomSheet
 import com.example.workerapp.ui.detail.components.JobWorkflow
 import com.example.workerapp.ui.detail.components.WeeklySchedule
+import com.example.workerapp.utils.button.SlideToConfirmButton
+import com.example.workerapp.utils.components.CircleLoadingIndicator
 
 sealed class CleaningJobSection {
     data class UserInfo(val user: UserModel) : CleaningJobSection()
-    data class JobDetails(val job: CleaningJobModel) : CleaningJobSection()
-    data class WeeklySchedule(val days: List<Int>, val isWeekly: Boolean) : CleaningJobSection()
+    data class JobDetails(val job: CleaningJobModel1) : CleaningJobSection()
+    data class WeeklySchedule(val days: List<String>, val isWeekly: Boolean) : CleaningJobSection()
     data class AdditionalJob(val isCooking: Boolean, val isIroning: Boolean) : CleaningJobSection()
-    object JobWorkflow : CleaningJobSection()
+    data class JobWorkflow(val services: List<CleaningServiceModel>) : CleaningJobSection()
     object ActionButtons : CleaningJobSection()
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CleaningDetailScreen() {
-    val TAG = "CleaningDetailScreen"
+fun CleaningDetailScreen(viewmodel: CleaningViewModel, navController: NavController) {
+    val tag = "CleaningDetailScreen"
+    val context = LocalContext.current
 
-    val fakeUser = UserModel(
-        username = "Phạm Thanh Sơn",
-        gender = "Male",
-        dob = "1990-01-01",
-        avatar = "https://example.com/avatar.jpg",
-        tel = "1234567890",
-        location = "New York",
-        email = "john.doe@example.com",
-        role = "user"
-    )
-    val fakeCleaningJob = CleaningJobModel(
-        id = "job123",
-        durationID = "duration456",
-        services = listOf("Floor Cleaning", "Window Washing"),
-        isCooking = true,
-        isIroning = true,
-        jobDetail = JobModel(
-            serviceType = "Cleaning",
-            startTime = 1622520000000L,
-            endTime = 1622523600000L,
-            workerQuantity = 2,
-            price = 1500000.0,
-            isWeek = true,
-            dayOfWeek = 3,
-            createdAt = 1622516400000L,
-            status = "Pending"
-        )
-    )
-    val fakeDays = listOf(2, 3, 4)
-    val fakeRoomCleaningServices = listOf(
-        CleaningServiceModel(
-            id = "kitchen_cleaning",
-            duties = listOf("Wipe countertops", "Clean sink", "Mop floor", "Clean appliances"),
-            imageUrl = "https://example.com/kitchen.jpg",
-            serviceType = "Cleaning",
-            serviceName = "Kitchen Cleaning"
-        ),
-        CleaningServiceModel(
-            id = "living_room_cleaning",
-            duties = listOf("Vacuum carpet", "Dust furniture", "Clean windows", "Organize shelves"),
-            imageUrl = "https://example.com/living_room.jpg",
-            serviceType = "Cleaning",
-            serviceName = "Living Room Cleaning"
-        ),
-        CleaningServiceModel(
-            id = "bathroom_cleaning",
-            duties = listOf("Scrub toilet", "Clean shower", "Wipe mirrors", "Mop floor"),
-            imageUrl = "https://example.com/bathroom.jpg",
-            serviceType = "Cleaning",
-            serviceName = "Bath Room Cleaning"
-        )
-    )
+    val uiState by viewmodel.uiState.collectAsState()
+    var sections = emptyList<CleaningJobSection>()
 
-    val sections = listOf(
-        CleaningJobSection.UserInfo(fakeUser),
-        CleaningJobSection.JobDetails(fakeCleaningJob),
-        CleaningJobSection.WeeklySchedule(fakeDays, fakeCleaningJob.jobDetail.isWeek),
-        CleaningJobSection.AdditionalJob(fakeCleaningJob.isCooking, fakeCleaningJob.isIroning),
-        CleaningJobSection.JobWorkflow,
-        CleaningJobSection.ActionButtons
-    )
+    when (uiState) {
+        is CleaningUiState.Success -> {
+            val data = (uiState as CleaningUiState.Success).job
+            Log.d(tag, "CleaningDetailScreen: Fetched job detail: $data")
 
-    var isShowBottomSheet by remember { mutableStateOf(false) }
+            sections = listOf(
+                UserInfo(data.user),
+                JobDetails(data),
+                CleaningJobSection.WeeklySchedule(
+                    data.listDays,
+                    data.listDays.size > 1
+                ),
+                CleaningJobSection.AdditionalJob(data.isCooking, data.isIroning),
+                CleaningJobSection.JobWorkflow(data.services),
+                CleaningJobSection.ActionButtons
+            )
+        }
 
-    if (isShowBottomSheet) {
-        JobServiceBottomSheet(
-            items = fakeRoomCleaningServices,
-            onDismiss = { isShowBottomSheet = false }
-        )
+        is CleaningUiState.Error -> {
+            Toast.makeText(
+                context,
+                (uiState as CleaningUiState.Error).message,
+                Toast.LENGTH_LONG
+            ).show()
+        }
+
+        CleaningUiState.Loading -> {
+            Box(
+                Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircleLoadingIndicator()
+            }
+        }
+
+        CleaningUiState.Idle -> {
+            Box(
+                Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("nothing to show")
+            }
+        }
     }
 
     Column(Modifier.fillMaxSize()) {
@@ -156,6 +136,7 @@ fun CleaningDetailScreen() {
             },
             colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
         )
+
         LazyColumn(
             Modifier
                 .fillMaxSize()
@@ -164,25 +145,26 @@ fun CleaningDetailScreen() {
             item {
                 Spacer(Modifier.height(16.dp))
             }
+
             sections.forEach { section ->
                 when (section) {
-                    is CleaningJobSection.UserInfo -> {
+                    is UserInfo -> {
                         item {
                             ClientCard(user = section.user)
                             Spacer(Modifier.height(12.dp))
                         }
                     }
 
-                    is CleaningJobSection.JobDetails -> {
+                    is JobDetails -> {
                         item {
-                            JobDetailCard(cleaningJob = section.job)
+                            JobDetailCard(job = section.job)
                             Spacer(Modifier.height(12.dp))
                         }
                     }
 
                     is CleaningJobSection.WeeklySchedule -> {
                         item {
-                            WeeklySchedule(section.days)
+                            WeeklySchedule(section.days, section.isWeekly)
                             Spacer(Modifier.height(12.dp))
                         }
                     }
@@ -191,13 +173,12 @@ fun CleaningDetailScreen() {
                         item {
                             AdditionalJob(section.isCooking, section.isIroning)
                             Spacer(Modifier.height(24.dp))
-
                         }
                     }
 
                     is CleaningJobSection.JobWorkflow -> {
                         item {
-                            JobWorkflow(onClick = { isShowBottomSheet = true })
+                            JobWorkflow(section.services)
                             Spacer(Modifier.height(24.dp))
                         }
                     }
@@ -206,7 +187,7 @@ fun CleaningDetailScreen() {
                         item {
                             SlideToConfirmButton(
                                 onConfirmed = {
-                                    Log.d(TAG, "CleaningDetailScreen: Confirmed")
+                                    Log.d(tag, "CleaningDetailScreen: Confirmed")
                                 },
                             )
                             Spacer(Modifier.height(24.dp))
@@ -275,40 +256,4 @@ fun AdditionalJobItem(modifier: Modifier = Modifier, icon: Int, title: String) {
             )
         }
     }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun PrevJobDetail1(modifier: Modifier = Modifier) {
-    UserModel(
-        username = "Phạm Thanh Sơn",
-        gender = "Male",
-        dob = "1990-01-01",
-        avatar = "https://example.com/avatar.jpg",
-        tel = "1234567890",
-        location = "New York",
-        email = "john.doe@example.com",
-        role = "user"
-    )
-    CleaningJobModel(
-        id = "job123",
-        durationID = "duration456",
-        services = listOf("Floor Cleaning", "Window Washing"),
-        isCooking = true,
-        isIroning = true,
-        jobDetail = JobModel(
-            serviceType = "Cleaning",
-            startTime = 1622520000000L,
-            endTime = 1622523600000L,
-            workerQuantity = 2,
-            price = 1500000.0,
-            isWeek = false,
-            dayOfWeek = 3,
-            createdAt = 1622516400000L,
-            status = "Pending"
-        )
-    )
-
-    CleaningDetailScreen()
 }

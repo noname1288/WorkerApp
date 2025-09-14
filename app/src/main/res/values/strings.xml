@@ -1,10 +1,12 @@
 <resources>
     <string name="app_name">WorkerApp</string>
+    <string name="base_url">https://bedatn-eosin.vercel.app/api</string>
+
     <string name="login_title">Đăng nhập</string>
     <string name="login_body">*Vui lòng đăng nhập</string>
     <string name="type_here_1">"Vui lòng nhập email... "</string>
     <string name="forgot_password_title">Quên mật khẩu?</string>
-    <string name="register_title">Bạn chưa có tài khoản?</string>
+    <string name="ban_chua_co_tai_khoan">Bạn chưa có tài khoản?</string>
     <string name="register_action">Đăng ký</string>
     <string name="search_hint">Tìm kiếm công việc</string>
     <string name="category_title">Danh mục</string>
@@ -27,5 +29,9 @@
     <string name="logout_title">Đăng xuất</string>
     <string name="calendar_title">Lịch làm</string>
     <string name="detail_information">Chi tiết</string>
+    <string name="scope_of_work">Phạm vi công việc</string>
+    <string name="register_body">Vui lòng đăng ký*</string>
+    <string name="register_button">Đăng ký</string>
+    <string name="ban_da_co_tai_khoan">Bạn đã có tài khoản?</string>
 </resources>
 

@@ -6,4 +6,6 @@ object AppLocator {
     val firebaseAuth by lazy {
         FirebaseAuth.getInstance()
     }
+
+
 }

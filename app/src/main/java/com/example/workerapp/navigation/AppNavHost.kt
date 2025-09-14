@@ -2,40 +2,48 @@ package com.example.workerapp.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.workerapp.ui.calendar.CalendarScreen
 import com.example.workerapp.ui.detail.cleaning.CleaningDetailScreen
+import com.example.workerapp.ui.detail.cleaning.CleaningViewModel
 import com.example.workerapp.ui.detail.healcare.HealthcareDetailScreen
+import com.example.workerapp.ui.detail.healcare.HealthcareViewModel
 import com.example.workerapp.ui.home.HomeScreen
 import com.example.workerapp.ui.income.IncomeScreen
-import com.example.workerapp.ui.login.LoginScreen
-import com.example.workerapp.ui.login.AuthViewModel
+import com.example.workerapp.ui.authen.LoginScreen
+import com.example.workerapp.ui.authen.AuthViewModel
+import com.example.workerapp.ui.authen.RegisterScreen
 import com.example.workerapp.ui.notification.NotificationScreen
 import com.example.workerapp.ui.profile.ProfileScreen
 
 @Composable
 fun AppNavHost(
     modifier: Modifier = Modifier,
-    navHostController: NavHostController,
+    navController: NavHostController,
     authViewModel: AuthViewModel,
     startDestination: String
 ) {
     NavHost(
         modifier = modifier,
-        navController = navHostController,
+        navController = navController,
         startDestination = startDestination,
     ) {
         composable(AppRoutes.LOGIN) {
-            LoginScreen(navController = navHostController, viewModel = authViewModel)
+            LoginScreen(navController = navController, viewModel = authViewModel)
+        }
+
+        composable (AppRoutes.REGISTER) {
+            RegisterScreen(navController = navController, viewModel = authViewModel)
         }
 
         composable(AppRoutes.HOME) {
-            HomeScreen(navController = navHostController)
+            HomeScreen(navController = navController)
         }
         composable(AppRoutes.CALENDAR) {
-            CalendarScreen(navController = navHostController)
+            CalendarScreen(navController = navController)
         }
         composable(AppRoutes.INCOME) {
             IncomeScreen()
@@ -48,10 +56,12 @@ fun AppNavHost(
         }
 
         composable(AppRoutes.CLEANING_DETAIL) {
-            CleaningDetailScreen()
+            val cleaningViewModel : CleaningViewModel = viewModel()
+            CleaningDetailScreen(cleaningViewModel, navController)
         }
         composable (AppRoutes.HEALTHCARE_DETAIL) {
-            HealthcareDetailScreen()
+            val healthcareViewModel : HealthcareViewModel = viewModel()
+            HealthcareDetailScreen(healthcareViewModel, navController)
         }
     }
 }

@@ -1,11 +1,14 @@
-package com.example.workerapp.ui.login
+package com.example.workerapp.ui.authen
 
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,8 +21,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Email
-import androidx.compose.material.icons.outlined.Password
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Password
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.Button
@@ -32,6 +35,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -58,11 +63,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import com.example.workerapp.R
 import com.example.workerapp.navigation.AppRoutes
+import com.example.workerapp.utils.components.CircleLoadingIndicator
 import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
-    modifier: Modifier = Modifier,
     navController: NavController,
     viewModel: AuthViewModel
 ) {
@@ -70,10 +75,50 @@ fun LoginScreen(
     val activity = context as ComponentActivity
     val credentialManager = remember { CredentialManager.create(context) }
 
+    val uiState by viewModel.uiState.collectAsState()
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+
+    when (uiState) {
+        is AuthenticationUIState.Success -> {
+            Toast.makeText(
+                context,
+                (uiState as AuthenticationUIState.Success).message,
+                Toast.LENGTH_LONG
+            ).show()
+        }
+
+        is AuthenticationUIState.Error -> {
+            Toast.makeText(
+                context,
+                (uiState as AuthenticationUIState.Error).message,
+                Toast.LENGTH_LONG
+            ).show()
+        }
+
+        AuthenticationUIState.Idle -> {
+            Box(
+                Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("idle")
+            }
+        }
+
+        AuthenticationUIState.Loading -> {
+            Box(
+                Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircleLoadingIndicator()
+            }
+        }
+    }
 
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
+            .background(Color.White)
             .padding(32.dp),
         horizontalAlignment = Alignment.Start
     ) {
@@ -97,11 +142,27 @@ fun LoginScreen(
         )
         Spacer(Modifier.height(64.dp))
 
-        CustomEditTextField(title = "Tài khoản: ", isPasswordTextField = false)
+        CustomEditTextField(
+            leadingIcon = Icons.Default.Email,
+            title = "Tài khoản: ",
+            placeholderText = "Nhập email",
+            isPasswordTextField = false,
+            onTextChange = {
+                email = it
+            }
+        )
 
         Spacer(Modifier.height(32.dp))
 
-        CustomEditTextField(title = "Mật khẩu: ", isPasswordTextField = true)
+        CustomEditTextField(
+            leadingIcon = Icons.Default.Password,
+            title = "Mật khẩu: ",
+            placeholderText = "Nhập mật khẩu",
+            isPasswordTextField = true,
+            onTextChange = {
+                password = it
+            }
+        )
 
         Spacer(Modifier.height(16.dp))
 
@@ -120,8 +181,8 @@ fun LoginScreen(
 
         Button(
             onClick = {
-                Toast.makeText(context, "clicked login", Toast.LENGTH_SHORT).show()
-                navController.navigate(AppRoutes.HOME)
+                Log.d("LoginScreen", "email: $email - password: $password")
+                viewModel.loginWithEmailAndPassword(email, password)
             },
             shape = RoundedCornerShape(10.dp),
             colors = ButtonColors(
@@ -147,13 +208,17 @@ fun LoginScreen(
             horizontalArrangement = Arrangement.Center
         ) {
             Text(
-                text = stringResource(R.string.register_title)
+                text = stringResource(R.string.ban_chua_co_tai_khoan)
             )
             Spacer(Modifier.width(8.dp))
             Text(
                 text = stringResource(R.string.register_action),
                 fontSize = 14.sp,
-                fontStyle = FontStyle.Italic
+                fontStyle = FontStyle.Italic,
+                color = colorResource(R.color.orange_primary),
+                modifier = Modifier.clickable {
+                    navController.navigate(AppRoutes.REGISTER)
+                }
             )
         }
 
@@ -179,10 +244,14 @@ fun LoginScreen(
 @Composable
 fun CustomEditTextField(
     modifier: Modifier = Modifier,
+    leadingIcon: ImageVector,
     title: String = "Email:",
+    placeholderText: String = "Nhập email",
+    onTextChange: (String) -> Unit,
     isPasswordTextField: Boolean = false
 ) {
     val light_gray = colorResource(R.color.light_gray)
+
     val keyboardOptions = if (isPasswordTextField) KeyboardOptions(
         keyboardType = KeyboardType.Password,
         imeAction = ImeAction.Done
@@ -190,24 +259,30 @@ fun CustomEditTextField(
         keyboardType = KeyboardType.Email,
         imeAction = ImeAction.Next
     )
-    val leadingIcon = if (isPasswordTextField) Icons.Outlined.Password else Icons.Outlined.Email
-    val placeholderText = if (isPasswordTextField) "Nhập mật khẩu" else "Nhập email"
 
     var input by remember { mutableStateOf("") }
     var isVisibility by remember { mutableStateOf(false) }
 
-    Text(title, fontSize = 18.sp)
+    Text(
+        title,
+        style = MaterialTheme.typography.titleMedium
+    )
 
     Spacer(Modifier.height(4.dp))
 
     OutlinedTextField(
         value = input,
-        onValueChange = { input = it },
+        onValueChange = {
+            input = it
+            onTextChange(it)
+        },
         placeholder = {
             Text(
                 placeholderText,
-                fontStyle = FontStyle.Italic,
-                color = light_gray
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontStyle = FontStyle.Italic,
+                    color = light_gray
+                )
             )
         },
         leadingIcon = {
@@ -236,15 +311,16 @@ fun CustomEditTextField(
 
 
         },
-        visualTransformation = if (isVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+        visualTransformation = if (!isVisibility) VisualTransformation.None else PasswordVisualTransformation(),
         keyboardOptions = keyboardOptions,
         singleLine = true,
         shape = RoundedCornerShape(10.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            unfocusedTextColor = Color.Gray,
-            focusedBorderColor = colorResource(R.color.orange_primary)
+            focusedTextColor = Color.Black,
+            unfocusedTextColor = Color.Black,
+            focusedBorderColor = colorResource(R.color.orange_primary),
+            unfocusedBorderColor = light_gray,
         ),
-
         modifier = Modifier
             .fillMaxWidth()
             .padding()

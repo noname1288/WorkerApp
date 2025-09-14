@@ -34,14 +34,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.workerapp.R
-import com.example.workerapp.data.model.base.ServiceModel
+import com.example.workerapp.data.model.cleaning.CleaningServiceModel
 import com.example.workerapp.utils.button.FilledRoundedButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun JobServiceBottomSheet(
-    items: List<ServiceModel>,
-    onDismiss: () -> Unit) {
+    items: List<CleaningServiceModel>,
+    onDismiss: () -> Unit
+) {
     val sheetState = rememberModalBottomSheetState()
 
     var currentIndex by remember { mutableIntStateOf(0) }
