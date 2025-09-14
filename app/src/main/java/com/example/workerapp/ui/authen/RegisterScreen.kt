@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -46,13 +47,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.workerapp.R
-import com.example.workerapp.navigation.AppRoutes
+import com.example.workerapp.utils.components.CircleLoadingIndicator
+import com.example.workerapp.utils.navigation.popBackIfCan
 
 @Composable
 fun RegisterScreen(viewModel: AuthViewModel, navController: NavController) {
     val context = LocalContext.current
 
-    val uiState by viewModel.uiState.collectAsState()
+    val registerState by viewModel.registerState.collectAsState()
 
     var displayName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -63,7 +65,8 @@ fun RegisterScreen(viewModel: AuthViewModel, navController: NavController) {
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-            .padding(32.dp),
+            .padding(32.dp)
+            .imePadding(),
         horizontalAlignment = Alignment.Start
     ) {
         /* *
@@ -122,7 +125,7 @@ fun RegisterScreen(viewModel: AuthViewModel, navController: NavController) {
                 title = "Tên hiển thị",
                 placeholderText = "Nhập tên hiển thị",
                 isPasswordTextField = false,
-                onTextChange = {displayName = it}
+                onTextChange = { displayName = it }
             )
 
             Spacer(Modifier.height(12.dp))
@@ -131,7 +134,7 @@ fun RegisterScreen(viewModel: AuthViewModel, navController: NavController) {
                 leadingIcon = Icons.Default.Email,
                 title = "Tài khoản",
                 placeholderText = "Nhập email",
-                onTextChange = {email = it}
+                onTextChange = { email = it }
             )
 
             Spacer(Modifier.height(12.dp))
@@ -141,18 +144,31 @@ fun RegisterScreen(viewModel: AuthViewModel, navController: NavController) {
                 title = "Mật khẩu",
                 placeholderText = "Nhập mật khẩu",
                 isPasswordTextField = true,
-                onTextChange = {password = it}
+                onTextChange = { password = it }
             )
 
             Spacer(Modifier.height(24.dp))
+        }
 
+        /* *
+        * Button Register
+        * */
+        item {
             Button(
                 onClick = {
-                    Toast.makeText(context, "clicked register", Toast.LENGTH_SHORT).show()
-                    viewModel.registerWithForm(
-                        displayName, email, password, imageUrl
-                    )
+//                            viewModel.registerWithForm(
+//                                displayName, email, password, imageUrl
+//                            )
+
+//                    viewModel.changeRegisterState(AuthenticationUIState.Success("Register successful"))
+
+                    //clear form
+                    displayName = ""
+                    email = ""
+                    password = ""
+                    imageUrl = null
                 },
+                enabled = registerState !is AuthenticationUIState.Loading,
                 shape = RoundedCornerShape(10.dp),
                 colors = ButtonColors(
                     containerColor = colorResource(R.color.orange_primary),
@@ -169,7 +185,9 @@ fun RegisterScreen(viewModel: AuthViewModel, navController: NavController) {
                     fontSize = 16.sp
                 )
             }
+
             Spacer(Modifier.height(16.dp))
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
@@ -184,11 +202,39 @@ fun RegisterScreen(viewModel: AuthViewModel, navController: NavController) {
                     fontStyle = FontStyle.Italic,
                     color = colorResource(R.color.orange_primary),
                     modifier = Modifier.clickable {
-                        navController.navigate(AppRoutes.LOGIN)
+                        navController.popBackIfCan()
                     }
                 )
             }
+
             Spacer(Modifier.height(32.dp))
+        }
+    }
+
+    when (registerState) {
+        is AuthenticationUIState.Success -> {
+            Toast.makeText(
+                context,
+                (registerState as AuthenticationUIState.Success).message,
+                Toast.LENGTH_LONG
+            ).show()
+
+            //navigate to login screen
+            navController.popBackIfCan()
+        }
+
+        is AuthenticationUIState.Error -> {
+            Toast.makeText(
+                context,
+                (registerState as AuthenticationUIState.Error).message,
+                Toast.LENGTH_LONG
+            ).show()
+        }
+
+        AuthenticationUIState.Idle -> {}
+
+        AuthenticationUIState.Loading -> {
+            CircleLoadingIndicator()
         }
     }
 }

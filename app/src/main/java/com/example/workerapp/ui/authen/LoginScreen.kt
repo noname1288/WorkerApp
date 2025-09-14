@@ -1,6 +1,5 @@
 package com.example.workerapp.ui.authen
 
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.BorderStroke
@@ -8,18 +7,20 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Password
@@ -64,6 +65,7 @@ import androidx.navigation.NavController
 import com.example.workerapp.R
 import com.example.workerapp.navigation.AppRoutes
 import com.example.workerapp.utils.components.CircleLoadingIndicator
+import com.example.workerapp.utils.navigation.safeNavigate
 import kotlinx.coroutines.launch
 
 @Composable
@@ -75,49 +77,17 @@ fun LoginScreen(
     val activity = context as ComponentActivity
     val credentialManager = remember { CredentialManager.create(context) }
 
-    val uiState by viewModel.uiState.collectAsState()
+    val scrollState = rememberScrollState()
+    val loginState by viewModel.loginState.collectAsState()
+
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-
-    when (uiState) {
-        is AuthenticationUIState.Success -> {
-            Toast.makeText(
-                context,
-                (uiState as AuthenticationUIState.Success).message,
-                Toast.LENGTH_LONG
-            ).show()
-        }
-
-        is AuthenticationUIState.Error -> {
-            Toast.makeText(
-                context,
-                (uiState as AuthenticationUIState.Error).message,
-                Toast.LENGTH_LONG
-            ).show()
-        }
-
-        AuthenticationUIState.Idle -> {
-            Box(
-                Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("idle")
-            }
-        }
-
-        AuthenticationUIState.Loading -> {
-            Box(
-                Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircleLoadingIndicator()
-            }
-        }
-    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(scrollState)
+            .imePadding()
             .background(Color.White)
             .padding(32.dp),
         horizontalAlignment = Alignment.Start
@@ -130,7 +100,9 @@ fun LoginScreen(
                 color = colorResource(R.color.orange_primary)
             )
         )
+
         Spacer(Modifier.height(8.dp))
+
         Text(
             text = stringResource(R.string.login_body),
             style = TextStyle(
@@ -181,9 +153,15 @@ fun LoginScreen(
 
         Button(
             onClick = {
-                Log.d("LoginScreen", "email: $email - password: $password")
-                viewModel.loginWithEmailAndPassword(email, password)
+//                        viewModel.loginWithEmailAndPassword(email, password)
+                viewModel.changeLoginState(AuthenticationUIState.Success("Login successful"))
+
+                // clear form
+                email = ""
+                password = ""
+
             },
+            enabled = loginState !is AuthenticationUIState.Loading,
             shape = RoundedCornerShape(10.dp),
             colors = ButtonColors(
                 containerColor = colorResource(R.color.orange_primary),
@@ -239,7 +217,36 @@ fun LoginScreen(
             }
         }
     }
+
+    when (loginState) {
+        is AuthenticationUIState.Success -> {
+            Toast.makeText(
+                context,
+                (loginState as AuthenticationUIState.Success).message,
+                Toast.LENGTH_LONG
+            ).show()
+
+            // Navigate to home screen + clear login screen from back stack
+            navController.safeNavigate(AppRoutes.HOME, AppRoutes.LOGIN, inclusive = true, restore = false)
+        }
+
+        is AuthenticationUIState.Error -> {
+            Toast.makeText(
+                context,
+                (loginState as AuthenticationUIState.Error).message,
+                Toast.LENGTH_LONG
+            ).show()
+        }
+
+        AuthenticationUIState.Idle -> {}
+
+        AuthenticationUIState.Loading -> {
+            CircleLoadingIndicator()
+        }
+    }
 }
+
+
 
 @Composable
 fun CustomEditTextField(

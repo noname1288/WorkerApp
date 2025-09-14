@@ -23,23 +23,33 @@ import kotlinx.coroutines.launch
 class AuthViewModel : ViewModel() {
     private val userRepository = UserRepositoryImpl.getInstance()
 
-    private val _uiState = MutableStateFlow<AuthenticationUIState>(AuthenticationUIState.Idle)
-    val uiState: StateFlow<AuthenticationUIState> = _uiState
+    private val _loginState = MutableStateFlow<AuthenticationUIState>(AuthenticationUIState.Idle)
+    private val _registerState = MutableStateFlow<AuthenticationUIState>(AuthenticationUIState.Idle)
+    val loginState: StateFlow<AuthenticationUIState> = _loginState
+    val registerState: StateFlow<AuthenticationUIState> = _registerState
+
+    fun changeLoginState(value : AuthenticationUIState){
+        _loginState.value = value
+    }
+
+    fun changeRegisterState(value : AuthenticationUIState){
+        _registerState.value = value
+    }
 
     fun loginWithEmailAndPassword(email: String, password: String) {
         val request = UserLoginRequest(email, password)
 
         viewModelScope.launch {
-            _uiState.value = AuthenticationUIState.Loading
+            _loginState.value = AuthenticationUIState.Loading
 
             val result = userRepository.login(request)
             when (result) {
                 is NetworkResult.Success -> {
-                    _uiState.value = AuthenticationUIState.Success("Login successful")
+                    _loginState.value = AuthenticationUIState.Success("Login successful")
                 }
 
                 is NetworkResult.Error -> {
-                    _uiState.value = AuthenticationUIState.Error(
+                    _loginState.value = AuthenticationUIState.Error(
                         result.message
                     )
                 }
@@ -51,13 +61,15 @@ class AuthViewModel : ViewModel() {
         val request = UserRegisterRequest(displayName, email, password, null)
 
         viewModelScope.launch {
+            _registerState.value = AuthenticationUIState.Loading
+
             val result = userRepository.register(request)
             when(result){
                 is NetworkResult.Success -> {
-                    _uiState.value = AuthenticationUIState.Success("Register successful")
+                    _registerState.value = AuthenticationUIState.Success("Register successful")
                 }
                 is NetworkResult.Error -> {
-                    _uiState.value = AuthenticationUIState.Error(result.message)
+                    _registerState.value = AuthenticationUIState.Error(result.message)
                 }
             }
         }

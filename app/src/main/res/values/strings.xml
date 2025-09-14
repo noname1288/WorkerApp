@@ -33,5 +33,11 @@
     <string name="register_body">Vui lòng đăng ký*</string>
     <string name="register_button">Đăng ký</string>
     <string name="ban_da_co_tai_khoan">Bạn đã có tài khoản?</string>
+    <string name="cleaning_service_title">Dọn dẹp nhà cửa</string>
+    <string name="cleaning_service_body">Mang lại không gian sống sạch sẽ, thoáng đãng cho mọi gia đình! Công việc không chỉ giúp thu nhập ổn định mà còn đóng góp trực tiếp vào việc nâng cao chất lượng cuộc sống khách hàng. </string>
+    <string name="healthcare_service_title">Chăm sóc sức khỏe</string>
+    <string name="healthcare_service_body">Chung tay chăm sóc sức khỏe cộng đồng, mang đến sự an tâm cho người bệnh và gia đình họ! Với kỹ năng và sự tận tâm, bạn sẽ là người đồng hành đáng tin cậy!</string>
+    <string name="maintenance_service_title">Bảo trì máy lạnh, máy giặt</string>
+    <string name="maintenance_service_body">Công việc bảo trì không chỉ đòi hỏi tay nghề mà còn giúp bạn giải quyết các vấn đề thực tế, mang lại sự tiện nghi cho khách hàng.</string>
 </resources>
 

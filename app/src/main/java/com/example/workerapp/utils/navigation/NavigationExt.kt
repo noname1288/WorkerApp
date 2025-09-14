@@ -21,7 +21,6 @@ fun NavController.safeNavigate(
 
 fun NavController.popBackIfCan() {
     if (popBackStack()) {
-        this.popBackStack()
     }
 }
 
