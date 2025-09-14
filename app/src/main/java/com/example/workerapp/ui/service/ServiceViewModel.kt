@@ -1,7 +1,56 @@
 package com.example.workerapp.ui.service
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.workerapp.data.model.base.JobModel1
+import com.example.workerapp.data.repository.remote.NetworkResult
+import com.example.workerapp.data.repository.remote.repository.JobRepositoryImpl
+import com.example.workerapp.data.repository.remote.repository.ServiceRepositoryImpl
+import com.example.workerapp.utils.ServiceType
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 
 class ServiceViewModel : ViewModel(){
+    private val _jobRepository = JobRepositoryImpl.getInstance()
+    private val _serviceRepository = ServiceRepositoryImpl.getInstance()
 
+    private val _uiState = MutableStateFlow<ServiceUIState>(ServiceUIState.Idle)
+    val uiState: MutableStateFlow<ServiceUIState> = _uiState
+
+    private val _serviceTypeState = MutableStateFlow<String>(ServiceType.CleaningType)
+
+    fun updateServiceType(newType: String){
+        _serviceTypeState.value = newType
+    }
+
+    fun fetchData(){
+        viewModelScope.launch {
+            _uiState.value = ServiceUIState.Loading
+            try {
+                val result = when (_serviceTypeState.value){
+                    ServiceType.CleaningType -> _jobRepository.getCleaningJobs()
+                    ServiceType.HealthcareType -> _jobRepository.getHealthcareJobs()
+                    else -> _jobRepository.getCleaningJobs()
+                }
+
+                when(result){
+                    is NetworkResult.Error -> {
+                        _uiState.value = ServiceUIState.Error(result.message)
+                    }
+                    is NetworkResult.Success -> {
+                        _uiState.value = ServiceUIState.Success(result.data)
+                    }
+                }
+            }catch (e: Exception){
+                _uiState.value = ServiceUIState.Error(e.message ?: "Something went wrong")
+            }
+        }
+    }
+}
+
+sealed class ServiceUIState{
+    data class Success(val jobs: List<JobModel1>) : ServiceUIState()
+    data class Error(val message: String) : ServiceUIState()
+    object Loading : ServiceUIState()
+    object Idle : ServiceUIState()
 }

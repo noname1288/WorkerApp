@@ -4,7 +4,7 @@ import com.example.workerapp.data.model.healthcare.HealthcareServiceModel
 import com.example.workerapp.data.model.cleaning.DurationModel
 import com.example.workerapp.data.model.base.JobModel1
 import com.example.workerapp.data.model.base.UserModel
-import com.example.workerapp.data.model.healthcare.HealthServiceWrapper
+import com.example.workerapp.data.repository.remote.dto.wrapper.HealthServiceWrapper
 import com.example.workerapp.utils.ServiceType
 import com.squareup.moshi.JsonClass
 
@@ -16,7 +16,6 @@ data class HealthcareJobModel(
     override var serviceType: String = ServiceType.HealthcareType,
 
     var services: List<HealthServiceWrapper> = emptyList(),
-    override var workerQuantity: Int = 0,
     override var price: Double = 0.0,
     override var status: String = "",
     override var listDays: List<String> = emptyList(),
@@ -31,7 +30,6 @@ data class HealthcareJobModel(
     uid,
     user,
     serviceType,
-    workerQuantity,
     price,
     status,
     listDays,

@@ -1,4 +1,4 @@
-package com.example.workerapp.utils.session
+package com.example.workerapp.utils.cached
 
 object UserSession {
     var isLoggedIn: Boolean = false
@@ -6,12 +6,15 @@ object UserSession {
     var displayName: String? = null
     var userEmail: String? = null
     var userProfilePicUrl: String? = null
+    var token: String? = null
 
-    fun logIn(uid: String, name: String, email: String, profilePicUrl: String?) {
+    fun saveState(uid: String, displayName: String?, email: String?, profilePicUrl: String?, token: String?) {
         isLoggedIn = true
-        displayName = name
-        userEmail = email
-        userProfilePicUrl = profilePicUrl
+        this.uid = uid
+        this.displayName = displayName
+        this.userEmail = email
+        this.userProfilePicUrl = profilePicUrl
+        this.token = token
     }
 
     fun logOut() {
@@ -20,5 +23,6 @@ object UserSession {
         displayName = null
         userEmail = null
         userProfilePicUrl = null
+        token = null
     }
 }

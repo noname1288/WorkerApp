@@ -12,8 +12,6 @@ data class CleaningJobModel1(
     override var user: UserModel = UserModel(),
     override var serviceType: String = ServiceType.CleaningType,
 
-    var services: List<CleaningServiceModel> = emptyList(),
-    override var workerQuantity: Int = 0,
     override var price: Double = 0.0,
     override var status: String = "",
     override var listDays: List<String> = emptyList(),
@@ -30,7 +28,6 @@ data class CleaningJobModel1(
     uid,
     user,
     serviceType,
-    workerQuantity,
     price,
     status,
     listDays,

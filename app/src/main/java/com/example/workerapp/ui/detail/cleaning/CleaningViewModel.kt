@@ -17,14 +17,15 @@ class CleaningViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<CleaningUiState>(CleaningUiState.Idle)
     val uiState: StateFlow<CleaningUiState> = _uiState
 
-    init {
-        fetchJobDetail()
-    }
 
-    fun fetchJobDetail() {
+    fun fetchJobDetail(uid: String) {
+        if (uid.isEmpty()){
+            _uiState.value = CleaningUiState.Error("Invalid job ID")
+            return
+        }
         viewModelScope.launch {
             _uiState.value = CleaningUiState.Loading
-            when (val result = cleaningRepository.getCleaningDetail("67Yf1lIOiL6ot8FZFIZM")) {
+            when (val result = cleaningRepository.getCleaningDetail(uid)) {
                 is NetworkResult.Success -> {
                     _uiState.value = CleaningUiState.Success(result.data)
                 }

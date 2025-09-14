@@ -1,9 +1,9 @@
-package com.example.workerapp.data.model.healthcare
+package com.example.workerapp.data.repository.remote.dto.wrapper
 
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class HealthServiceWrapper(
-    var healthcareService: HealthcareServiceModel = HealthcareServiceModel(),
+    var serviceID: String = "",
     var quantity: Int = 0,
 )

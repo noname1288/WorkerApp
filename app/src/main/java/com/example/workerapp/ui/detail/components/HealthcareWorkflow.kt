@@ -37,93 +37,93 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.workerapp.R
-import com.example.workerapp.data.model.healthcare.HealthServiceWrapper
+import com.example.workerapp.data.repository.remote.dto.wrapper.HealthServiceWrapper
 import com.example.workerapp.data.model.healthcare.HealthcareServiceModel
 
-@Composable
-fun HealthcareWorkflow(jobServices: List<HealthServiceWrapper>) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        jobServices.forEach { serviceWrapper ->
-            val image: Int = when (serviceWrapper.healthcareService.serviceName) {
-                "Trẻ em" -> R.drawable.childcare
-                "Người già" -> R.drawable.eldercare
-                "Người khuyết tật" -> R.drawable.wheelchaircare
-                else -> R.drawable.ic_launcher_background
-            }
-            HealthcareServiceCardItem(
-                painter = image,
-                jobService = serviceWrapper
-            )
-        }
-    }
-}
-
-@Composable
-fun HealthcareServiceCardItem(
-    painter: Int,
-    jobService: HealthServiceWrapper,
-) {
-    var showDialog by remember { mutableStateOf(false) }
-
-    if (showDialog) {
-        HealthcareServiceDetailDialog(
-            item = jobService.healthcareService,
-            onDismissRequest = { showDialog = false }
-        )
-    }
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Image
-            Image(
-                painter = painterResource(painter),
-                contentDescription = "Healthcare Service",
-                modifier = Modifier
-                    .size(height = 90.dp, width = 120.dp)
-                    .clip(RoundedCornerShape(8.dp)),
-                contentScale = ContentScale.Crop
-            )
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            // Text content
-            Column(
-                modifier = Modifier.weight(1f),
-            ) {
-                Text(
-                    text = jobService.healthcareService.serviceName,
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-                )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    text = "Số lượng: ${jobService.quantity}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Text(
-                    text = "Danh sách công việc",
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        fontStyle = FontStyle.Italic,
-                        color = colorResource(R.color.green)
-                    ),
-                    modifier = Modifier.clickable { showDialog = true }
-                )
-            }
-        }
-    }
-}
+//@Composable
+//fun HealthcareWorkflow(jobServices: List<HealthServiceWrapper>) {
+//    Column(
+//        verticalArrangement = Arrangement.spacedBy(12.dp)
+//    ) {
+//        jobServices.forEach { serviceWrapper ->
+//            val image: Int = when (serviceWrapper.healthcareService.serviceName) {
+//                "Trẻ em" -> R.drawable.childcare
+//                "Người già" -> R.drawable.eldercare
+//                "Người khuyết tật" -> R.drawable.wheelchaircare
+//                else -> R.drawable.ic_launcher_background
+//            }
+//            HealthcareServiceCardItem(
+//                painter = image,
+//                jobService = serviceWrapper
+//            )
+//        }
+//    }
+//}
+//
+//@Composable
+//fun HealthcareServiceCardItem(
+//    painter: Int,
+//    jobService: HealthcareServiceModel,
+//) {
+//    var showDialog by remember { mutableStateOf(false) }
+//
+//    if (showDialog) {
+//        HealthcareServiceDetailDialog(
+//            item = jobService,
+//            onDismissRequest = { showDialog = false }
+//        )
+//    }
+//
+//    Card(
+//        modifier = Modifier
+//            .fillMaxWidth(),
+//        shape = RoundedCornerShape(12.dp),
+//        colors = CardDefaults.cardColors(containerColor = Color.White),
+//        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+//    ) {
+//        Row(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(16.dp),
+//            verticalAlignment = Alignment.CenterVertically
+//        ) {
+//            // Image
+//            Image(
+//                painter = painterResource(painter),
+//                contentDescription = "Healthcare Service",
+//                modifier = Modifier
+//                    .size(height = 90.dp, width = 120.dp)
+//                    .clip(RoundedCornerShape(8.dp)),
+//                contentScale = ContentScale.Crop
+//            )
+//
+//            Spacer(modifier = Modifier.width(16.dp))
+//
+//            // Text content
+//            Column(
+//                modifier = Modifier.weight(1f),
+//            ) {
+//                Text(
+//                    text = jobService.healthcareService.serviceName,
+//                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+//                )
+//                Spacer(Modifier.height(4.dp))
+//                Text(
+//                    text = "Số lượng: ${jobService.quantity}",
+//                    style = MaterialTheme.typography.bodyMedium
+//                )
+//                Text(
+//                    text = "Danh sách công việc",
+//                    style = MaterialTheme.typography.bodyMedium.copy(
+//                        fontStyle = FontStyle.Italic,
+//                        color = colorResource(R.color.green)
+//                    ),
+//                    modifier = Modifier.clickable { showDialog = true }
+//                )
+//            }
+//        }
+//    }
+//}
 
 @Composable
 fun HealthcareServiceDetailDialog(item: HealthcareServiceModel, onDismissRequest: () -> Unit) {

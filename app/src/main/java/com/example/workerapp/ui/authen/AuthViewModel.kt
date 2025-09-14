@@ -8,10 +8,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.workerapp.data.repository.remote.NetworkResult
 import com.example.workerapp.data.repository.remote.dto.request.UserLoginRequest
+import com.example.workerapp.data.repository.remote.dto.request.UserLoginWithGGRequest
 import com.example.workerapp.data.repository.remote.dto.request.UserRegisterRequest
 import com.example.workerapp.data.repository.remote.repository.UserRepositoryImpl
 import com.example.workerapp.utils.locator.AppLocator
-import com.example.workerapp.utils.session.UserSession
+import com.example.workerapp.utils.cached.UserSession
 import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
@@ -19,6 +20,7 @@ import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlin.math.log
 
 class AuthViewModel : ViewModel() {
     private val userRepository = UserRepositoryImpl.getInstance()
@@ -28,11 +30,11 @@ class AuthViewModel : ViewModel() {
     val loginState: StateFlow<AuthenticationUIState> = _loginState
     val registerState: StateFlow<AuthenticationUIState> = _registerState
 
-    fun changeLoginState(value : AuthenticationUIState){
+    fun changeLoginState(value: AuthenticationUIState) {
         _loginState.value = value
     }
 
-    fun changeRegisterState(value : AuthenticationUIState){
+    fun changeRegisterState(value: AuthenticationUIState) {
         _registerState.value = value
     }
 
@@ -45,6 +47,14 @@ class AuthViewModel : ViewModel() {
             val result = userRepository.login(request)
             when (result) {
                 is NetworkResult.Success -> {
+                    //update User's session
+                    val currentUser = result.data
+                    UserSession.saveState(uid = currentUser.user.uid,
+                        displayName = currentUser.user.username,
+                        email = currentUser.user.email,
+                        profilePicUrl = currentUser.user.avatar,
+                        token = currentUser.token)
+
                     _loginState.value = AuthenticationUIState.Success("Login successful")
                 }
 
@@ -64,10 +74,11 @@ class AuthViewModel : ViewModel() {
             _registerState.value = AuthenticationUIState.Loading
 
             val result = userRepository.register(request)
-            when(result){
+            when (result) {
                 is NetworkResult.Success -> {
                     _registerState.value = AuthenticationUIState.Success("Register successful")
                 }
+
                 is NetworkResult.Error -> {
                     _registerState.value = AuthenticationUIState.Error(result.message)
                 }
@@ -96,6 +107,8 @@ class AuthViewModel : ViewModel() {
                         // and authenticate on the server
                         val googleIdTokenCredential =
                             GoogleIdTokenCredential.createFrom(credential.data)
+
+                        /* Authenticate in FirebaseAuth*/
                         firebaseAuthWithGoogleIdToken(googleIdTokenCredential.idToken)
                     } catch (e: GoogleIdTokenParsingException) {
                         onGoogleSignInError(e)
@@ -124,28 +137,64 @@ class AuthViewModel : ViewModel() {
                 if (task.isSuccessful) {
                     Log.d(TAG, "FIREBASE: signInWithCredential - success")
                     val user = AppLocator.firebaseAuth.currentUser!!
-                    //update User's session
-                    UserSession.logIn(
-                        uid = user.uid,
-                        name = user.displayName ?: "Not found",
-                        email = user.email ?: "Not found",
-                        profilePicUrl = user.photoUrl.toString()
-                    )
-                    //updateUI(user)
+
+                    //get user's token
+                    task.result?.user?.getIdToken(true) //force refresh
+                        ?.addOnCompleteListener {
+                            if (it.isSuccessful) {
+                                val firebaseIdToken = it.result?.token
+                                Log.d(TAG, "Firebase ID Token: $firebaseIdToken")
+                                //call api to save in BE
+                                if (firebaseIdToken == null){
+                                    _loginState.value = AuthenticationUIState.Error("Firebase ID Token is null")
+                                }else{
+                                    callApiLoginWithGoogle(firebaseIdToken)
+                                }
+                            }else {
+                                Log.e(TAG, "getIdToken failed", it.exception)
+                            }
+                        }
                 } else {
                     Log.e(TAG, "FIREBASE: signInWithCredential - failure", task.exception)
-                    //updateUI(null)
+                    _loginState.value = AuthenticationUIState.Error(task.exception?.message ?: "Firebase authentication failed")
                 }
 
             }
             .addOnFailureListener {
                 Log.e(TAG, "FIREBASE: signInWithCredential - failure", it)
+                _loginState.value = AuthenticationUIState.Error(it.message ?: "Firebase authentication failed")
             }
+    }
 
+    private fun callApiLoginWithGoogle(idToken: String) {
+        viewModelScope.launch {
+            _loginState.value = AuthenticationUIState.Loading
+
+            val request = UserLoginWithGGRequest(idToken)
+            val result = userRepository.loginWithGoogle(request)
+            when (result) {
+                is NetworkResult.Success -> {
+                    //update User's session
+                    val currentUser = result.data
+                    UserSession.saveState(uid = currentUser.user.uid,
+                        displayName = currentUser.user.username,
+                        email = currentUser.user.email,
+                        profilePicUrl = currentUser.user.avatar,
+                        token = currentUser.token)
+
+                    _loginState.value =
+                        AuthenticationUIState.Success("Login with Google successful")
+                }
+
+                is NetworkResult.Error -> {
+                    _loginState.value = AuthenticationUIState.Error(result.message)
+                }
+            }
+        }
     }
 
     companion object {
-        private const val TAG = "LoginViewModel"
+        private const val TAG = "AuthViewModel"
         private const val WEB_CLIENT_ID =
             "982452710221-c5pev1iv7f4g2a4gv3jg6js1ju84mmbt.apps.googleusercontent.com"
     }

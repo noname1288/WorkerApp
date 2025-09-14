@@ -1,6 +1,5 @@
 package com.example.workerapp.ui.home
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,10 +28,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,12 +42,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.workerapp.R
-import com.example.workerapp.data.repository.remote.dto.response.JobResponseDto
-import com.example.workerapp.ui.home.components.JobCard
-import com.example.workerapp.ui.home.components.SearchOutlinedTextField
+import com.example.workerapp.navigation.AppRoutes
+import com.example.workerapp.utils.ServiceType
+import com.example.workerapp.utils.navigation.navigateWithArgs
 
 /**
  * Sealed class representing different sections of the Home screen
@@ -135,7 +129,10 @@ fun HomeScreen(modifier: Modifier = Modifier, navController: NavController) {
                                     body = stringResource(R.string.cleaning_service_body),
                                     imageInt = R.drawable.img_housekeeping,
                                     onClick = {
-
+                                        navController.navigateWithArgs(
+                                            AppRoutes.SERVICE_DETAIL,
+                                            args = arrayOf(ServiceType.CleaningType)
+                                        )
                                     }
                                 )
                                 Spacer(Modifier.height(12.dp))
@@ -146,7 +143,10 @@ fun HomeScreen(modifier: Modifier = Modifier, navController: NavController) {
                                     imageInt = R.drawable.img_healthcare_1,
                                     isReverse = false,
                                     onClick = {
-
+                                        navController.navigateWithArgs(
+                                            AppRoutes.SERVICE_DETAIL,
+                                            args = arrayOf(ServiceType.HealthcareType)
+                                        )
                                     }
                                 )
                                 Spacer(Modifier.height(12.dp))
@@ -156,7 +156,10 @@ fun HomeScreen(modifier: Modifier = Modifier, navController: NavController) {
                                     body = stringResource(R.string.maintenance_service_body),
                                     imageInt = R.drawable.img_maintenance,
                                     onClick = {
-
+                                        navController.navigateWithArgs(
+                                            AppRoutes.SERVICE_DETAIL,
+                                            args = arrayOf(ServiceType.MaintenanceType)
+                                        )
                                     }
                                 )
                             }
@@ -264,46 +267,6 @@ fun CategoryCard(
         }
 
     }
-}
-
-@Composable
-fun JobListSection(jobs: List<JobResponseDto>, onClickItem: (String) -> Unit) {
-    val context = LocalContext.current
-    Column {
-        Text(
-            stringResource(R.string.job_list_title),
-            fontSize = 16.sp,
-            fontWeight = FontWeight.W500
-        )
-
-        Spacer(Modifier.height(16.dp))
-
-        jobs.forEachIndexed { index, job ->
-            JobCard(job) {
-                onClickItem(index.toString())
-                Toast.makeText(context, "Click job id: ", Toast.LENGTH_SHORT).show()
-            }
-            if (index < jobs.size - 1) {
-                Spacer(Modifier.height(12.dp))
-            }
-
-        }
-    }
-}
-
-@Composable
-fun SearchRow() {
-    val context = LocalContext.current
-
-    val lightGray = colorResource(R.color.light_gray)
-
-    var searchInput by remember { mutableStateOf("") }
-
-    SearchOutlinedTextField(
-        value = searchInput,
-        onValueChange = { searchInput = it },
-        placeholder = "Tìm kiếm công việc...",
-    )
 }
 
 @Composable

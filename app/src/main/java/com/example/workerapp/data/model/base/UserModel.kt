@@ -8,9 +8,13 @@ data class UserModel(
     val username: String = "",
     val gender: String = "",
     val dob: String = "",
-    val avatar: String = "",
-    val tel: String = "",
-    val location: String = "",
+    var avatar: String = "",
+    var tel: String = "",
+    var location: String = "",
     val email: String = "",
-    val role: String = ""
+    val provider:String = "",
+    var emailVerified: Boolean = false,
+    var requiresProfileUpdate: Boolean = false,
+    val role: String = "",
+    var lastLogin: String = "",
 )

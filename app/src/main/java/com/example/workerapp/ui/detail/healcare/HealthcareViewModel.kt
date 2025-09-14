@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.workerapp.data.model.healthcare.HealthcareJobModel
 import com.example.workerapp.data.repository.remote.repository.JobRepositoryImpl
+import com.example.workerapp.ui.detail.cleaning.CleaningUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
@@ -13,19 +14,20 @@ class HealthcareViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<HealthcareUiState>(HealthcareUiState.Idle)
     val uiState: MutableStateFlow<HealthcareUiState> = _uiState
 
-    init {
-        fetchJobDetail()
-    }
-
-    fun fetchJobDetail() {
+    fun fetchJobDetail(uid: String) {
+        if (uid.isEmpty()){
+            _uiState.value = HealthcareUiState.Error("Invalid job ID")
+            return
+        }
         viewModelScope.launch {
             _uiState.value = HealthcareUiState.Loading
             try {
-                val result = repository.getHealthcareDetail("1mLLN663AiCu0ymv421B")
+                val result = repository.getHealthcareDetail(uid)
                 when (result) {
                     is com.example.workerapp.data.repository.remote.NetworkResult.Success -> {
                         _uiState.value = HealthcareUiState.Success(result.data)
                     }
+
                     is com.example.workerapp.data.repository.remote.NetworkResult.Error -> {
                         _uiState.value = HealthcareUiState.Error(result.message)
                     }

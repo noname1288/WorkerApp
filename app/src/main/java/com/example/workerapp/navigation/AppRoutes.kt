@@ -10,6 +10,7 @@ object AppRoutes {
     const val LOGIN = "login"
     const val REGISTER = "register"
 
-    const val CLEANING_DETAIL = "cleaning_detail"
-    const val HEALTHCARE_DETAIL = "healthcare_detail"
+    const val SERVICE_DETAIL = "service_detail/%s"
+    const val CLEANING_DETAIL = "cleaning_detail/%s"
+    const val HEALTHCARE_DETAIL = "healthcare_detail/%s"
 }

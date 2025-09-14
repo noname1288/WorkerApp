@@ -1,6 +1,7 @@
 package com.example.workerapp.data.repository.remote
 
 import com.example.workerapp.data.repository.remote.api.JobApi
+import com.example.workerapp.data.repository.remote.api.ServiceApi
 import com.example.workerapp.data.repository.remote.api.UserApi
 import com.squareup.moshi.Moshi
 import okhttp3.OkHttpClient
@@ -28,4 +29,5 @@ object RetrofitHelper {
 
     val jobApi: JobApi by lazy { retrofit.create(JobApi::class.java) }
     val userApi: UserApi by lazy { retrofit.create(UserApi::class.java) }
+    val serviceApi: ServiceApi by lazy { retrofit.create(ServiceApi::class.java) }
 }

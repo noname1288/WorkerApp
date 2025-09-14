@@ -20,6 +20,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -32,10 +33,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.workerapp.R
 import com.example.workerapp.data.model.base.UserModel
-import com.example.workerapp.data.model.healthcare.HealthServiceWrapper
 import com.example.workerapp.data.model.healthcare.HealthcareJobModel
 import com.example.workerapp.ui.detail.components.ClientCard
-import com.example.workerapp.ui.detail.components.HealthcareWorkflow
 import com.example.workerapp.ui.detail.components.JobDetailCard
 import com.example.workerapp.ui.detail.components.WeeklySchedule
 import com.example.workerapp.utils.button.SlideToConfirmButton
@@ -44,19 +43,29 @@ import com.example.workerapp.utils.components.CircleLoadingIndicator
 sealed class HealthcareJobSection {
     data class UserInfo(val user: UserModel) : HealthcareJobSection()
     data class JobDetails(val job: HealthcareJobModel) : HealthcareJobSection()
-    data class WeeklySchedule(val days: List<String>, val isWeekly: Boolean) : HealthcareJobSection()
-    data class JobWorkflow(val jobServiceWrapper: List<HealthServiceWrapper>) : HealthcareJobSection()
+    data class WeeklySchedule(val days: List<String>, val isWeekly: Boolean) :
+        HealthcareJobSection()
+
+    //    data class JobWorkflow(val jobServiceWrapper: List<HealthServiceWrapper>) : HealthcareJobSection()
     object ActionButtons : HealthcareJobSection()
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HealthcareDetailScreen(viewModel: HealthcareViewModel, navController: NavController) {
+fun HealthcareDetailScreen(
+    healthcareUid: String,
+    viewModel: HealthcareViewModel,
+    navController: NavController
+) {
     val context = LocalContext.current
     val TAG = "HealthcareDetailScreen"
 
     val uiState by viewModel.uiState.collectAsState()
     var sections = listOf<HealthcareJobSection>()
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchJobDetail(healthcareUid)
+    }
 
     when (uiState) {
         is HealthcareUiState.Success -> {
@@ -69,7 +78,7 @@ fun HealthcareDetailScreen(viewModel: HealthcareViewModel, navController: NavCon
                     days = job.listDays,
                     isWeekly = job.listDays.size != 1
                 ),
-                HealthcareJobSection.JobWorkflow(job.services),
+//                HealthcareJobSection.JobWorkflow(job.services),
                 HealthcareJobSection.ActionButtons
             )
         }
@@ -144,12 +153,12 @@ fun HealthcareDetailScreen(viewModel: HealthcareViewModel, navController: NavCon
                         }
                     }
 
-                    is HealthcareJobSection.JobWorkflow -> {
-                        item {
-                            HealthcareWorkflow(section.jobServiceWrapper)
-                            Spacer(Modifier.height(24.dp))
-                        }
-                    }
+//                    is HealthcareJobSection.JobWorkflow -> {
+//                        item {
+//                            HealthcareWorkflow(section.jobServiceWrapper)
+//                            Spacer(Modifier.height(24.dp))
+//                        }
+//                    }
 
                     is HealthcareJobSection.ActionButtons -> {
                         item {

@@ -28,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -53,24 +54,29 @@ import com.example.workerapp.ui.detail.components.JobWorkflow
 import com.example.workerapp.ui.detail.components.WeeklySchedule
 import com.example.workerapp.utils.button.SlideToConfirmButton
 import com.example.workerapp.utils.components.CircleLoadingIndicator
+import com.example.workerapp.utils.navigation.popBackIfCan
 
 sealed class CleaningJobSection {
     data class UserInfo(val user: UserModel) : CleaningJobSection()
     data class JobDetails(val job: CleaningJobModel1) : CleaningJobSection()
     data class WeeklySchedule(val days: List<String>, val isWeekly: Boolean) : CleaningJobSection()
     data class AdditionalJob(val isCooking: Boolean, val isIroning: Boolean) : CleaningJobSection()
-    data class JobWorkflow(val services: List<CleaningServiceModel>) : CleaningJobSection()
+//    data class JobWorkflow(val services: List<CleaningServiceModel>) : CleaningJobSection()
     object ActionButtons : CleaningJobSection()
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CleaningDetailScreen(viewmodel: CleaningViewModel, navController: NavController) {
+fun CleaningDetailScreen(cleaningUid: String, viewmodel: CleaningViewModel, navController: NavController) {
     val tag = "CleaningDetailScreen"
     val context = LocalContext.current
 
     val uiState by viewmodel.uiState.collectAsState()
     var sections = emptyList<CleaningJobSection>()
+
+    LaunchedEffect(Unit) {
+        viewmodel.fetchJobDetail(cleaningUid)
+    }
 
     when (uiState) {
         is CleaningUiState.Success -> {
@@ -85,7 +91,7 @@ fun CleaningDetailScreen(viewmodel: CleaningViewModel, navController: NavControl
                     data.listDays.size > 1
                 ),
                 CleaningJobSection.AdditionalJob(data.isCooking, data.isIroning),
-                CleaningJobSection.JobWorkflow(data.services),
+//                CleaningJobSection.JobWorkflow(data.services),
                 CleaningJobSection.ActionButtons
             )
         }
@@ -127,7 +133,9 @@ fun CleaningDetailScreen(viewmodel: CleaningViewModel, navController: NavControl
             },
             windowInsets = WindowInsets(0, 0, 0, 0),
             navigationIcon = {
-                IconButton(onClick = {}) {
+                IconButton(onClick = {
+                    navController.popBackIfCan()
+                }) {
                     Icon(
                         Icons.Default.ArrowBackIosNew, contentDescription = "Back",
                         modifier = Modifier.size(20.dp)
@@ -176,12 +184,12 @@ fun CleaningDetailScreen(viewmodel: CleaningViewModel, navController: NavControl
                         }
                     }
 
-                    is CleaningJobSection.JobWorkflow -> {
-                        item {
-                            JobWorkflow(section.services)
-                            Spacer(Modifier.height(24.dp))
-                        }
-                    }
+//                    is CleaningJobSection.JobWorkflow -> {
+//                        item {
+//                            JobWorkflow(section.services)
+//                            Spacer(Modifier.height(24.dp))
+//                        }
+//                    }
 
                     is CleaningJobSection.ActionButtons -> {
                         item {

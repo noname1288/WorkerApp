@@ -22,7 +22,6 @@ open class JobModel1(
     open var user: UserModel,
     open var serviceType: String,
 
-    open var workerQuantity: Int,
     open var price: Double,
     open var status: String,
     open var listDays: List<String>,
