@@ -222,6 +222,8 @@ fun RegisterScreen(
                 Toast.LENGTH_LONG
             ).show()
 
+            viewModel.clearState()
+
             //navigate to login screen
             navController.popBackIfCan()
         }

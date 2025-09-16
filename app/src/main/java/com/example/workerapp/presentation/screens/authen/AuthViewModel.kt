@@ -85,6 +85,11 @@ class AuthViewModel : ViewModel() {
         }
     }
 
+    fun clearState() {
+        _loginState.value = AuthenticationUIState.Idle
+        _registerState.value = AuthenticationUIState.Idle
+    }
+
     //trigger a sign-in with GG button
     val googleIdOption = GetSignInWithGoogleOption.Builder(
         serverClientId = WEB_CLIENT_ID

@@ -69,7 +69,7 @@ fun AppNavHost(
             NotificationScreen()
         }
         composable(AppRoutes.PROFILE) {
-            ProfileScreen()
+            ProfileScreen(navController = navController)
         }
 
         composable(

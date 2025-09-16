@@ -36,9 +36,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.workerapp.R
 import com.example.workerapp.data.source.remote.model.base.UserModel
+import com.example.workerapp.navigation.AppRoutes
 import com.example.workerapp.presentation.screens.profile.components.CustomExtendedButton
+import com.example.workerapp.utils.navigation.safeNavigate
 
 sealed class ProfileSection {
     object Avatar : ProfileSection()
@@ -47,7 +50,7 @@ sealed class ProfileSection {
 }
 
 @Composable
-fun ProfileScreen(modifier: Modifier = Modifier) {
+fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
     val fakeUser = UserModel(
         username = "Phạm Thanh Sơn",
         gender = "Male",
@@ -87,7 +90,7 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
                 is ProfileSection.Logout -> {
                     item {
                         Button(
-                            onClick = {},
+                            onClick = {navController.safeNavigate(AppRoutes.LOGIN, popUpToRoute = AppRoutes.LOGIN, inclusive = false, restore = false )},
                             shape = RoundedCornerShape(0.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = colorResource(R.color.light_orange_icon)
@@ -174,12 +177,4 @@ fun SettingButtons(
         )
 
     }
-}
-
-
-@Preview(showBackground = true, backgroundColor = 0xFF4B5563)
-@Composable
-fun PreviewProfileScreen() {
-//    ProfileHeader()
-    ProfileScreen()
 }

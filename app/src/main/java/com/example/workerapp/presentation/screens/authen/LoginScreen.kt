@@ -227,6 +227,8 @@ fun LoginScreen(
                 Toast.LENGTH_LONG
             ).show()
 
+            viewModel.clearState()
+
             // Navigate to home screen + clear login screen from back stack
             navController.safeNavigate(AppRoutes.HOME, AppRoutes.LOGIN, inclusive = true, restore = false)
         }
