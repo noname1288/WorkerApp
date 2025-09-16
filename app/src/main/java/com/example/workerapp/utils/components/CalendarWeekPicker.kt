@@ -78,6 +78,7 @@ fun CalendarWeekPicker(
             onDismiss = {
                 showSheet = false
             },
+            doneLabel = "Xong",
             onDoneClick = {
                 currentMonthYear = YearMonth.from(it)
                 currentWeekStart = it.with(DayOfWeek.MONDAY)

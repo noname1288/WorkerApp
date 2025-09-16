@@ -21,15 +21,25 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.workerapp.R
+import com.example.workerapp.data.source.remote.model.base.JobModel1
+import com.example.workerapp.utils.ServiceType
 
 @Composable
 fun InformationDialog(
     modifier: Modifier = Modifier,
+    job: JobModel1,
     onDismissRequest: () -> Unit,
 ) {
+    val serviceType = when (job.serviceType){
+        ServiceType.CleaningType -> "Dọn dẹp"
+        ServiceType.HealthcareType -> "Chăm sóc sức khỏe"
+        ServiceType.MaintenanceType -> "Bảo trì"
+        else -> "Khác"
+    }
+
+    val days = job.listDays.joinToString (separator = "\n")
 
     AlertDialog(
         onDismissRequest = {
@@ -61,28 +71,28 @@ fun InformationDialog(
         },
         text = {
             Column {
-                InformationItem("Thể loại", "Dọn dẹp")
+                InformationItem("Thể loại", serviceType)
                 HorizontalDivider()
 
-                InformationItem("Tên khách hàng", "Lich hoc")
+                InformationItem("Tên khách hàng", job.user.username)
                 HorizontalDivider()
 
-                InformationItem("Số điện thoại", "Lich hoc")
+                InformationItem("Số điện thoại", job.user.tel)
                 HorizontalDivider()
 
                 InformationItem(
                     "Địa chỉ",
-                    "When the user clicks either of the buttons, the dialog closes. When the user clicks confirm, it calls a function that also hand"
+                    job.location
                 )
                 HorizontalDivider()
 
-                InformationItem("Ngày bắt đầu", "19/08/2024")
+                InformationItem("Ngày làm việc", days)
                 HorizontalDivider()
 
-                InformationItem("Thời gian bắt đầu", "08:00")
+                InformationItem("Thời gian bắt đầu", job.startTime)
                 HorizontalDivider()
 
-                InformationItem("Thời gian kết thúc", "12:00")
+                InformationItem("Lương", "${job.price} VND", true)
             }
         },
         containerColor = Color.White,
@@ -113,17 +123,10 @@ fun InformationItem(label: String, value: String, isImportant: Boolean = false) 
                     ),
                     fontWeight = if (isImportant) FontWeight.Bold else FontWeight.Normal
                 ),
-                maxLines = 2,
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.End
             )
         }
     }
-}
-
-@Preview
-@Composable
-fun Prev2(modifier: Modifier = Modifier) {
-    InformationDialog(onDismissRequest = {})
 }
 

@@ -1,15 +1,16 @@
 package com.example.workerapp.utils
 
 import com.example.workerapp.utils.components.MonthWithDays
+import java.time.Duration
 import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.YearMonth
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.time.Duration
-import java.time.LocalDate
-import java.time.YearMonth
 import java.util.concurrent.TimeUnit
 
-object TimeUtils{
+object TimeUtils {
 
     fun formatDateTimeFull(timestamp: Long): String {
         val instant = Instant.ofEpochMilli(timestamp)
@@ -63,5 +64,24 @@ object TimeUtils{
             }
             .sortedBy { it.month }
     }
+
+    fun getShiftLabel(time: LocalTime): String {
+        return when {
+            time.isBefore(LocalTime.NOON) -> TimeShift.MORNING          // < 12:00
+            time.isBefore(LocalTime.of(18, 0)) -> TimeShift.AFTERNOON    // 12:00 - 18:00
+            else -> TimeShift.EVENING                                    // >= 18:00
+        }
+    }
+
+    fun toStringWithFormatter(date: LocalDate, pattern: String = "dd/MM/yyyy") : String {
+        val formatter = DateTimeFormatter.ofPattern(pattern)
+        return date.format(formatter)
+    }
+}
+
+object TimeShift{
+    const val MORNING = "Ca sáng"
+    const val AFTERNOON = "Ca chiều"
+    const val EVENING = "Ca tối"
 }
 

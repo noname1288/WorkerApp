@@ -1,6 +1,18 @@
 package com.example.workerapp.navigation
 
+object AppScreen{
+    const val SERVICE_SCREEN = "service_detail"
+    const val CLEANING_SCREEN = "cleaning_detail"
+    const val HEALTHCARE_SCREEN = "healthcare_detail"
+}
+
+object DestinationArgs{
+    const val SERVICE_TYPE = "serviceType"
+    const val JOB_ID = "jobId"
+}
+
 object AppRoutes {
+    const val SPLASH = "splash"
     const val HOME = "home"
     const val CALENDAR = "calendar"
     const val INCOME = "income"
@@ -10,7 +22,7 @@ object AppRoutes {
     const val LOGIN = "login"
     const val REGISTER = "register"
 
-    const val SERVICE_DETAIL = "service_detail/%s"
-    const val CLEANING_DETAIL = "cleaning_detail/%s"
-    const val HEALTHCARE_DETAIL = "healthcare_detail/%s"
+    const val SERVICE_DETAIL = "${AppScreen.SERVICE_SCREEN}/%s"
+    const val CLEANING_DETAIL = "${AppScreen.CLEANING_SCREEN}/%s"
+    const val HEALTHCARE_DETAIL = "${AppScreen.HEALTHCARE_SCREEN}/%s"
 }

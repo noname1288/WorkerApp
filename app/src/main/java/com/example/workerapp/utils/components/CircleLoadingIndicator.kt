@@ -18,7 +18,7 @@ fun CircleLoadingIndicator() {
     Box(
         Modifier
             .fillMaxSize()
-            .background(colorResource(R.color.bg_gray).copy(alpha = 0.5f)),
+            .background(colorResource(R.color.bg_gray).copy(alpha = 0.2f)),
         contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator(
