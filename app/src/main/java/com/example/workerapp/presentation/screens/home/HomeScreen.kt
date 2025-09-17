@@ -1,4 +1,4 @@
-package com.example.workerapp.ui.home
+package com.example.workerapp.presentation.screens.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -43,9 +43,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.example.workerapp.R
 import com.example.workerapp.navigation.AppRoutes
 import com.example.workerapp.utils.ServiceType
+import com.example.workerapp.utils.cached.UserSession
 import com.example.workerapp.utils.navigation.navigateWithArgs
 
 /**
@@ -86,20 +88,9 @@ fun HomeScreen(modifier: Modifier = Modifier, navController: NavController) {
                 .fillMaxSize()
         ) {
             item {
-//            CenterAlignedTopAppBar(
-//                title = {
-//                    Text(
-//                        stringResource(R.string.home_title),
-//                        fontWeight = FontWeight.Bold
-//                    )
-//                },
-//                windowInsets = WindowInsets(0, 0, 0, 0),
-//                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
-//            )
                 Spacer(Modifier.height(16.dp))
             }
 
-            // Render each section
             homeSections.forEach { section ->
                 item {
                     when (section) {
@@ -173,11 +164,6 @@ fun HomeScreen(modifier: Modifier = Modifier, navController: NavController) {
 }
 
 @Composable
-fun CategoryList(modifier: Modifier = Modifier) {
-
-}
-
-@Composable
 fun CategoryCard(
     modifier: Modifier = Modifier,
     label: String = "Cleaning",
@@ -207,7 +193,7 @@ fun CategoryCard(
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.Bold,
                                 color = colorResource(R.color.orange_primary),
-                                textAlign = if (isReverse) TextAlign.Start else TextAlign.End
+                                textAlign = TextAlign.Start
                             ), maxLines = 2,
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -241,7 +227,7 @@ fun CategoryCard(
                             label,
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.Bold,
-                                textAlign = if (isReverse) TextAlign.Start else TextAlign.End,
+                                textAlign = TextAlign.End,
                                 color = colorResource(R.color.orange_primary)
                             ), maxLines = 2,
                             modifier = Modifier.fillMaxWidth()
@@ -250,7 +236,7 @@ fun CategoryCard(
                         Text(
                             text = body,
                             style = MaterialTheme.typography.bodyMedium.copy(
-                                textAlign = if (isReverse) TextAlign.Start else TextAlign.End
+                                textAlign = TextAlign.End
                             )
                         )
                     }
@@ -280,9 +266,10 @@ fun CustomAvatarRow(
             .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(
-            painter = painterResource(R.drawable.avt),
+        AsyncImage(
+            model = UserSession.userProfilePicUrl, // Thay URL này bằng URL ảnh của bạn
             contentDescription = null,
+            error = painterResource(R.drawable.ic_launcher_background),
             modifier = Modifier
                 .size(36.dp)
                 .clip(CircleShape),
@@ -292,7 +279,7 @@ fun CustomAvatarRow(
         Spacer(Modifier.width(8.dp))
 
         Text(
-            "Le Minh Quang",
+            UserSession.displayName ?: "Khách",
             style = MaterialTheme.typography.bodyLarge.copy(
                 fontWeight = FontWeight.Bold,
                 color = Color.White

@@ -1,4 +1,4 @@
-package com.example.workerapp.ui.authen
+package com.example.workerapp.presentation.screens.authen
 
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -154,8 +154,8 @@ fun LoginScreen(
 
         Button(
             onClick = {
-//                        viewModel.loginWithEmailAndPassword(email, password)
-                viewModel.changeLoginState(AuthenticationUIState.Success("Login successful"))
+                viewModel.loginWithEmailAndPassword(email, password)
+//                viewModel.changeLoginState(AuthenticationUIState.Success("Login successful"))
 
                 // clear form
                 email = ""
@@ -223,14 +223,19 @@ fun LoginScreen(
         is AuthenticationUIState.Success -> {
             Toast.makeText(
                 context,
-                (loginState as AuthenticationUIState.Success).message,
+                "Login successfully",
                 Toast.LENGTH_LONG
             ).show()
 
             viewModel.clearState()
 
             // Navigate to home screen + clear login screen from back stack
-            navController.safeNavigate(AppRoutes.HOME, AppRoutes.LOGIN, inclusive = true, restore = false)
+            navController.safeNavigate(
+                AppRoutes.HOME,
+                AppRoutes.LOGIN,
+                inclusive = true,
+                restore = false
+            )
         }
 
         is AuthenticationUIState.Error -> {
@@ -250,7 +255,6 @@ fun LoginScreen(
 }
 
 
-
 @Composable
 fun CustomEditTextField(
     modifier: Modifier = Modifier,
@@ -260,7 +264,7 @@ fun CustomEditTextField(
     onTextChange: (String) -> Unit,
     isPasswordTextField: Boolean = false
 ) {
-    val light_gray = colorResource(R.color.light_gray)
+    val lightGray = colorResource(R.color.light_gray)
 
     val keyboardOptions = if (isPasswordTextField) KeyboardOptions(
         keyboardType = KeyboardType.Password,
@@ -291,7 +295,7 @@ fun CustomEditTextField(
                 placeholderText,
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontStyle = FontStyle.Italic,
-                    color = light_gray
+                    color = lightGray
                 )
             )
         },
@@ -305,7 +309,7 @@ fun CustomEditTextField(
                     contentDescription = null,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
-                Text("|", fontSize = 25.sp, color = light_gray)
+                Text("|", fontSize = 25.sp, color = lightGray)
                 Spacer(Modifier.width(8.dp))
             }
         },
@@ -329,7 +333,7 @@ fun CustomEditTextField(
             focusedTextColor = Color.Black,
             unfocusedTextColor = Color.Black,
             focusedBorderColor = colorResource(R.color.orange_primary),
-            unfocusedBorderColor = light_gray,
+            unfocusedBorderColor = lightGray,
         ),
         modifier = Modifier
             .fillMaxWidth()

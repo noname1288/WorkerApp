@@ -1,4 +1,4 @@
-package com.example.workerapp.ui.income
+package com.example.workerapp.presentation.screens.income
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

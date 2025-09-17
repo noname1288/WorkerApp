@@ -1,5 +1,6 @@
 package com.example.workerapp.data.source.remote
 
+import com.example.workerapp.data.TokenRepository
 import com.example.workerapp.data.source.remote.api.JobApi
 import com.example.workerapp.data.source.remote.api.ServiceApi
 import com.example.workerapp.data.source.remote.api.UserApi
@@ -12,23 +13,26 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 
 object RetrofitHelper {
-    private val baseUrl = "https://bedatn-eosin.vercel.app/api/"
+    private const val baseUrl = "https://bedatn-eosin.vercel.app/api/"
 
-    private val moshi = Moshi.Builder()
-        .build()
+    private lateinit var retrofit: Retrofit
 
-    private val okHttpClient: OkHttpClient = OkHttpClient.Builder()
-        .addInterceptor(HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
-        })
-        .addInterceptor(AuthInterceptor { UserSession.token })
-        .build()
+    fun init(tokenRepository: TokenRepository) {
+        val moshi = Moshi.Builder().build()
 
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(baseUrl)
-        .client(okHttpClient)
-        .addConverterFactory(MoshiConverterFactory.create(moshi))
-        .build()
+        val okHttpClient: OkHttpClient = OkHttpClient.Builder()
+            .addInterceptor(HttpLoggingInterceptor().apply {
+                level = HttpLoggingInterceptor.Level.BODY
+            })
+            .addInterceptor(AuthInterceptor(tokenRepository))
+            .build()
+
+        retrofit = Retrofit.Builder()
+            .baseUrl(baseUrl)
+            .client(okHttpClient)
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .build()
+    }
 
     val jobApi: JobApi by lazy { retrofit.create(JobApi::class.java) }
     val userApi: UserApi by lazy { retrofit.create(UserApi::class.java) }

@@ -34,13 +34,14 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.example.workerapp.R
-import com.example.workerapp.data.source.remote.model.base.UserModel
 import com.example.workerapp.navigation.AppRoutes
+import com.example.workerapp.presentation.screens.authen.AuthViewModel
 import com.example.workerapp.presentation.screens.profile.components.CustomExtendedButton
+import com.example.workerapp.utils.cached.UserSession
 import com.example.workerapp.utils.navigation.safeNavigate
 
 sealed class ProfileSection {
@@ -50,17 +51,8 @@ sealed class ProfileSection {
 }
 
 @Composable
-fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
-    val fakeUser = UserModel(
-        username = "Phạm Thanh Sơn",
-        gender = "Male",
-        dob = "1990-01-01",
-        avatar = "https://example.com/avatar.jpg",
-        tel = "1234567890",
-        location = "New York",
-        email = "john.doe@example.com",
-        role = "user"
-    )
+fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController, viewModel: AuthViewModel) {
+
     val sections = listOf(
         ProfileSection.Avatar,
         ProfileSection.Settings,
@@ -90,7 +82,16 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
                 is ProfileSection.Logout -> {
                     item {
                         Button(
-                            onClick = {navController.safeNavigate(AppRoutes.LOGIN, popUpToRoute = AppRoutes.LOGIN, inclusive = false, restore = false )},
+                            onClick = {
+                                viewModel.logout()
+
+                                navController.safeNavigate(
+                                    AppRoutes.LOGIN,
+                                    popUpToRoute = AppRoutes.LOGIN,
+                                    inclusive = false,
+                                    restore = false
+                                )
+                            },
                             shape = RoundedCornerShape(0.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = colorResource(R.color.light_orange_icon)
@@ -110,26 +111,36 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
 
 @Composable
 fun ProfileHeader() {
-    Row(Modifier
-        .fillMaxWidth()
-        .background(Color.White)
-        .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 32.dp),
-        verticalAlignment = Alignment.CenterVertically) {
-        Image(
-            painterResource(R.drawable.ic_launcher_background), null,
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .background(Color.White)
+            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 32.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        AsyncImage(
+            model = UserSession.userProfilePicUrl,
+            null,
+            error = painterResource(R.drawable.ic_launcher_background),
             modifier = Modifier
                 .size(80.dp)
                 .clip(CircleShape)
         )
+
         Spacer(Modifier.width(16.dp))
+
         Column {
             Text(
-                "Phạm Thanh Sơn",
+                UserSession.displayName ?: "Khách",
                 style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
             )
             Text(
                 "Xem hồ sơ >",
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, color = colorResource(R.color.green))
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = colorResource(R.color.green)
+                )
             )
         }
     }
@@ -143,7 +154,6 @@ fun SettingButtons(
     onSupportClick: () -> Unit = {},
     onSettingClick: () -> Unit = {}
 ) {
-    val internalModifier = Modifier.fillMaxWidth()
     Column(modifier.fillMaxWidth()) {
         CustomExtendedButton(
             label = stringResource(R.string.job_history_title),
@@ -168,7 +178,6 @@ fun SettingButtons(
         )
 
         HorizontalDivider()
-
 
         CustomExtendedButton(
             label = stringResource(R.string.setting_title),

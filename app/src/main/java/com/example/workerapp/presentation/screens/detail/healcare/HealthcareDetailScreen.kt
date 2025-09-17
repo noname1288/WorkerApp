@@ -1,6 +1,5 @@
 package com.example.workerapp.ui.detail.healcare
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +22,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -66,6 +68,7 @@ fun HealthcareDetailScreen(
 
     val uiState by viewModel.uiState.collectAsState()
     val applyState by viewModel.applyState.collectAsState()
+    var isConfirmed by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(applyState) {
         if (applyState) {
@@ -122,7 +125,9 @@ fun HealthcareDetailScreen(
             },
             windowInsets = WindowInsets(0, 0, 0, 0),
             navigationIcon = {
-                IconButton(onClick = {}) {
+                IconButton(onClick = {
+                    navController.popBackIfCan()
+                }) {
                     Icon(
                         Icons.Default.ArrowBackIosNew, contentDescription = "Back",
                         modifier = Modifier.size(20.dp)
@@ -174,10 +179,8 @@ fun HealthcareDetailScreen(
                     is HealthcareJobSection.ActionButtons -> {
                         item {
                             SlideToConfirmButton(
-                                onConfirmed = {
-                                    Log.d(TAG, "HealthDetailScreen: Confirmed")
-                                    viewModel.applyToJob(healthcareUid)
-                                }
+                                isConfirmed = isConfirmed,
+                                onValueChange = { isConfirmed = it }
                             )
                             Spacer(Modifier.height(24.dp))
                         }

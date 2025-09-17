@@ -10,22 +10,22 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.workerapp.presentation.screens.authen.AuthViewModel
 import com.example.workerapp.presentation.screens.notification.NotificationScreen
 import com.example.workerapp.presentation.screens.profile.ProfileScreen
 import com.example.workerapp.presentation.screens.service.ServiceDetailScreen
 import com.example.workerapp.presentation.screens.service.ServiceViewModel
 import com.example.workerapp.presentation.screens.splash.SplashScreen
-import com.example.workerapp.ui.authen.AuthViewModel
-import com.example.workerapp.ui.authen.LoginScreen
-import com.example.workerapp.ui.authen.RegisterScreen
+import com.example.workerapp.presentation.screens.authen.LoginScreen
+import com.example.workerapp.presentation.screens.authen.RegisterScreen
 import com.example.workerapp.ui.calendar.CalendarScreen
 import com.example.workerapp.ui.calendar.CalendarViewModel
 import com.example.workerapp.ui.detail.cleaning.CleaningDetailScreen
 import com.example.workerapp.ui.detail.cleaning.CleaningViewModel
 import com.example.workerapp.ui.detail.healcare.HealthcareDetailScreen
 import com.example.workerapp.ui.detail.healcare.HealthcareViewModel
-import com.example.workerapp.ui.home.HomeScreen
-import com.example.workerapp.ui.income.IncomeScreen
+import com.example.workerapp.presentation.screens.home.HomeScreen
+import com.example.workerapp.presentation.screens.income.IncomeScreen
 import com.example.workerapp.utils.ServiceType
 
 @Composable
@@ -41,7 +41,7 @@ fun AppNavHost(
         startDestination = startDestination,
     ) {
         composable(AppRoutes.SPLASH) {
-            SplashScreen(navController)
+            SplashScreen(navController, authViewModel)
         }
 
         composable(AppRoutes.LOGIN) {
@@ -69,7 +69,7 @@ fun AppNavHost(
             NotificationScreen()
         }
         composable(AppRoutes.PROFILE) {
-            ProfileScreen(navController = navController)
+            ProfileScreen(navController = navController, viewModel = authViewModel)
         }
 
         composable(

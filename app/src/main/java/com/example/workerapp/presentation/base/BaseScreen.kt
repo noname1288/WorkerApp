@@ -33,17 +33,22 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.workerapp.MyApplication
 import com.example.workerapp.R
 import com.example.workerapp.navigation.AppNavHost
 import com.example.workerapp.navigation.AppRoutes
 import com.example.workerapp.navigation.NavItem
-import com.example.workerapp.ui.authen.AuthViewModel
+import com.example.workerapp.presentation.base.BaseViewModelFactory
+import com.example.workerapp.presentation.screens.authen.AuthViewModel
+import com.example.workerapp.utils.navigation.safeNavigate
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
 fun BaseScreen() {
     val context = LocalContext.current
-    val startDestination = AppRoutes.LOGIN
+    val app = context.applicationContext as MyApplication
+
+    val startDestination = AppRoutes.SPLASH
 
     val showBottomBar = listOf(
         AppRoutes.HOME,
@@ -61,7 +66,13 @@ fun BaseScreen() {
         Log.d("BaseScreen", "Current route: $currentRoute")
     }
 
-    val authViewModel: AuthViewModel = viewModel()
+    /* *
+    * Shared ViewModel
+    * */
+    val authViewModelFactory = BaseViewModelFactory{
+        AuthViewModel(app.tokenRepository, app.userRepository)
+    }
+    val authViewModel: AuthViewModel = viewModel (factory = authViewModelFactory)
 
     val systemUiController = rememberSystemUiController()
     val useDarkIcons = true // vì nền trắng nên dùng icon tối
@@ -80,7 +91,7 @@ fun BaseScreen() {
                 CustomNavigationBar(
                     selectedRoute = currentRoute,
                     onItemSelected = { route ->
-                        navController.navigate(route)
+                        navController.safeNavigate(route, popUpToRoute = AppRoutes.HOME, restore = true)
                     }
                 )
         },

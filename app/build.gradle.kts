@@ -42,6 +42,13 @@ android {
 }
 
 dependencies {
+    //room
+    val room_version = "2.8.0"
+
+    implementation("androidx.room:room-runtime:$room_version")
+    ksp("androidx.room:room-compiler:$room_version")
+    implementation("androidx.room:room-ktx:${room_version}")
+
     //datastore
     implementation("androidx.datastore:datastore-preferences:1.1.7")
     // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp

@@ -31,6 +31,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -77,15 +80,16 @@ fun CleaningDetailScreen(
 
     val uiState by viewmodel.uiState.collectAsState()
     val applyState by viewmodel.applyState.collectAsState()
+    var confirmed by rememberSaveable { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        viewmodel.fetchJobDetail(cleaningUid)
-    }
-
-    LaunchedEffect(applyState) {
-        if (applyState) {
+    LaunchedEffect(Unit, applyState) {
+        if (applyState == true) {
             Toast.makeText(context, "Ứng tuyển thành công!", Toast.LENGTH_LONG).show()
             navController.popBackIfCan()
+        } else if (applyState == false) {
+            viewmodel.updateApplyState(null)
+        } else {
+            viewmodel.fetchJobDetail(cleaningUid)
         }
     }
 
@@ -198,10 +202,13 @@ fun CleaningDetailScreen(
                     is CleaningJobSection.ActionButtons -> {
                         item {
                             SlideToConfirmButton(
-                                onConfirmed = {
+                                isConfirmed = confirmed,
+                                onValueChange = {
+                                    confirmed = it
+
                                     Log.d(tag, "CleaningDetailScreen: Confirmed")
                                     viewmodel.applyToJob(cleaningUid)
-                                },
+                                }
                             )
                             Spacer(Modifier.height(24.dp))
                         }

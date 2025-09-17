@@ -42,14 +42,12 @@ import com.example.workerapp.R
 @Composable
 fun SlideToConfirmButton(
     modifier: Modifier = Modifier,
-    onConfirmed: () -> Unit,
+    isConfirmed: Boolean,
+    onValueChange: (Boolean) -> Unit,
 ) {
     val thumbSize = 56.dp
     var offsetX by remember { mutableStateOf(0f) }
-    var confirmed by rememberSaveable { mutableStateOf(false) }
     val density = LocalDensity.current
-
-
 
     BoxWithConstraints(
         modifier = modifier
@@ -62,8 +60,8 @@ fun SlideToConfirmButton(
         val maxDragPx = with(density) { (maxWidth - thumbSize).toPx() }
 
         // Khi confirmed = true thì ép thumb về cuối
-        LaunchedEffect(confirmed) {
-            if (confirmed) offsetX = maxDragPx
+        LaunchedEffect(isConfirmed) {
+            if (isConfirmed) offsetX = maxDragPx
         }
 
         // phần nền màu fill theo offset
@@ -75,7 +73,7 @@ fun SlideToConfirmButton(
                     val progress = (offsetX / maxDragPx).coerceIn(0f, 1f)
                     val fillWidth = size.width * progress
                     drawRoundRect(
-                        color = if (confirmed) Color(0xFF4CAF50) else Color(0xFFF8A66E),
+                        color = if (isConfirmed) Color(0xFF4CAF50) else Color(0xFFF8A66E),
                         size = Size(fillWidth, size.height),
                         cornerRadius = CornerRadius(20.dp.toPx(), 20.dp.toPx())
                     )
@@ -84,8 +82,8 @@ fun SlideToConfirmButton(
 
         // text
         Text(
-            text = if (confirmed) "Đã xác nhận!" else "Trượt để xác nhận",
-            color = if (confirmed) Color.White else Color.DarkGray,
+            text = if (isConfirmed) "Đã xác nhận!" else "Trượt để xác nhận",
+            color = if (isConfirmed) Color.White else Color.DarkGray,
             modifier = Modifier.align(Alignment.Center)
         )
 
@@ -96,21 +94,20 @@ fun SlideToConfirmButton(
                 .offset { IntOffset(offsetX.toInt(), 0) }
                 .size(thumbSize)
                 .clip(RoundedCornerShape(20.dp))
-                .background(if (confirmed) Color.White else Color(0xFF4CAF50))
+                .background(if (isConfirmed) Color.White else Color(0xFF4CAF50))
                 .border(1.dp, colorResource(R.color.green), RoundedCornerShape(20.dp))
                 .draggable(
                     orientation = Orientation.Horizontal,
                     state = rememberDraggableState { delta ->
-                        if (!confirmed) {
+                        if (!isConfirmed) {
                             offsetX = (offsetX + delta).coerceIn(0f, maxDragPx)
                         }
                     },
                     onDragStopped = {
                         val threshold = maxDragPx * 0.8f
                         if (offsetX >= threshold) {
-                            confirmed = true
+                            onValueChange (true)
                             offsetX = maxDragPx
-                            onConfirmed()
                         } else {
                             offsetX = 0f
                         }
@@ -118,7 +115,7 @@ fun SlideToConfirmButton(
                 ),
             contentAlignment = Alignment.Center
         ) {
-            if (confirmed) {
+            if (isConfirmed) {
                 Icon(Icons.Default.Check, contentDescription = null, tint = Color(0xFF4CAF50))
             } else {
                 Icon(Icons.Default.ArrowForward, contentDescription = null, tint = Color.White)

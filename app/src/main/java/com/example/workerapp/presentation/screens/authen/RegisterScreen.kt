@@ -1,4 +1,4 @@
-package com.example.workerapp.ui.authen
+package com.example.workerapp.presentation.screens.authen
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -159,11 +159,9 @@ fun RegisterScreen(
         item {
             Button(
                 onClick = {
-//                            viewModel.registerWithForm(
-//                                displayName, email, password, imageUrl
-//                            )
-
-//                    viewModel.changeRegisterState(AuthenticationUIState.Success("Register successful"))
+                    viewModel.registerWithForm(
+                        displayName, email, password, imageUrl
+                    )
 
                     //clear form
                     displayName = ""
@@ -218,7 +216,7 @@ fun RegisterScreen(
         is AuthenticationUIState.Success -> {
             Toast.makeText(
                 context,
-                (registerState as AuthenticationUIState.Success).message,
+                "Register successfully! Please login to continue.",
                 Toast.LENGTH_LONG
             ).show()
 

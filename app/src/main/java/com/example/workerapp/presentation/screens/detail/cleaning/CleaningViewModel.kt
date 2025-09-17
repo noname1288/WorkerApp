@@ -19,8 +19,8 @@ class CleaningViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<CleaningUiState>(CleaningUiState.Idle)
     val uiState: StateFlow<CleaningUiState> = _uiState
 
-    private val _applyState = MutableStateFlow(false)
-    val applyState: StateFlow<Boolean> = _applyState
+    private val _applyState = MutableStateFlow<Boolean?>(null)
+    val applyState: StateFlow<Boolean?> = _applyState
 
     fun fetchJobDetail(uid: String) {
         if (uid.isEmpty()) {
@@ -41,12 +41,17 @@ class CleaningViewModel : ViewModel() {
         }
     }
 
+    fun updateApplyState(value: Boolean?){
+        _applyState.value = value
+    }
+
     fun applyToJob(uid: String) {
         if (uid.isEmpty()) {
             _uiState.value = CleaningUiState.Error("Invalid job ID")
             return
         }
         viewModelScope.launch {
+            _uiState.value = CleaningUiState.Loading
             try {
                 val request = ApplicationRequest(
                     workerID = UserSession.uid,
@@ -62,11 +67,12 @@ class CleaningViewModel : ViewModel() {
                         _applyState.value = true
                     }
                     is NetworkResult.Error -> {
+                        _applyState.value = false
                         _uiState.value = CleaningUiState.Error(result.message)
                     }
                 }
             } catch (e: Exception) {
-                _applyState.value = true
+                _applyState.value = false
                 _uiState.value = CleaningUiState.Error(e.message ?: "Unknown error")
             }
         }
