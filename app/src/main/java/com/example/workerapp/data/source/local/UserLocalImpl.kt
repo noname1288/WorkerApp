@@ -19,8 +19,6 @@ class UserLocalImpl(private val userDao: UserDao) : UserDataSource.Local {
     }
 
     companion object{
-        const val TAG = "UserLocalImpl"
-
         private var singleton: UserLocalImpl? = null
         fun getInstance(userDao: UserDao): UserLocalImpl{
             if(singleton == null){

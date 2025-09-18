@@ -34,8 +34,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.workerapp.R
-import com.example.workerapp.data.source.remote.model.base.UserModel
-import com.example.workerapp.data.source.remote.model.healthcare.HealthcareJobModel
+import com.example.workerapp.data.source.model.base.UserModel
+import com.example.workerapp.data.source.model.healthcare.HealthcareJobModel
 import com.example.workerapp.ui.detail.components.ClientCard
 import com.example.workerapp.ui.detail.components.JobDetailCard
 import com.example.workerapp.ui.detail.components.WeeklySchedule
@@ -58,6 +58,7 @@ sealed class HealthcareJobSection {
 fun HealthcareDetailScreen(
     modifier: Modifier = Modifier,
     healthcareUid: String,
+    isOnlyWatch: Boolean = false,
     viewModel: HealthcareViewModel,
     navController: NavController
 ) {
@@ -178,10 +179,12 @@ fun HealthcareDetailScreen(
 
                     is HealthcareJobSection.ActionButtons -> {
                         item {
-                            SlideToConfirmButton(
-                                isConfirmed = isConfirmed,
-                                onValueChange = { isConfirmed = it }
-                            )
+                            if (!isOnlyWatch) {
+                                SlideToConfirmButton(
+                                    isConfirmed = isConfirmed,
+                                    onValueChange = { isConfirmed = it }
+                                )
+                            }
                             Spacer(Modifier.height(24.dp))
                         }
                     }

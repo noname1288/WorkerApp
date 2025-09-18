@@ -4,9 +4,10 @@ import android.util.Log
 import com.example.workerapp.data.source.JobDataSource
 import com.example.workerapp.data.source.remote.api.JobApi
 import com.example.workerapp.data.source.remote.dto.request.ApplicationRequest
-import com.example.workerapp.data.source.remote.model.base.JobModel1
-import com.example.workerapp.data.source.remote.model.cleaning.CleaningJobModel1
-import com.example.workerapp.data.source.remote.model.healthcare.HealthcareJobModel
+import com.example.workerapp.data.source.model.base.JobModel1
+import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
+import com.example.workerapp.data.source.model.healthcare.HealthcareJobModel
+import com.example.workerapp.data.source.remote.dto.NetworkResult
 
 class JobRemoteImpl(private val jobApi: JobApi) : JobDataSource.Remote {
     override suspend fun getCleaningJobs(): NetworkResult<List<CleaningJobModel1>> {
@@ -27,7 +28,7 @@ class JobRemoteImpl(private val jobApi: JobApi) : JobDataSource.Remote {
 
     override suspend fun getCleaningDetail(jobUid: String): NetworkResult<CleaningJobModel1> {
         try {
-            val result = jobApi.getCleaingJobByUid(jobUid)
+            val result = jobApi.getCleaningJobByUid(jobUid)
             if (result.success) {
                 Log.d(TAG, "job detail: ${result.job}")
                 return NetworkResult.Success(result.job ?: CleaningJobModel1())

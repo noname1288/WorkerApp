@@ -3,8 +3,9 @@ package com.example.workerapp.data.source.remote
 import android.util.Log
 import com.example.workerapp.data.source.JobServiceDataSource
 import com.example.workerapp.data.source.remote.api.ServiceApi
-import com.example.workerapp.data.source.remote.model.cleaning.CleaningServiceModel
-import com.example.workerapp.data.source.remote.model.healthcare.HealthcareServiceModel
+import com.example.workerapp.data.source.model.cleaning.CleaningServiceModel
+import com.example.workerapp.data.source.model.healthcare.HealthcareServiceModel
+import com.example.workerapp.data.source.remote.dto.NetworkResult
 
 class JobServiceRemoteImpl(private val serviceApi: ServiceApi) : JobServiceDataSource.Remote {
     override suspend fun getCleaningServices(): NetworkResult<List<CleaningServiceModel>> {

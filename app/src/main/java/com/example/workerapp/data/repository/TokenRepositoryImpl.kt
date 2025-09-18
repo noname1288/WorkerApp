@@ -1,5 +1,6 @@
 package com.example.workerapp.data.repository
 
+import android.util.Log
 import com.example.workerapp.data.TokenRepository
 import com.example.workerapp.data.source.TokenDataSource
 import kotlinx.coroutines.flow.firstOrNull
@@ -22,6 +23,14 @@ class TokenRepositoryImpl (
         null
     }
 
+    override suspend fun getFcmToken(): String? = try {
+        Log.d(TAG, "getFcmToken: ${local.getFcmToken().firstOrNull()}")
+        local.getFcmToken().firstOrNull()
+    }catch (e: Exception){
+        e.printStackTrace()
+        null
+    }
+
     override suspend fun saveAccessToken(token: String) {
         try {
             local.saveAccessToken(token)
@@ -38,11 +47,23 @@ class TokenRepositoryImpl (
         }
     }
 
-    override suspend fun clearTokens() {
+    override suspend fun saveFcmToken(fcmToken: String) {
         try {
-            local.clearTokens()
+            local.saveFcmToken(fcmToken)
+        }catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    override suspend fun clearAuthTokens() {
+        try {
+            local.clearAuthTokens()
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    companion object{
+        private const val TAG = "TokenRepositoryImpl"
     }
 }

@@ -5,7 +5,7 @@ import com.example.workerapp.data.TokenRepository
 import com.example.workerapp.data.UserRepository
 import com.example.workerapp.data.source.UserDataSource
 import com.example.workerapp.data.source.local.room.entity.UserLocalEntity
-import com.example.workerapp.data.source.remote.NetworkResult
+import com.example.workerapp.data.source.remote.dto.NetworkResult
 import com.example.workerapp.data.source.remote.dto.request.UserLoginRequest
 import com.example.workerapp.data.source.remote.dto.request.UserLoginWithGGRequest
 import com.example.workerapp.data.source.remote.dto.request.UserRegisterRequest
@@ -69,6 +69,26 @@ class UserRepositoryImpl(
 
         } catch (e: Exception) {
             Log.e(TAG, "login - Exception: ${e.message}")
+            return Result.failure(e)
+        }
+    }
+
+    override suspend fun saveFcmToken(fcmToken: String): Result<Unit> {
+        try {
+            val response = remote.updateFcmToken(fcmToken)
+            when (response) {
+                is NetworkResult.Error -> {
+                    Log.e(TAG, "saveFcmToken - Error: ${response.message}")
+                    return Result.failure(Exception(response.message))
+                }
+
+                is NetworkResult.Success -> {
+                    Log.d(TAG, "saveFcmToken - FCM token updated successfully on server")
+                    return Result.success(Unit)
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "saveFcmToken - Exception: ${e.message}")
             return Result.failure(e)
         }
     }
@@ -185,7 +205,7 @@ class UserRepositoryImpl(
 
     override suspend fun getUserProfile(): Flow<Result<UserLocalEntity?>> {
         return local.getUserProfile()
-            .map{ user ->
+            .map { user ->
                 Result.success(user)
             }
             .catch { e ->

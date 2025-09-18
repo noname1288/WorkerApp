@@ -19,7 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.workerapp.R
-import com.example.workerapp.data.source.remote.model.healthcare.HealthcareServiceModel
+import com.example.workerapp.data.source.model.healthcare.HealthcareServiceModel
 
 //@Composable
 //fun HealthcareWorkflow(jobServices: List<HealthServiceWrapper>) {

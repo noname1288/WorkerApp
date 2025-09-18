@@ -31,7 +31,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.workerapp.R
-import com.example.workerapp.data.source.remote.model.healthcare.HealthcareJobModel
+import com.example.workerapp.data.source.model.healthcare.HealthcareJobModel
 import com.example.workerapp.ui.theme.AppColors
 
 @Composable

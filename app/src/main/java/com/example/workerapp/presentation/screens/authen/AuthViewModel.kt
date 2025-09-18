@@ -21,7 +21,6 @@ import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 class AuthViewModel(
@@ -41,11 +40,11 @@ class AuthViewModel(
     fun checkUserLoggedIn() {
         viewModelScope.launch {
             val token = tokenRepository.getAccessToken()
+            val fcmTokenLocal = tokenRepository.getFcmToken()
 
             val result = runCatching {
                 userRepository.getUserProfile().first()
             }.getOrNull()
-
 
             if (result != null) {
                 result.onSuccess { user ->
@@ -80,6 +79,12 @@ class AuthViewModel(
 
                 //update session
                 UserSession.saveState(it.uid, it.username, it.email, it.avatar)
+
+                //update fcm token
+                val fcmTokenLocal = tokenRepository.getFcmToken()
+                if (fcmTokenLocal != null){
+                    userRepository.saveFcmToken(fcmTokenLocal)
+                }
             }
                 .onFailure {
                     _loginState.value = AuthenticationUIState.Error(it.message ?: "Login failed")
@@ -100,6 +105,12 @@ class AuthViewModel(
 
                 //update session
                 UserSession.saveState(it.uid, it.username, it.email, it.avatar)
+
+                //update fcm token
+                val fcmTokenLocal = tokenRepository.getFcmToken()
+                if (fcmTokenLocal != null){
+                    userRepository.saveFcmToken(fcmTokenLocal)
+                }
             }.onFailure {
                 _registerState.value =
                     AuthenticationUIState.Error(it.message ?: "Registration failed")
@@ -162,7 +173,7 @@ class AuthViewModel(
             UserSession.logOut()
 
             //clear token in local storage
-            tokenRepository.clearTokens()
+            tokenRepository.clearAuthTokens()
 
             //clear user profile in local database
             userRepository.clearUserProfile()
@@ -221,6 +232,12 @@ class AuthViewModel(
 
                 //update session
                 UserSession.saveState(it.uid, it.username, it.email, it.avatar)
+
+                //update fcm token
+                val fcmTokenLocal = tokenRepository.getFcmToken()
+                if (fcmTokenLocal != null){
+                    userRepository.saveFcmToken(fcmTokenLocal)
+                }
             }.onFailure {
                 _loginState.value =
                     AuthenticationUIState.Error(it.message ?: "Login with Google failed")

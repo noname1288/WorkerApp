@@ -42,6 +42,10 @@ android {
 }
 
 dependencies {
+    //messaging
+    implementation(libs.firebase.messaging)
+    // analytics
+    implementation(libs.firebase.analytics)
     //room
     val room_version = "2.8.0"
 

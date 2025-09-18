@@ -1,4 +1,4 @@
-package com.example.workerapp.ui.detail.cleaning
+package com.example.workerapp.presentation.screens.detail.cleaning
 
 import android.util.Log
 import android.widget.Toast
@@ -46,10 +46,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.workerapp.R
-import com.example.workerapp.data.source.remote.model.base.UserModel
-import com.example.workerapp.data.source.remote.model.cleaning.CleaningJobModel1
-import com.example.workerapp.ui.detail.cleaning.CleaningJobSection.JobDetails
-import com.example.workerapp.ui.detail.cleaning.CleaningJobSection.UserInfo
+import com.example.workerapp.data.source.model.base.UserModel
+import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
+import com.example.workerapp.presentation.screens.detail.cleaning.CleaningJobSection.JobDetails
+import com.example.workerapp.presentation.screens.detail.cleaning.CleaningJobSection.UserInfo
+import com.example.workerapp.ui.detail.cleaning.CleaningUiState
+import com.example.workerapp.ui.detail.cleaning.CleaningViewModel
 import com.example.workerapp.ui.detail.components.ClientCard
 import com.example.workerapp.ui.detail.components.JobDetailCard
 import com.example.workerapp.ui.detail.components.WeeklySchedule
@@ -71,7 +73,9 @@ sealed class CleaningJobSection {
 @Composable
 fun CleaningDetailScreen(
     modifier: Modifier = Modifier,
-    cleaningUid: String, viewmodel: CleaningViewModel, navController: NavController
+    cleaningUid: String,
+    isOnlyWatch: Boolean = false,
+    viewmodel: CleaningViewModel, navController: NavController
 ) {
     val tag = "CleaningDetailScreen"
     val context = LocalContext.current
@@ -83,13 +87,19 @@ fun CleaningDetailScreen(
     var confirmed by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit, applyState) {
-        if (applyState == true) {
-            Toast.makeText(context, "Ứng tuyển thành công!", Toast.LENGTH_LONG).show()
-            navController.popBackIfCan()
-        } else if (applyState == false) {
-            viewmodel.updateApplyState(null)
-        } else {
-            viewmodel.fetchJobDetail(cleaningUid)
+        when (applyState) {
+            true -> {
+                Toast.makeText(context, "Ứng tuyển thành công!", Toast.LENGTH_LONG).show()
+                navController.popBackIfCan()
+            }
+
+            false -> {
+                viewmodel.updateApplyState(null)
+            }
+
+            else -> {
+                viewmodel.fetchJobDetail(cleaningUid)
+            }
         }
     }
 
@@ -201,17 +211,20 @@ fun CleaningDetailScreen(
 
                     is CleaningJobSection.ActionButtons -> {
                         item {
-                            SlideToConfirmButton(
-                                isConfirmed = confirmed,
-                                onValueChange = {
-                                    confirmed = it
+                            if (!isOnlyWatch) {
+                                SlideToConfirmButton(
+                                    isConfirmed = confirmed,
+                                    onValueChange = {
+                                        confirmed = it
 
-                                    Log.d(tag, "CleaningDetailScreen: Confirmed")
-                                    viewmodel.applyToJob(cleaningUid)
-                                }
-                            )
-                            Spacer(Modifier.height(24.dp))
+                                        Log.d(tag, "CleaningDetailScreen: Confirmed")
+                                        viewmodel.applyToJob(cleaningUid)
+                                    }
+                                )
+                                Spacer(Modifier.height(24.dp))
+                            }
                         }
+
                     }
                 }
             }

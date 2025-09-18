@@ -3,6 +3,8 @@ package com.example.workerapp.data.source.remote
 import android.util.Log
 import com.example.workerapp.data.source.UserDataSource
 import com.example.workerapp.data.source.remote.api.UserApi
+import com.example.workerapp.data.source.remote.dto.NetworkResult
+import com.example.workerapp.data.source.remote.dto.request.FcmTokenRequest
 import com.example.workerapp.data.source.remote.dto.request.UserLoginRequest
 import com.example.workerapp.data.source.remote.dto.request.UserLoginWithGGRequest
 import com.example.workerapp.data.source.remote.dto.request.UserRegisterRequest
@@ -22,6 +24,23 @@ class UserRemoteImpl(private val userApi: UserApi) : UserDataSource.Remote {
             }
         } catch (e: Exception) {
             Log.e(TAG, "login: ${e.message}")
+            return NetworkResult.Error(e.message ?: "An unknown error occurred")
+        }
+    }
+
+    override suspend fun updateFcmToken(fcmToken: String): NetworkResult<Unit> {
+        try {
+            val response = userApi.updateFcmToken(FcmTokenRequest(fcmToken))
+
+            if (response.success) {
+                Log.d(TAG, "updateFcmToken: success")
+                return NetworkResult.Success(Unit)
+            } else {
+                Log.e(TAG, "updateFcmToken error: ${response.message}")
+                return NetworkResult.Error(response.message)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "updateFcmToken Exception: ${e.message}")
             return NetworkResult.Error(e.message ?: "An unknown error occurred")
         }
     }

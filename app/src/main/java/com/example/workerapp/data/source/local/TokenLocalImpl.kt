@@ -16,6 +16,10 @@ class TokenLocalImpl (private val dataStore: DataStore<Preferences>) : TokenData
     override fun getRefreshToken(): Flow<String?> =
         dataStore.data.map { prefs -> prefs[PrefKeys.REFRESH_TOKEN] }
 
+    override fun getFcmToken(): Flow<String?> =
+        dataStore.data.map { prefs -> prefs[PrefKeys.FCM_TOKEN] }
+
+
     override suspend fun saveAccessToken(accessToken: String) {
         dataStore.edit { prefs ->
             prefs[PrefKeys.ACCESS_TOKEN] = accessToken
@@ -28,9 +32,16 @@ class TokenLocalImpl (private val dataStore: DataStore<Preferences>) : TokenData
         }
     }
 
-    override suspend fun clearTokens() {
+    override suspend fun saveFcmToken(fcmToken: String) {
         dataStore.edit { prefs ->
-            prefs.clear()
+            prefs[PrefKeys.FCM_TOKEN] = fcmToken
+        }
+    }
+
+    override suspend fun clearAuthTokens() {
+        dataStore.edit { prefs ->
+            prefs.remove(PrefKeys.ACCESS_TOKEN)
+            prefs.remove(PrefKeys.REFRESH_TOKEN)
         }
     }
 }

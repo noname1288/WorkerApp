@@ -2,8 +2,8 @@ package com.example.workerapp.ui.calendar
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.workerapp.data.source.remote.NetworkResult
-import com.example.workerapp.data.source.remote.model.base.JobModel1
+import com.example.workerapp.data.source.remote.dto.NetworkResult
+import com.example.workerapp.data.source.model.base.JobModel1
 import com.example.workerapp.data.source.remote.JobRemoteImpl
 import com.example.workerapp.utils.TimeUtils
 import com.example.workerapp.utils.cached.UserSession

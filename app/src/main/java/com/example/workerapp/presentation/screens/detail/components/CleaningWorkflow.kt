@@ -26,7 +26,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.workerapp.R
-import com.example.workerapp.data.source.remote.model.cleaning.CleaningServiceModel
+import com.example.workerapp.data.source.model.cleaning.CleaningServiceModel
 
 @Composable
 fun JobWorkflow(data: List<CleaningServiceModel>) {

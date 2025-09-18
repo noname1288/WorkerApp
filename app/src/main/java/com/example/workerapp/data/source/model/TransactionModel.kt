@@ -1,4 +1,4 @@
-package com.example.workerapp.data.source.remote.model
+package com.example.workerapp.data.source.model
 
 data class TransactionModel (
     val id: String,

@@ -2,6 +2,7 @@ package com.example.workerapp.data.source.remote
 
 import com.example.workerapp.data.TokenRepository
 import com.example.workerapp.data.source.remote.api.JobApi
+import com.example.workerapp.data.source.remote.api.NotificationApi
 import com.example.workerapp.data.source.remote.api.ServiceApi
 import com.example.workerapp.data.source.remote.api.UserApi
 import com.example.workerapp.data.source.remote.interceptor.AuthInterceptor
@@ -37,4 +38,5 @@ object RetrofitHelper {
     val jobApi: JobApi by lazy { retrofit.create(JobApi::class.java) }
     val userApi: UserApi by lazy { retrofit.create(UserApi::class.java) }
     val serviceApi: ServiceApi by lazy { retrofit.create(ServiceApi::class.java) }
+    val notificationApi: NotificationApi by lazy { retrofit.create(NotificationApi::class.java) }
 }

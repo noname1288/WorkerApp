@@ -2,8 +2,8 @@ package com.example.workerapp.data.source.remote.api
 
 import com.example.workerapp.data.source.remote.dto.BaseResponse
 import com.example.workerapp.data.source.remote.dto.response.ServiceResponse
-import com.example.workerapp.data.source.remote.model.cleaning.CleaningServiceModel
-import com.example.workerapp.data.source.remote.model.healthcare.HealthcareServiceModel
+import com.example.workerapp.data.source.model.cleaning.CleaningServiceModel
+import com.example.workerapp.data.source.model.healthcare.HealthcareServiceModel
 import retrofit2.http.GET
 
 interface ServiceApi {

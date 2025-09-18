@@ -33,9 +33,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.workerapp.R
-import com.example.workerapp.data.source.remote.model.base.UserModel
-import com.example.workerapp.data.source.remote.model.cleaning.CleaningJobModel1
-import com.example.workerapp.data.source.remote.model.cleaning.DurationModel
+import com.example.workerapp.data.source.model.base.UserModel
+import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
+import com.example.workerapp.data.source.model.cleaning.DurationModel
 import com.example.workerapp.ui.theme.AppColors
 
 @Composable

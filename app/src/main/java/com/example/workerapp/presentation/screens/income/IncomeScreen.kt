@@ -39,7 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.workerapp.R
-import com.example.workerapp.data.source.remote.model.TransactionModel
+import com.example.workerapp.data.source.model.TransactionModel
 
 sealed class IncomeSection {
     object Turnover : IncomeSection()

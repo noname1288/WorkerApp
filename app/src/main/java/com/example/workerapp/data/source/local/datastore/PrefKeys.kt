@@ -8,4 +8,5 @@ object PrefKeys {
     val ACCESS_TOKEN = stringPreferencesKey("access_token")
     val REFRESH_TOKEN = stringPreferencesKey("refresh_token")
     val DARK_MODE = booleanPreferencesKey("dark_mode")
+    val FCM_TOKEN = stringPreferencesKey("fcm_token")
 }

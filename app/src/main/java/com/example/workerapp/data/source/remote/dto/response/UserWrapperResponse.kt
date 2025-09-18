@@ -1,6 +1,6 @@
 package com.example.workerapp.data.source.remote.dto.response
 
-import com.example.workerapp.data.source.remote.model.base.UserModel
+import com.example.workerapp.data.source.model.base.UserModel
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)

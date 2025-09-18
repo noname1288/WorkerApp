@@ -33,6 +33,7 @@ import com.example.workerapp.R
 import com.example.workerapp.navigation.AppRoutes
 import com.example.workerapp.presentation.screens.authen.AuthViewModel
 import com.example.workerapp.presentation.screens.authen.AuthenticationUIState
+import com.example.workerapp.presentation.screens.notification.RequestNotificationPermission
 import com.example.workerapp.utils.cached.UserSession
 import com.example.workerapp.utils.navigation.safeNavigate
 import kotlinx.coroutines.delay
@@ -42,6 +43,9 @@ fun SplashScreen(navController: NavController, viewModel: AuthViewModel) {
     var visible by remember { mutableStateOf(false) }
 
     val splashState by viewModel.splashState.collectAsState()
+
+    //trigger to request notification permission
+    RequestNotificationPermission()
 
     LaunchedEffect(Unit) {
         visible = true

@@ -12,6 +12,7 @@ object UserSession {
     var displayName: String? = null
     var userEmail: String? = null
     var userProfilePicUrl: String? = null
+
     fun saveState(uid: String, displayName: String?, email: String?, profilePicUrl: String?) {
         Log.d("UserSession", "saveState: $uid, $displayName, $email, $profilePicUrl ")
         _isLoggedIn.value = true

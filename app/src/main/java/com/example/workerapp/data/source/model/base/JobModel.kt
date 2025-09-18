@@ -1,4 +1,4 @@
-package com.example.workerapp.data.source.remote.model.base
+package com.example.workerapp.data.source.model.base
 
 import com.squareup.moshi.JsonClass
 

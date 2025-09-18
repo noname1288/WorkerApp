@@ -49,8 +49,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.workerapp.R
-import com.example.workerapp.data.source.remote.model.base.JobModel1
-import com.example.workerapp.data.source.remote.model.base.UserModel
+import com.example.workerapp.data.source.model.base.JobModel1
+import com.example.workerapp.data.source.model.base.UserModel
 import com.example.workerapp.utils.ServiceType
 import com.example.workerapp.utils.TimeUtils
 import com.example.workerapp.utils.components.CircleLoadingIndicator

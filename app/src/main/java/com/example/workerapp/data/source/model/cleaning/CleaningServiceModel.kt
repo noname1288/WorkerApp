@@ -1,12 +1,16 @@
-package com.example.workerapp.data.source.remote.model.cleaning
+package com.example.workerapp.data.source.model.cleaning
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.example.workerapp.utils.ServiceType
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
+@Entity(tableName = "cleaning_service")
 @JsonClass(generateAdapter = true)
 data class CleaningServiceModel(
-    var uid: String = "",
+    @PrimaryKey var uid: String = "",
+
     @Json(name = "tasks")
     var duties: List<String> = emptyList(),
 

@@ -34,9 +34,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.workerapp.data.source.remote.model.base.JobModel1
-import com.example.workerapp.data.source.remote.model.cleaning.CleaningJobModel1
-import com.example.workerapp.data.source.remote.model.healthcare.HealthcareJobModel
+import com.example.workerapp.data.source.model.base.JobModel1
+import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
+import com.example.workerapp.data.source.model.healthcare.HealthcareJobModel
 import com.example.workerapp.navigation.AppRoutes
 import com.example.workerapp.ui.home.components.CleaningJobCard
 import com.example.workerapp.ui.home.components.HealthcareJobCard
@@ -134,7 +134,7 @@ fun ServiceDetailScreen(
                                 onClick = {
                                     navController.navigateWithArgs(
                                         route = AppRoutes.CLEANING_DETAIL,
-                                        args = arrayOf(job.uid)
+                                        args = arrayOf(job.uid, false)
                                     )
                                 })
                         }
@@ -142,11 +142,12 @@ fun ServiceDetailScreen(
 
                     ServiceType.HealthcareType -> {
                         item {
-                            HealthcareJobCard(job as HealthcareJobModel,
+                            HealthcareJobCard(
+                                job as HealthcareJobModel,
                                 onClick = {
                                     navController.navigateWithArgs(
                                         route = AppRoutes.HEALTHCARE_DETAIL,
-                                        args = arrayOf(job.uid)
+                                        args = arrayOf(job.uid, false)
                                     )
                                 })
                         }

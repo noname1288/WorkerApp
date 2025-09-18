@@ -35,7 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.workerapp.R
-import com.example.workerapp.data.source.remote.model.base.UserModel
+import com.example.workerapp.data.source.model.base.UserModel
 
 @Composable
 fun ClientCard(user: UserModel) {

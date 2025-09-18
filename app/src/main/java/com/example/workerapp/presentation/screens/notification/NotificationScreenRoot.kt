@@ -1,6 +1,8 @@
 package com.example.workerapp.presentation.screens.notification
 
+import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -19,18 +21,27 @@ import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.workerapp.R
+import com.example.workerapp.data.source.model.NotificationItem
+import com.example.workerapp.navigation.AppRoutes
+import com.example.workerapp.utils.ServiceType
+import com.example.workerapp.utils.components.CircleLoadingIndicator
+import com.example.workerapp.utils.navigation.navigateWithArgs
 
 enum class NotificationDestinationType {
     Message, Notification
@@ -43,8 +54,10 @@ data class NotificationTabDestination(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotificationScreen(
+fun NotificationScreenRoot(
     modifier: Modifier = Modifier,
+    notificationViewModel: NotificationViewModel,
+    navController: NavController
 ) {
     val destinations = listOf(
         NotificationTabDestination("Hệ thống", NotificationDestinationType.Notification),
@@ -100,31 +113,102 @@ fun NotificationScreen(
             Spacer(Modifier.height(12.dp))
         }
 
-        items(10) {
-            NotificationItem()
-            HorizontalDivider()
+        item {
+            when (selectedDestination) {
+                0 -> {
+                    NotificationScreen(viewModel = notificationViewModel, navController = navController)
+                }
 
+                1 -> {
+                    Text("Chat Screen")
+                }
+            }
         }
     }
 }
 
 @Composable
-fun NotificationItem() {
+fun NotificationScreen(modifier: Modifier = Modifier, viewModel: NotificationViewModel, navController: NavController) {
+    val context = LocalContext.current
+    val uiState by viewModel.uiState.collectAsState()
+
+    val listItems by viewModel.listItems.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchAllNotifications()
+    }
+
+    when (uiState) {
+        is NotificationUiState.Success -> {}
+        is NotificationUiState.Error -> {
+            Toast.makeText(
+                context,
+                (uiState as NotificationUiState.Error).message,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
+        NotificationUiState.Idle -> {}
+        NotificationUiState.Loading -> {
+            CircleLoadingIndicator()
+        }
+    }
+
+    Column(Modifier.fillMaxWidth()) {
+        if (listItems.isEmpty()) {
+            Text("Không có thông báo nào")
+        } else {
+            listItems.forEach { item ->
+                NotificationItem(item, onClick = {
+                    when(item.serviceType){
+                        ServiceType.CleaningType -> {
+                            navController.navigateWithArgs(
+                                route = AppRoutes.CLEANING_DETAIL,
+                                args = arrayOf(item.jobID, true)
+                            )
+                        }
+
+                        ServiceType.HealthcareType ->{
+                            navController.navigateWithArgs(
+                                route = AppRoutes.HEALTHCARE_DETAIL,
+                                args = arrayOf(item.jobID, true)
+                            )
+                        }
+
+                        ServiceType.MaintenanceType -> {
+
+                        }
+
+                        else -> {
+
+                        }
+                    }
+                })
+                HorizontalDivider()
+            }
+        }
+    }
+
+}
+
+@Composable
+fun NotificationItem(item: NotificationItem = NotificationItem(), onClick: () -> Unit) {
     Column(
         Modifier
             .fillMaxWidth()
             .background(Color.White)
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clickable { onClick() },
     ) {
         Text(
-            "14:15 | 20/10/2024",
+            item.createdAt,
             style = MaterialTheme.typography.bodySmall.copy(color = colorResource(R.color.subtext))
         )
 
         Spacer(Modifier.height(4.dp))
 
         Text(
-            "ĐÃ ĐẾN GIỜ LÀM VIỆC #1 - NÂNG TẦM DỊCH VỤ CHO BẢN THÂN VÀ GIA ĐÌNH HÔM NAY",
+            item.title + " #" + item.jobID,
             maxLines = 2,
             style = MaterialTheme.typography.bodyMedium.copy(
                 fontWeight = FontWeight.Bold
@@ -134,15 +218,9 @@ fun NotificationItem() {
         Spacer(Modifier.height(4.dp))
 
         Text(
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            item.content,
             style = MaterialTheme.typography.bodyMedium.copy(color = colorResource(R.color.subtext)),
             maxLines = 1
         )
     }
-}
-
-@Preview(showBackground = true, backgroundColor = 0xF8A66E)
-@Composable
-fun PrevNotificationScreen() {
-    NotificationScreen()
 }

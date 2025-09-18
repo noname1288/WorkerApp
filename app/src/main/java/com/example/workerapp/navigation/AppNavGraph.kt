@@ -11,7 +11,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.workerapp.presentation.screens.authen.AuthViewModel
-import com.example.workerapp.presentation.screens.notification.NotificationScreen
+import com.example.workerapp.presentation.screens.notification.NotificationScreenRoot
 import com.example.workerapp.presentation.screens.profile.ProfileScreen
 import com.example.workerapp.presentation.screens.service.ServiceDetailScreen
 import com.example.workerapp.presentation.screens.service.ServiceViewModel
@@ -20,12 +20,13 @@ import com.example.workerapp.presentation.screens.authen.LoginScreen
 import com.example.workerapp.presentation.screens.authen.RegisterScreen
 import com.example.workerapp.ui.calendar.CalendarScreen
 import com.example.workerapp.ui.calendar.CalendarViewModel
-import com.example.workerapp.ui.detail.cleaning.CleaningDetailScreen
+import com.example.workerapp.presentation.screens.detail.cleaning.CleaningDetailScreen
 import com.example.workerapp.ui.detail.cleaning.CleaningViewModel
 import com.example.workerapp.ui.detail.healcare.HealthcareDetailScreen
 import com.example.workerapp.ui.detail.healcare.HealthcareViewModel
 import com.example.workerapp.presentation.screens.home.HomeScreen
 import com.example.workerapp.presentation.screens.income.IncomeScreen
+import com.example.workerapp.presentation.screens.notification.NotificationViewModel
 import com.example.workerapp.utils.ServiceType
 
 @Composable
@@ -66,7 +67,8 @@ fun AppNavHost(
             IncomeScreen()
         }
         composable(AppRoutes.NOTIFICATION) {
-            NotificationScreen()
+            val notificationViewModel: NotificationViewModel = viewModel()
+            NotificationScreenRoot(notificationViewModel = notificationViewModel, navController = navController)
         }
         composable(AppRoutes.PROFILE) {
             ProfileScreen(navController = navController, viewModel = authViewModel)
@@ -90,25 +92,39 @@ fun AppNavHost(
             )
         }
         composable(
-            route = "${AppScreen.CLEANING_SCREEN}/{${DestinationArgs.JOB_ID}}",
-            arguments = listOf(navArgument(DestinationArgs.JOB_ID) { type = NavType.StringType })
+            route = "${AppScreen.CLEANING_SCREEN}/{${DestinationArgs.JOB_ID}}/{${DestinationArgs.ONLY_WATCH}}",
+            arguments = listOf(
+                navArgument(DestinationArgs.JOB_ID) { type = NavType.StringType },
+                navArgument(DestinationArgs.ONLY_WATCH) { type = NavType.BoolType }
+            )
         ) {
             val cleaningViewModel: CleaningViewModel = viewModel()
+
             val cleaningUid = it.arguments?.getString(DestinationArgs.JOB_ID) ?: ""
+            val onlyWatch = it.arguments?.getBoolean(DestinationArgs.ONLY_WATCH) ?: false
+
             CleaningDetailScreen(
                 cleaningUid = cleaningUid,
+                isOnlyWatch = onlyWatch,
                 viewmodel = cleaningViewModel,
                 navController = navController
             )
         }
         composable(
-            route = "${AppScreen.HEALTHCARE_SCREEN}/{${DestinationArgs.JOB_ID}}",
-            arguments = listOf(navArgument(DestinationArgs.JOB_ID) { type = NavType.StringType })
+            route = "${AppScreen.HEALTHCARE_SCREEN}/{${DestinationArgs.JOB_ID}}/{${DestinationArgs.ONLY_WATCH}}",
+            arguments = listOf(
+                navArgument(DestinationArgs.JOB_ID) { type = NavType.StringType },
+                navArgument(DestinationArgs.ONLY_WATCH) { type = NavType.BoolType }
+            )
         ) {
-            val healthcareUid = it.arguments?.getString(DestinationArgs.JOB_ID) ?: ""
             val healthcareViewModel: HealthcareViewModel = viewModel()
+
+            val healthcareUid = it.arguments?.getString(DestinationArgs.JOB_ID) ?: ""
+            val onlyWatch = it.arguments?.getBoolean(DestinationArgs.ONLY_WATCH) ?: false
+
             HealthcareDetailScreen(
                 healthcareUid = healthcareUid,
+                isOnlyWatch = onlyWatch,
                 viewModel = healthcareViewModel,
                 navController = navController
             )

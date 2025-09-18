@@ -23,7 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.workerapp.R
-import com.example.workerapp.data.source.remote.model.base.JobModel1
+import com.example.workerapp.data.source.model.base.JobModel1
 import com.example.workerapp.utils.ServiceType
 
 @Composable

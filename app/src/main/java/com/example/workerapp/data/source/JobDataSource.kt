@@ -1,10 +1,10 @@
 package com.example.workerapp.data.source
 
-import com.example.workerapp.data.source.remote.NetworkResult
+import com.example.workerapp.data.source.remote.dto.NetworkResult
 import com.example.workerapp.data.source.remote.dto.request.ApplicationRequest
-import com.example.workerapp.data.source.remote.model.base.JobModel1
-import com.example.workerapp.data.source.remote.model.cleaning.CleaningJobModel1
-import com.example.workerapp.data.source.remote.model.healthcare.HealthcareJobModel
+import com.example.workerapp.data.source.model.base.JobModel1
+import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
+import com.example.workerapp.data.source.model.healthcare.HealthcareJobModel
 
 interface JobDataSource {
     /* *

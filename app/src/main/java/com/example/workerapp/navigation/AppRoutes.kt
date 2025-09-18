@@ -9,6 +9,7 @@ object AppScreen{
 object DestinationArgs{
     const val SERVICE_TYPE = "serviceType"
     const val JOB_ID = "jobId"
+    const val ONLY_WATCH = "onlyWatch"
 }
 
 object AppRoutes {
@@ -23,6 +24,6 @@ object AppRoutes {
     const val REGISTER = "register"
 
     const val SERVICE_DETAIL = "${AppScreen.SERVICE_SCREEN}/%s"
-    const val CLEANING_DETAIL = "${AppScreen.CLEANING_SCREEN}/%s"
-    const val HEALTHCARE_DETAIL = "${AppScreen.HEALTHCARE_SCREEN}/%s"
+    const val CLEANING_DETAIL = "${AppScreen.CLEANING_SCREEN}/%s/%b"
+    const val HEALTHCARE_DETAIL = "${AppScreen.HEALTHCARE_SCREEN}/%s/%b"
 }
