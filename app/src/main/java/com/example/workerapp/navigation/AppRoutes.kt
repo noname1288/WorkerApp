@@ -26,4 +26,6 @@ object AppRoutes {
     const val SERVICE_DETAIL = "${AppScreen.SERVICE_SCREEN}/%s"
     const val CLEANING_DETAIL = "${AppScreen.CLEANING_SCREEN}/%s/%b"
     const val HEALTHCARE_DETAIL = "${AppScreen.HEALTHCARE_SCREEN}/%s/%b"
+
+    const val LIST_APPLICATIONS = "list_applications"
 }

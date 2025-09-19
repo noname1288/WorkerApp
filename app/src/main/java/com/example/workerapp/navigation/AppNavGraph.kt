@@ -22,17 +22,20 @@ import com.example.workerapp.ui.calendar.CalendarScreen
 import com.example.workerapp.ui.calendar.CalendarViewModel
 import com.example.workerapp.presentation.screens.detail.cleaning.CleaningDetailScreen
 import com.example.workerapp.ui.detail.cleaning.CleaningViewModel
-import com.example.workerapp.ui.detail.healcare.HealthcareDetailScreen
+import com.example.workerapp.presentation.screens.detail.healcare.HealthcareDetailScreen
 import com.example.workerapp.ui.detail.healcare.HealthcareViewModel
 import com.example.workerapp.presentation.screens.home.HomeScreen
 import com.example.workerapp.presentation.screens.income.IncomeScreen
 import com.example.workerapp.presentation.screens.notification.NotificationViewModel
+import com.example.workerapp.presentation.screens.profile.ProfileViewModel
+import com.example.workerapp.presentation.screens.profile.detail.ApplicationsScreen
 import com.example.workerapp.utils.ServiceType
 
 @Composable
 fun AppNavHost(
     navController: NavHostController,
     authViewModel: AuthViewModel,
+    profileViewModel: ProfileViewModel,
     startDestination: String,
     innerPadding: PaddingValues
 ) {
@@ -68,10 +71,17 @@ fun AppNavHost(
         }
         composable(AppRoutes.NOTIFICATION) {
             val notificationViewModel: NotificationViewModel = viewModel()
-            NotificationScreenRoot(notificationViewModel = notificationViewModel, navController = navController)
+            NotificationScreenRoot(
+                notificationViewModel = notificationViewModel,
+                navController = navController
+            )
         }
         composable(AppRoutes.PROFILE) {
-            ProfileScreen(navController = navController, viewModel = authViewModel)
+            ProfileScreen(
+                navController = navController,
+                authViewModel = authViewModel,
+                profileViewModel = profileViewModel
+            )
         }
 
         composable(
@@ -106,7 +116,7 @@ fun AppNavHost(
             CleaningDetailScreen(
                 cleaningUid = cleaningUid,
                 isOnlyWatch = onlyWatch,
-                viewmodel = cleaningViewModel,
+                viewModel = cleaningViewModel,
                 navController = navController
             )
         }
@@ -128,6 +138,10 @@ fun AppNavHost(
                 viewModel = healthcareViewModel,
                 navController = navController
             )
+        }
+
+        composable (AppRoutes.LIST_APPLICATIONS) {
+            ApplicationsScreen(viewModel = profileViewModel)
         }
     }
 }

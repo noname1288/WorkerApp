@@ -39,5 +39,7 @@
     <string name="healthcare_service_body">Chung tay chăm sóc sức khỏe cộng đồng, mang đến sự an tâm cho người bệnh và gia đình họ! Với kỹ năng và sự tận tâm, bạn sẽ là người đồng hành đáng tin cậy!</string>
     <string name="maintenance_service_title">Bảo trì máy lạnh, máy giặt</string>
     <string name="maintenance_service_body">Công việc bảo trì không chỉ đòi hỏi tay nghề mà còn giúp bạn giải quyết các vấn đề thực tế, mang lại sự tiện nghi cho khách hàng.</string>
+    <string name="applied_job">Công việc đã ứng tuyển</string>
+    <string name="list_applications_title">Công việc đã ứng tuyển</string>
 </resources>
 

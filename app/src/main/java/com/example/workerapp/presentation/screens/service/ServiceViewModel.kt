@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class ServiceViewModel : ViewModel(){
-    private val _jobRepository = JobRemoteImpl.getInstance()
+    private val _jobRemoteImpl = JobRemoteImpl.getInstance()
     private val _serviceRepository = JobServiceRemoteImpl.getInstance()
 
     private val _uiState = MutableStateFlow<ServiceUIState>(ServiceUIState.Idle)
@@ -28,9 +28,9 @@ class ServiceViewModel : ViewModel(){
             _uiState.value = ServiceUIState.Loading
             try {
                 val result = when (_serviceTypeState.value){
-                    ServiceType.CleaningType -> _jobRepository.getCleaningJobs()
-                    ServiceType.HealthcareType -> _jobRepository.getHealthcareJobs()
-                    else -> _jobRepository.getCleaningJobs()
+                    ServiceType.CleaningType -> _jobRemoteImpl.getCleaningJobs()
+                    ServiceType.HealthcareType -> _jobRemoteImpl.getHealthcareJobs()
+                    else -> _jobRemoteImpl.getCleaningJobs()
                 }
 
                 when(result){

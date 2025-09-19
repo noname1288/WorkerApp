@@ -1,5 +1,6 @@
-package com.example.workerapp.ui.detail.healcare
+package com.example.workerapp.presentation.screens.detail.healcare
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,6 +40,8 @@ import com.example.workerapp.data.source.model.healthcare.HealthcareJobModel
 import com.example.workerapp.ui.detail.components.ClientCard
 import com.example.workerapp.ui.detail.components.JobDetailCard
 import com.example.workerapp.ui.detail.components.WeeklySchedule
+import com.example.workerapp.ui.detail.healcare.HealthcareUiState
+import com.example.workerapp.ui.detail.healcare.HealthcareViewModel
 import com.example.workerapp.utils.button.SlideToConfirmButton
 import com.example.workerapp.utils.components.CircleLoadingIndicator
 import com.example.workerapp.utils.navigation.popBackIfCan
@@ -63,18 +66,28 @@ fun HealthcareDetailScreen(
     navController: NavController
 ) {
     val context = LocalContext.current
-    val TAG = "HealthcareDetailScreen"
+    val tag = "HealthcareDetailScreen"
 
     var sections = listOf<HealthcareJobSection>()
 
     val uiState by viewModel.uiState.collectAsState()
     val applyState by viewModel.applyState.collectAsState()
-    var isConfirmed by rememberSaveable { mutableStateOf(false) }
+    var confirmed by rememberSaveable { mutableStateOf(false) }
 
-    LaunchedEffect(applyState) {
-        if (applyState) {
-            Toast.makeText(context, "Ứng tuyển thành công", Toast.LENGTH_LONG).show()
-            navController.popBackIfCan()
+    LaunchedEffect(Unit, applyState) {
+        when (applyState) {
+            true -> {
+                Toast.makeText(context, "Ứng tuyển thành công!", Toast.LENGTH_LONG).show()
+                navController.popBackIfCan()
+            }
+
+            false -> {
+                viewModel.updateApplyState(null)
+            }
+
+            else -> {
+                viewModel.fetchJobDetail(healthcareUid)
+            }
         }
     }
 
@@ -181,8 +194,13 @@ fun HealthcareDetailScreen(
                         item {
                             if (!isOnlyWatch) {
                                 SlideToConfirmButton(
-                                    isConfirmed = isConfirmed,
-                                    onValueChange = { isConfirmed = it }
+                                    isConfirmed = confirmed,
+                                    onValueChange = {
+                                        confirmed = it
+
+                                        Log.d(tag, "HealthcareDetailScreen: $confirmed")
+                                        viewModel.applyToJob(healthcareUid)
+                                    }
                                 )
                             }
                             Spacer(Modifier.height(24.dp))

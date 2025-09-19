@@ -7,6 +7,7 @@ import com.example.workerapp.data.source.remote.dto.request.ApplicationRequest
 import com.example.workerapp.data.source.model.base.JobModel1
 import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
 import com.example.workerapp.data.source.model.healthcare.HealthcareJobModel
+import com.example.workerapp.data.source.remote.dto.ApplicationWrapper
 import com.example.workerapp.data.source.remote.dto.NetworkResult
 
 class JobRemoteImpl(private val jobApi: JobApi) : JobDataSource.Remote {
@@ -107,6 +108,22 @@ class JobRemoteImpl(private val jobApi: JobApi) : JobDataSource.Remote {
         } catch (e: Exception) {
             Log.e(TAG, "getSchedules Exception: ${e.message}")
             NetworkResult.Error(e.message ?: "Unknown error")
+        }
+    }
+
+    override suspend fun getApplication(workerId: String) : NetworkResult<List<ApplicationWrapper>> {
+        try {
+            val response = jobApi.getApplicationsByWorkerId(workerId)
+            if (response.success){
+                Log.d(TAG, "getApplication: ${response.orders}")
+                return NetworkResult.Success(response.orders)
+            }else {
+                Log.e(TAG, "getApplication Error: ${response.message}")
+                return NetworkResult.Error(response.message)
+            }
+        }catch (e: Exception){
+            Log.e(TAG, "getApplication Exception: ${e.message}")
+            return NetworkResult.Error(e.message ?: "Unknown error")
         }
     }
 

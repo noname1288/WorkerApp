@@ -14,7 +14,7 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 class CalendarViewModel : ViewModel() {
-    private val jobRepository = JobRemoteImpl.getInstance()
+    private val jobRemoteImpl = JobRemoteImpl.getInstance()
 
     private val _morningJobs = MutableStateFlow(emptyList<JobModel1>())
     val morningJobs: StateFlow<List<JobModel1>> = _morningJobs
@@ -39,7 +39,7 @@ class CalendarViewModel : ViewModel() {
                     return@launch
                 }
 
-                val result = jobRepository.getSchedules(
+                val result = jobRemoteImpl.getSchedules(
                     workerId = workerId,
                     date = date
                 )

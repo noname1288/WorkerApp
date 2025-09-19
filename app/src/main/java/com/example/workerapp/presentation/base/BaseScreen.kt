@@ -41,6 +41,7 @@ import com.example.workerapp.navigation.NavItem
 import com.example.workerapp.presentation.base.BaseViewModelFactory
 import com.example.workerapp.presentation.screens.authen.AuthViewModel
 import com.example.workerapp.presentation.screens.notification.RequestNotificationPermission
+import com.example.workerapp.presentation.screens.profile.ProfileViewModel
 import com.example.workerapp.utils.navigation.safeNavigate
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
@@ -75,6 +76,11 @@ fun BaseScreen() {
     }
     val authViewModel: AuthViewModel = viewModel (factory = authViewModelFactory)
 
+    val profileViewModelFactory = BaseViewModelFactory{
+        ProfileViewModel(app.tokenRepository)
+    }
+    val profileViewModel: ProfileViewModel = viewModel (factory = profileViewModelFactory)
+
     val systemUiController = rememberSystemUiController()
     val useDarkIcons = true // vì nền trắng nên dùng icon tối
 
@@ -101,6 +107,7 @@ fun BaseScreen() {
         AppNavHost(
             navController,
             authViewModel,
+            profileViewModel,
             startDestination,
             innerPadding
         )

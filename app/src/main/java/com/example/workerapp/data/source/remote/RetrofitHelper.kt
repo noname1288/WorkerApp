@@ -1,6 +1,7 @@
 package com.example.workerapp.data.source.remote
 
 import com.example.workerapp.data.TokenRepository
+import com.example.workerapp.data.source.remote.adapter.JobModelAdapter
 import com.example.workerapp.data.source.remote.api.JobApi
 import com.example.workerapp.data.source.remote.api.NotificationApi
 import com.example.workerapp.data.source.remote.api.ServiceApi
@@ -8,6 +9,7 @@ import com.example.workerapp.data.source.remote.api.UserApi
 import com.example.workerapp.data.source.remote.interceptor.AuthInterceptor
 import com.example.workerapp.utils.cached.UserSession
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -19,7 +21,10 @@ object RetrofitHelper {
     private lateinit var retrofit: Retrofit
 
     fun init(tokenRepository: TokenRepository) {
-        val moshi = Moshi.Builder().build()
+        val moshi = Moshi.Builder()
+            .add(JobModelAdapter.FACTORY)
+            .add(KotlinJsonAdapterFactory())
+            .build()
 
         val okHttpClient: OkHttpClient = OkHttpClient.Builder()
             .addInterceptor(HttpLoggingInterceptor().apply {

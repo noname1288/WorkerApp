@@ -66,6 +66,7 @@ dependencies {
     // Moshi
     implementation("com.squareup.moshi:moshi:1.15.0")
     ksp("com.squareup.moshi:moshi-kotlin-codegen:1.15.0")
+    implementation("com.squareup.moshi:moshi-kotlin:1.15.0")
 
     // https://mvnrepository.com/artifact/com.google.accompanist/accompanist-systemuicontroller
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.36.0")

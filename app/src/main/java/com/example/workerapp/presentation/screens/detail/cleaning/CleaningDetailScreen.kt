@@ -75,15 +75,15 @@ fun CleaningDetailScreen(
     modifier: Modifier = Modifier,
     cleaningUid: String,
     isOnlyWatch: Boolean = false,
-    viewmodel: CleaningViewModel, navController: NavController
+    viewModel: CleaningViewModel, navController: NavController
 ) {
     val tag = "CleaningDetailScreen"
     val context = LocalContext.current
 
     var sections = emptyList<CleaningJobSection>()
 
-    val uiState by viewmodel.uiState.collectAsState()
-    val applyState by viewmodel.applyState.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
+    val applyState by viewModel.applyState.collectAsState()
     var confirmed by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit, applyState) {
@@ -94,11 +94,11 @@ fun CleaningDetailScreen(
             }
 
             false -> {
-                viewmodel.updateApplyState(null)
+                viewModel.updateApplyState(null)
             }
 
             else -> {
-                viewmodel.fetchJobDetail(cleaningUid)
+                viewModel.fetchJobDetail(cleaningUid)
             }
         }
     }
@@ -218,7 +218,7 @@ fun CleaningDetailScreen(
                                         confirmed = it
 
                                         Log.d(tag, "CleaningDetailScreen: Confirmed")
-                                        viewmodel.applyToJob(cleaningUid)
+                                        viewModel.applyToJob(cleaningUid)
                                     }
                                 )
                                 Spacer(Modifier.height(24.dp))

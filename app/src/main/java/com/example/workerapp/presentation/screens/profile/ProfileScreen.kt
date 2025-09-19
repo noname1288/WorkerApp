@@ -1,6 +1,5 @@
 package com.example.workerapp.presentation.screens.profile
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -16,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.DocumentScanner
 import androidx.compose.material.icons.outlined.Domain
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.SupportAgent
@@ -51,7 +51,12 @@ sealed class ProfileSection {
 }
 
 @Composable
-fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController, viewModel: AuthViewModel) {
+fun ProfileScreen(
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    authViewModel: AuthViewModel,
+    profileViewModel: ProfileViewModel,
+) {
 
     val sections = listOf(
         ProfileSection.Avatar,
@@ -74,7 +79,11 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController, v
 
                 is ProfileSection.Settings -> {
                     item {
-                        SettingButtons()
+                        SettingButtons(
+                            onApplicationsClick = {
+                                navController.safeNavigate(AppRoutes.LIST_APPLICATIONS)
+                            }
+                        )
                         Spacer(Modifier.height(32.dp))
                     }
                 }
@@ -83,7 +92,7 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController, v
                     item {
                         Button(
                             onClick = {
-                                viewModel.logout()
+                                authViewModel.logout()
 
                                 navController.safeNavigate(
                                     AppRoutes.LOGIN,
@@ -149,12 +158,22 @@ fun ProfileHeader() {
 @Composable
 fun SettingButtons(
     modifier: Modifier = Modifier,
+    onApplicationsClick: () -> Unit = {},
     onHistoryClick: () -> Unit = {},
     onTermClick: () -> Unit = {},
     onSupportClick: () -> Unit = {},
     onSettingClick: () -> Unit = {}
 ) {
     Column(modifier.fillMaxWidth()) {
+
+        CustomExtendedButton(
+            label = stringResource(R.string.applied_job),
+            leadingIcon = Icons.Outlined.DocumentScanner,
+            onClick = { onApplicationsClick() }
+        )
+
+        HorizontalDivider()
+
         CustomExtendedButton(
             label = stringResource(R.string.job_history_title),
             leadingIcon = Icons.Outlined.WorkHistory,

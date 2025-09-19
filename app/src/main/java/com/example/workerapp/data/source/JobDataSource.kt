@@ -5,6 +5,7 @@ import com.example.workerapp.data.source.remote.dto.request.ApplicationRequest
 import com.example.workerapp.data.source.model.base.JobModel1
 import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
 import com.example.workerapp.data.source.model.healthcare.HealthcareJobModel
+import com.example.workerapp.data.source.remote.dto.ApplicationWrapper
 
 interface JobDataSource {
     /* *
@@ -25,6 +26,8 @@ interface JobDataSource {
         suspend fun applyForJob(request: ApplicationRequest): NetworkResult<Boolean>
 
         suspend fun getSchedules(workerId: String, date: String): NetworkResult<List<JobModel1>>
+
+        suspend fun getApplication(workerId: String) : NetworkResult<List<ApplicationWrapper>>
     }
 }
 

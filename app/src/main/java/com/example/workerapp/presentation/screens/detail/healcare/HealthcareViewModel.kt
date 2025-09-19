@@ -18,8 +18,12 @@ class HealthcareViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<HealthcareUiState>(HealthcareUiState.Idle)
     val uiState: MutableStateFlow<HealthcareUiState> = _uiState
 
-    private val _applyState = MutableStateFlow(false)
-    val applyState: StateFlow<Boolean> = _applyState
+    private val _applyState = MutableStateFlow<Boolean?>(null)
+    val applyState: StateFlow<Boolean?> = _applyState
+
+    fun updateApplyState(value: Boolean?){
+        _applyState.value = value
+    }
 
     fun fetchJobDetail(uid: String) {
         if (uid.isEmpty()){
@@ -55,7 +59,7 @@ class HealthcareViewModel : ViewModel() {
                 val request = ApplicationRequest(
                     workerID = UserSession.uid,
                     jobID = uid,
-                    serviceType = ServiceType.CleaningType
+                    serviceType = ServiceType.HealthcareType
                 )
 
                 val result = healthcareRepository.applyForJob(request)
