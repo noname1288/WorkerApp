@@ -13,6 +13,10 @@ class JobServiceLocalImpl(private val serviceDao: ServiceDao) : JobServiceDataSo
     override suspend fun getHealthcareServices(): List<HealthcareServiceModel> =
         serviceDao.getHealthcareServices()
 
+    override suspend fun getHealthcareServiceByUid(uid: String): HealthcareServiceModel? =
+        serviceDao.getHealthcareServiceByUid(uid)
+
+
     override suspend fun saveCleaningServices(services: List<CleaningServiceModel>) {
         services.map { service -> serviceDao.insertCleaningService(service) }
     }

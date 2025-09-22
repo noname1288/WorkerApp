@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -24,6 +25,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -34,9 +36,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.workerapp.MyApplication
 import com.example.workerapp.R
 import com.example.workerapp.data.source.model.base.UserModel
 import com.example.workerapp.data.source.model.healthcare.HealthcareJobModel
+import com.example.workerapp.data.source.model.healthcare.HealthcareServiceModel
+import com.example.workerapp.data.source.remote.dto.wrapper.HealthServiceWrapper
+import com.example.workerapp.presentation.screens.detail.components.HealthcareServiceItem
 import com.example.workerapp.ui.detail.components.ClientCard
 import com.example.workerapp.ui.detail.components.JobDetailCard
 import com.example.workerapp.ui.detail.components.WeeklySchedule
@@ -52,7 +58,9 @@ sealed class HealthcareJobSection {
     data class WeeklySchedule(val days: List<String>, val isWeekly: Boolean) :
         HealthcareJobSection()
 
-    //    data class JobWorkflow(val jobServiceWrapper: List<HealthServiceWrapper>) : HealthcareJobSection()
+//    data class JobWorkflow(val jobServiceWrappers: List<HealthServiceWrapper>) :
+//        HealthcareJobSection()
+
     object ActionButtons : HealthcareJobSection()
 }
 
@@ -66,6 +74,7 @@ fun HealthcareDetailScreen(
     navController: NavController
 ) {
     val context = LocalContext.current
+    val app = context.applicationContext as MyApplication
     val tag = "HealthcareDetailScreen"
 
     var sections = listOf<HealthcareJobSection>()
@@ -73,6 +82,10 @@ fun HealthcareDetailScreen(
     val uiState by viewModel.uiState.collectAsState()
     val applyState by viewModel.applyState.collectAsState()
     var confirmed by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        viewModel.updateJobServiceRepository(app.jobServiceRepository)
+    }
 
     LaunchedEffect(Unit, applyState) {
         when (applyState) {
@@ -98,6 +111,7 @@ fun HealthcareDetailScreen(
     when (uiState) {
         is HealthcareUiState.Success -> {
             val job = (uiState as HealthcareUiState.Success).data
+            val serviceWrappers = (uiState as HealthcareUiState.Success).serviceWrapper
 
             sections = listOf(
                 HealthcareJobSection.UserInfo(job.user),
@@ -106,7 +120,7 @@ fun HealthcareDetailScreen(
                     days = job.listDays,
                     isWeekly = job.listDays.size != 1
                 ),
-//                HealthcareJobSection.JobWorkflow(job.services),
+//                HealthcareJobSection.JobWorkflow(serviceWrappers),
                 HealthcareJobSection.ActionButtons
             )
         }
@@ -185,8 +199,18 @@ fun HealthcareDetailScreen(
 
 //                    is HealthcareJobSection.JobWorkflow -> {
 //                        item {
-//                            HealthcareWorkflow(section.jobServiceWrapper)
-//                            Spacer(Modifier.height(24.dp))
+//                            section.jobServiceWrappers.forEach { serviceWrapper ->
+//
+//                                val service by produceState<HealthcareServiceModel?>(initialValue = null, serviceWrapper.serviceID) {
+//                                    value = viewModel.fetchJobService(serviceWrapper.serviceID)
+//                                }
+//
+//                                service?.let { HealthcareServiceItem(serviceWrapper, it) }
+//
+//                                Spacer(Modifier.height(12.dp))
+//                            }
+//
+//                            Spacer(Modifier.height(12.dp))
 //                        }
 //                    }
 

@@ -85,6 +85,19 @@ class JobServiceRepositoryImpl(
         }
     }
 
+    override suspend fun getHealthcareServiceByUid(uid: String): Result<HealthcareServiceModel> {
+        return try {
+            val cached = local.getHealthcareServiceByUid(uid)
+            if (cached != null) {
+                Result.success(cached)
+            } else {
+                Result.failure(Exception("Healthcare service $uid not found"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     companion object{
         const val TAG = "JobServiceRepositoryImpl"
 

@@ -21,4 +21,7 @@ interface ServiceDao {
 
     @Query("SELECT * FROM healthcare_service")
     suspend fun getHealthcareServices() : List<HealthcareServiceModel>
+
+    @Query("SELECT * FROM healthcare_service WHERE uid = :uid LIMIT 1")
+    suspend fun getHealthcareServiceByUid(uid: String): HealthcareServiceModel?
 }

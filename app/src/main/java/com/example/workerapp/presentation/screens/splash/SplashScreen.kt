@@ -44,8 +44,6 @@ fun SplashScreen(navController: NavController, viewModel: AuthViewModel) {
 
     val splashState by viewModel.splashState.collectAsState()
 
-    //trigger to request notification permission
-    RequestNotificationPermission()
 
     LaunchedEffect(Unit) {
         visible = true

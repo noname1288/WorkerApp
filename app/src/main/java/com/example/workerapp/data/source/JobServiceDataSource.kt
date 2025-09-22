@@ -9,9 +9,15 @@ interface JobServiceDataSource {
     * Local
     * */
     interface Local {
+
         suspend fun getCleaningServices(): List<CleaningServiceModel>
+
         suspend fun getHealthcareServices(): List<HealthcareServiceModel>
+
+        suspend fun getHealthcareServiceByUid(uid: String): HealthcareServiceModel?
+
         suspend fun saveCleaningServices(services: List<CleaningServiceModel>)
+
         suspend fun saveHealthcareServices(services: List<HealthcareServiceModel>)
     }
 
@@ -19,7 +25,9 @@ interface JobServiceDataSource {
     * Remote
     * */
     interface Remote {
+
         suspend fun getCleaningServices(): NetworkResult<List<CleaningServiceModel>>
+
         suspend fun getHealthcareServices(): NetworkResult<List<HealthcareServiceModel>>
     }
 }

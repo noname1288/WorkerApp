@@ -45,15 +45,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.workerapp.MyApplication
 import com.example.workerapp.R
 import com.example.workerapp.data.source.model.base.UserModel
 import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
+import com.example.workerapp.data.source.model.cleaning.CleaningServiceModel
 import com.example.workerapp.presentation.screens.detail.cleaning.CleaningJobSection.JobDetails
 import com.example.workerapp.presentation.screens.detail.cleaning.CleaningJobSection.UserInfo
 import com.example.workerapp.ui.detail.cleaning.CleaningUiState
 import com.example.workerapp.ui.detail.cleaning.CleaningViewModel
 import com.example.workerapp.ui.detail.components.ClientCard
 import com.example.workerapp.ui.detail.components.JobDetailCard
+import com.example.workerapp.ui.detail.components.JobWorkflow
 import com.example.workerapp.ui.detail.components.WeeklySchedule
 import com.example.workerapp.utils.button.SlideToConfirmButton
 import com.example.workerapp.utils.components.CircleLoadingIndicator
@@ -65,7 +68,7 @@ sealed class CleaningJobSection {
     data class WeeklySchedule(val days: List<String>, val isWeekly: Boolean) : CleaningJobSection()
     data class AdditionalJob(val isCooking: Boolean, val isIroning: Boolean) : CleaningJobSection()
 
-    //    data class JobWorkflow(val services: List<CleaningServiceModel>) : CleaningJobSection()
+    data class JobWorkflow(val services: List<CleaningServiceModel>) : CleaningJobSection()
     object ActionButtons : CleaningJobSection()
 }
 
@@ -79,12 +82,17 @@ fun CleaningDetailScreen(
 ) {
     val tag = "CleaningDetailScreen"
     val context = LocalContext.current
+    val app = context.applicationContext as MyApplication
 
     var sections = emptyList<CleaningJobSection>()
 
     val uiState by viewModel.uiState.collectAsState()
     val applyState by viewModel.applyState.collectAsState()
     var confirmed by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        viewModel.updateJobServiceRepository(app.jobServiceRepository)
+    }
 
     LaunchedEffect(Unit, applyState) {
         when (applyState) {
@@ -105,18 +113,19 @@ fun CleaningDetailScreen(
 
     when (uiState) {
         is CleaningUiState.Success -> {
-            val data = (uiState as CleaningUiState.Success).job
-            Log.d(tag, "CleaningDetailScreen: Fetched job detail: $data")
+            val jobDetail = (uiState as CleaningUiState.Success).job
+            val services = (uiState as CleaningUiState.Success).services
+            Log.d(tag, "CleaningDetailScreen: Fetched job detail: $jobDetail")
 
             sections = listOf(
-                UserInfo(data.user),
-                JobDetails(data),
+                UserInfo(jobDetail.user),
+                JobDetails(jobDetail),
                 CleaningJobSection.WeeklySchedule(
-                    data.listDays,
-                    data.listDays.size > 1
+                    jobDetail.listDays,
+                    jobDetail.listDays.size > 1
                 ),
-                CleaningJobSection.AdditionalJob(data.isCooking, data.isIroning),
-//                CleaningJobSection.JobWorkflow(data.services),
+                CleaningJobSection.AdditionalJob(jobDetail.isCooking, jobDetail.isIroning),
+                CleaningJobSection.JobWorkflow(services),
                 CleaningJobSection.ActionButtons
             )
         }
@@ -202,12 +211,12 @@ fun CleaningDetailScreen(
                         }
                     }
 
-//                    is CleaningJobSection.JobWorkflow -> {
-//                        item {
-//                            JobWorkflow(section.services)
-//                            Spacer(Modifier.height(24.dp))
-//                        }
-//                    }
+                    is CleaningJobSection.JobWorkflow -> {
+                        item {
+                            JobWorkflow(section.services)
+                            Spacer(Modifier.height(24.dp))
+                        }
+                    }
 
                     is CleaningJobSection.ActionButtons -> {
                         item {

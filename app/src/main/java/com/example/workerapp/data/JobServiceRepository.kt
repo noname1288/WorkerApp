@@ -8,4 +8,6 @@ interface JobServiceRepository {
     suspend fun getCleaningServices(): Result<List<CleaningServiceModel>>
 
     suspend fun getHealthcareServices(): Result<List<HealthcareServiceModel>>
+
+    suspend fun getHealthcareServiceByUid(uid: String): Result<HealthcareServiceModel>
 }

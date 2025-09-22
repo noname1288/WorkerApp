@@ -1,11 +1,15 @@
 package com.example.workerapp.ui.detail.healcare
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.workerapp.data.JobServiceRepository
 import com.example.workerapp.data.source.remote.dto.NetworkResult
 import com.example.workerapp.data.source.remote.dto.request.ApplicationRequest
 import com.example.workerapp.data.source.model.healthcare.HealthcareJobModel
+import com.example.workerapp.data.source.model.healthcare.HealthcareServiceModel
 import com.example.workerapp.data.source.remote.JobRemoteImpl
+import com.example.workerapp.data.source.remote.dto.wrapper.HealthServiceWrapper
 import com.example.workerapp.utils.ServiceType
 import com.example.workerapp.utils.cached.UserSession
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +17,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class HealthcareViewModel : ViewModel() {
-    val healthcareRepository = JobRemoteImpl.getInstance()
+    private val _healthcareRepository = JobRemoteImpl.getInstance()
+    private lateinit var _jobServiceRepository: JobServiceRepository
 
     private val _uiState = MutableStateFlow<HealthcareUiState>(HealthcareUiState.Idle)
     val uiState: MutableStateFlow<HealthcareUiState> = _uiState
@@ -21,22 +26,46 @@ class HealthcareViewModel : ViewModel() {
     private val _applyState = MutableStateFlow<Boolean?>(null)
     val applyState: StateFlow<Boolean?> = _applyState
 
-    fun updateApplyState(value: Boolean?){
+    fun updateJobServiceRepository(repository: JobServiceRepository) {
+        _jobServiceRepository = repository
+    }
+
+    fun updateApplyState(value: Boolean?) {
         _applyState.value = value
     }
 
+    fun fetchJobService(serviceUid: String): HealthcareServiceModel {
+        var service = HealthcareServiceModel()
+        viewModelScope.launch {
+            _jobServiceRepository.getHealthcareServiceByUid(serviceUid)
+                .onSuccess {
+                    service = it
+                    Log.d("HealthcareViewModel", "fetchJobService: $it")
+                }.onFailure {
+                    Log.e("HealthcareViewModel", "fetchJobService Fail: ${it.message}")
+                    _uiState.value = HealthcareUiState.Error(it.message ?: "Unknown error")
+                }
+        }
+
+        return service
+    }
+
     fun fetchJobDetail(uid: String) {
-        if (uid.isEmpty()){
+        if (uid.isEmpty()) {
             _uiState.value = HealthcareUiState.Error("Invalid job ID")
             return
         }
         viewModelScope.launch {
             _uiState.value = HealthcareUiState.Loading
             try {
-                val result = healthcareRepository.getHealthcareDetail(uid)
+                val result = _healthcareRepository.getHealthcareDetail(uid)
+
                 when (result) {
                     is NetworkResult.Success -> {
-                        _uiState.value = HealthcareUiState.Success(result.data)
+                        val job = result.data
+                        val serviceWrapper = job.services
+
+                        _uiState.value = HealthcareUiState.Success(result.data, serviceWrapper)
                     }
 
                     is NetworkResult.Error -> {
@@ -62,11 +91,12 @@ class HealthcareViewModel : ViewModel() {
                     serviceType = ServiceType.HealthcareType
                 )
 
-                val result = healthcareRepository.applyForJob(request)
+                val result = _healthcareRepository.applyForJob(request)
                 when (result) {
                     is NetworkResult.Success -> {
                         _applyState.value = true
                     }
+
                     is NetworkResult.Error -> {
                         _uiState.value = HealthcareUiState.Error(result.message)
                     }
@@ -82,6 +112,11 @@ class HealthcareViewModel : ViewModel() {
 sealed class HealthcareUiState {
     object Loading : HealthcareUiState()
     object Idle : HealthcareUiState()
-    data class Success(val data: HealthcareJobModel) : HealthcareUiState()
+    data class Success(
+        val data: HealthcareJobModel,
+        val serviceWrapper: List<HealthServiceWrapper>
+    ) :
+        HealthcareUiState()
+
     data class Error(val message: String) : HealthcareUiState()
 }

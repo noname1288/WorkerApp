@@ -1,5 +1,8 @@
 package com.example.workerapp.presentation.screens.home
 
+import android.os.Build
+import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,6 +31,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,10 +50,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.example.workerapp.MyApplication
 import com.example.workerapp.R
 import com.example.workerapp.navigation.AppRoutes
+import com.example.workerapp.presentation.screens.notification.RequestNotificationPermission
+import com.example.workerapp.ui.home.HomeUiState
+import com.example.workerapp.ui.home.HomeViewModel
 import com.example.workerapp.utils.ServiceType
 import com.example.workerapp.utils.cached.UserSession
+import com.example.workerapp.utils.components.CircleLoadingIndicator
 import com.example.workerapp.utils.navigation.navigateWithArgs
 
 /**
@@ -58,14 +69,51 @@ sealed class HomeSection {
     object Category : HomeSection()
 }
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier, navController: NavController) {
+fun HomeScreen(
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    viewModel: HomeViewModel
+) {
+    val context = LocalContext.current
+    val app = context.applicationContext as MyApplication
+
+    val uiState by viewModel.homeUiState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.updateJobServiceRepository(app.jobServiceRepository)
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchServices()
+    }
+
+    when (uiState) {
+        is HomeUiState.Error -> {
+            Toast.makeText(context, (uiState as HomeUiState.Error).message, Toast.LENGTH_LONG)
+                .show()
+        }
+
+        HomeUiState.Idle -> {}
+        HomeUiState.Loading -> {
+            CircleLoadingIndicator()
+        }
+
+        is HomeUiState.Success -> {
+            Toast.makeText(context, (uiState as HomeUiState.Success).data, Toast.LENGTH_LONG)
+        }
+    }
+
     // Create list of sections to display
     val homeSections = listOf(
         HomeSection.Avatar,
         HomeSection.Category,
     )
+
+    //trigger to request notification permission
+    RequestNotificationPermission()
 
     Box(Modifier.fillMaxSize()) {
         // Background gradient
@@ -310,12 +358,5 @@ fun CustomAvatarRow(
         }
 
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PrevHomeScreen() {
-    HomeScreen(navController = NavController(LocalContext.current))
-//    CategoryCard()
 }
 

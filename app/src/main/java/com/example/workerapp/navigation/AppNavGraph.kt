@@ -29,6 +29,7 @@ import com.example.workerapp.presentation.screens.income.IncomeScreen
 import com.example.workerapp.presentation.screens.notification.NotificationViewModel
 import com.example.workerapp.presentation.screens.profile.ProfileViewModel
 import com.example.workerapp.presentation.screens.profile.detail.ApplicationsScreen
+import com.example.workerapp.ui.home.HomeViewModel
 import com.example.workerapp.utils.ServiceType
 
 @Composable
@@ -57,7 +58,8 @@ fun AppNavHost(
         }
 
         composable(AppRoutes.HOME) {
-            HomeScreen(navController = navController)
+            val homeViewModel: HomeViewModel = viewModel()
+            HomeScreen(navController = navController, viewModel = homeViewModel)
         }
         composable(AppRoutes.CALENDAR) {
             val calendarViewModel: CalendarViewModel = viewModel()
@@ -140,7 +142,7 @@ fun AppNavHost(
             )
         }
 
-        composable (AppRoutes.LIST_APPLICATIONS) {
+        composable(AppRoutes.LIST_APPLICATIONS) {
             ApplicationsScreen(viewModel = profileViewModel)
         }
     }
