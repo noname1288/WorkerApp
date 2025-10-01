@@ -23,7 +23,7 @@ import com.example.workerapp.ui.calendar.CalendarViewModel
 import com.example.workerapp.presentation.screens.detail.cleaning.CleaningDetailScreen
 import com.example.workerapp.ui.detail.cleaning.CleaningViewModel
 import com.example.workerapp.presentation.screens.detail.healcare.HealthcareDetailScreen
-import com.example.workerapp.ui.detail.healcare.HealthcareViewModel
+import com.example.workerapp.presentation.screens.detail.healcare.HealthcareViewModel
 import com.example.workerapp.presentation.screens.home.HomeScreen
 import com.example.workerapp.presentation.screens.income.IncomeScreen
 import com.example.workerapp.presentation.screens.notification.NotificationViewModel

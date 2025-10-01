@@ -189,15 +189,17 @@ fun LoginScreen(
             Text(
                 text = stringResource(R.string.ban_chua_co_tai_khoan)
             )
+
             Spacer(Modifier.width(8.dp))
+
+            /*
+            * Business Logic: Worker can't create new account by yourself
+            * */
             Text(
                 text = stringResource(R.string.register_action),
                 fontSize = 14.sp,
                 fontStyle = FontStyle.Italic,
                 color = colorResource(R.color.orange_primary),
-                modifier = Modifier.clickable {
-                    navController.navigate(AppRoutes.REGISTER)
-                }
             )
         }
 
@@ -325,7 +327,7 @@ fun CustomEditTextField(
 
 
         },
-        visualTransformation = if (!isVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+        visualTransformation = if (!isVisibility && isPasswordTextField) PasswordVisualTransformation() else VisualTransformation.None,
         keyboardOptions = keyboardOptions,
         singleLine = true,
         shape = RoundedCornerShape(10.dp),
@@ -351,6 +353,7 @@ fun GoogleSignInButton(
         onClick = onClick,
         shape = RoundedCornerShape(8.dp),   // bo góc
         border = BorderStroke(1.dp, Color.Gray),
+        enabled = false,
         modifier = Modifier
             .fillMaxWidth()
             .height(48.dp)
@@ -378,4 +381,6 @@ fun GoogleSignInButton(
         }
     }
 }
+
+
 

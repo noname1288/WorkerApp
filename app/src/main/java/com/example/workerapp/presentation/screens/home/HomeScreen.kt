@@ -92,8 +92,7 @@ fun HomeScreen(
 
     when (uiState) {
         is HomeUiState.Error -> {
-            Toast.makeText(context, (uiState as HomeUiState.Error).message, Toast.LENGTH_LONG)
-                .show()
+            Toast.makeText(context, (uiState as HomeUiState.Error).message, Toast.LENGTH_LONG).show()
         }
 
         HomeUiState.Idle -> {}
@@ -102,7 +101,7 @@ fun HomeScreen(
         }
 
         is HomeUiState.Success -> {
-            Toast.makeText(context, (uiState as HomeUiState.Success).data, Toast.LENGTH_LONG)
+            Toast.makeText(context, (uiState as HomeUiState.Success).data, Toast.LENGTH_LONG).show()
         }
     }
 

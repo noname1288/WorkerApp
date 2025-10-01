@@ -19,6 +19,7 @@ import com.example.workerapp.data.source.model.base.JobModel1
 import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
 import com.example.workerapp.data.source.model.healthcare.HealthcareJobModel
 import com.example.workerapp.utils.components.InformationItem
+import com.example.workerapp.utils.toVND
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -77,7 +78,7 @@ fun JobDetailCard(job: JobModel1) {
                     )
                     InformationItem(
                         "Thanh toán",
-                        value = "${job.price}/người VND", isImportant = true
+                        value = job.price.toVND(), isImportant = true
                     )
 
                 }
@@ -104,7 +105,7 @@ fun JobDetailCard(job: JobModel1) {
                     )
                     InformationItem(
                         "Thanh toán",
-                        value = "${job.price}/người VND", isImportant = true
+                        value = job.price.toVND(), isImportant = true
                     )
                 }
                 else -> {

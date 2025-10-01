@@ -37,12 +37,11 @@ import com.example.workerapp.data.source.model.base.UserModel
 import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
 import com.example.workerapp.data.source.model.cleaning.DurationModel
 import com.example.workerapp.ui.theme.AppColors
+import com.example.workerapp.utils.toVND
 
 @Composable
 fun CleaningJobCard(job: CleaningJobModel1, modifier: Modifier = Modifier, onClick: () -> Unit = {}) {
-//    val iconJobInt = R.drawable.ic_cleaning_100
-//    else if (job.serviceType == ServiceType.HealthcareType) R.drawable.ic_healthcare_64
-//    else R.drawable.ic_launcher_background
+
     val iconJobInt = R.drawable.ic_cleaning_100
     val iconJob = painterResource(iconJobInt)
 
@@ -105,19 +104,21 @@ fun CleaningJobCard(job: CleaningJobModel1, modifier: Modifier = Modifier, onCli
                     Icon(
                         painterResource(R.drawable.ic_ironing_100),
                         null,
-                        tint = colorResource(R.color.orange_primary)
+                        tint = colorResource(R.color.orange_primary),
+                        modifier = Modifier.size(24.dp)
                     )
                 }
                 if (job.isCooking){
                     Icon(
                         painterResource(R.drawable.ic_cooking_64),
                         null,
-                        tint = colorResource(R.color.orange_primary)
+                        tint = colorResource(R.color.orange_primary),
+                        modifier = Modifier.size(24.dp)
                     )
                 }
                 Spacer(Modifier.weight(1f))
                 Text(
-                    text = job.price.toString(),
+                    text = job.price.toVND(),
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                     color = AppColors.Primary
                 )

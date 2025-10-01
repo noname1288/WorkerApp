@@ -7,4 +7,5 @@ import com.squareup.moshi.JsonClass
 data class UserWrapperResponse(
     var user: UserModel = UserModel(),
     var token: String = "",
+    var refreshToken: String = "",
 )

@@ -14,15 +14,14 @@ class JobServiceRepositoryImpl(
     override suspend fun getCleaningServices(): Result<List<CleaningServiceModel>> {
         return try {
             val response = remote.getCleaningServices()
-            // 1. Gọi API
             when (response) {
                 is NetworkResult.Success -> {
                     val services = response.data
 
-                    // 2. Lưu xuống local
+                    // Lưu xuống local
                     local.saveCleaningServices(services)
 
-                    // 3. Đọc từ local (đảm bảo dữ liệu đồng bộ)
+                    // Đọc từ local (đảm bảo dữ liệu đồng bộ)
                     val cached = local.getCleaningServices()
                     Result.success(cached)
                 }
@@ -51,7 +50,6 @@ class JobServiceRepositoryImpl(
     override suspend fun getHealthcareServices(): Result<List<HealthcareServiceModel>> {
         return try {
             val response = remote.getHealthcareServices()
-            // 1. Gọi API
             when (response) {
                 is NetworkResult.Success -> {
                     val services = response.data

@@ -13,7 +13,7 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface UserApi {
-    @POST("users/me")
+    @POST("auth/me")
     suspend fun login(@Body request: UserLoginRequest): BaseResponse<UserWrapperResponse>
 
     @POST("users/create")

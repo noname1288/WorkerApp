@@ -12,7 +12,6 @@ import kotlinx.coroutines.launch
 
 class ServiceViewModel : ViewModel(){
     private val _jobRemoteImpl = JobRemoteImpl.getInstance()
-    private val _serviceRepository = JobServiceRemoteImpl.getInstance()
 
     private val _uiState = MutableStateFlow<ServiceUIState>(ServiceUIState.Idle)
     val uiState: MutableStateFlow<ServiceUIState> = _uiState

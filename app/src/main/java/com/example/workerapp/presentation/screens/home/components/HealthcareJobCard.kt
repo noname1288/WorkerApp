@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import com.example.workerapp.R
 import com.example.workerapp.data.source.model.healthcare.HealthcareJobModel
 import com.example.workerapp.ui.theme.AppColors
+import com.example.workerapp.utils.toVND
 
 @Composable
 fun HealthcareJobCard(job: HealthcareJobModel, modifier: Modifier = Modifier, onClick: () -> Unit = {}) {
@@ -95,7 +96,7 @@ fun HealthcareJobCard(job: HealthcareJobModel, modifier: Modifier = Modifier, on
                 modifier = Modifier.padding(horizontal = 16.dp)) {
                 Spacer(Modifier.weight(1f))
                 Text(
-                    text = job.price.toString(),
+                    text = job.price.toVND(),
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                     color = AppColors.Primary
                 )
