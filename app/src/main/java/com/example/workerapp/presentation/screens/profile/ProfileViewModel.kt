@@ -7,14 +7,16 @@ import com.example.workerapp.data.source.remote.JobRemoteImpl
 import com.example.workerapp.data.source.remote.dto.ApplicationWrapper
 import com.example.workerapp.data.source.remote.dto.NetworkResult
 import com.example.workerapp.utils.cached.UserSession
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ProfileViewModel(
-    tokenRepository: TokenRepository
+@HiltViewModel
+class ProfileViewModel @Inject constructor(
+    private val tokenRepository: TokenRepository,
+    private val jobRemoteImpl: JobRemoteImpl
 ) : ViewModel() {
-
-    private val _jobRemoteImpl = JobRemoteImpl.getInstance()
 
     private val _applicationsState = MutableStateFlow<ApplicationsUiState>(ApplicationsUiState.Idle)
     val applicationsState: MutableStateFlow<ApplicationsUiState> = _applicationsState
@@ -31,7 +33,7 @@ class ProfileViewModel(
             _applicationsState.value = ApplicationsUiState.Loading
 
             try {
-                val result = _jobRemoteImpl.getApplication(userUid)
+                val result = jobRemoteImpl.getApplication(userUid)
 
                 when (result) {
                     is NetworkResult.Error -> {

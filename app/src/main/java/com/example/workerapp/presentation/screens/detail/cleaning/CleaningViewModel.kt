@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.workerapp.data.JobServiceRepository
+import com.example.workerapp.data.UserRepository
 import com.example.workerapp.data.source.remote.dto.NetworkResult
 import com.example.workerapp.data.source.remote.dto.request.ApplicationRequest
 import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
@@ -11,23 +12,23 @@ import com.example.workerapp.data.source.model.cleaning.CleaningServiceModel
 import com.example.workerapp.data.source.remote.JobRemoteImpl
 import com.example.workerapp.utils.ServiceType
 import com.example.workerapp.utils.cached.UserSession
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class CleaningViewModel : ViewModel() {
-    private val cleaningRepository = JobRemoteImpl.getInstance()
-    private lateinit var _jobServiceRepository: JobServiceRepository
+@HiltViewModel
+class CleaningViewModel @Inject constructor(
+    private val jobServiceRepository: JobServiceRepository,
+    private val cleaningRemoteImpl: JobRemoteImpl
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow<CleaningUiState>(CleaningUiState.Idle)
     val uiState: StateFlow<CleaningUiState> = _uiState
 
     private val _applyState = MutableStateFlow<Boolean?>(null)
     val applyState: StateFlow<Boolean?> = _applyState
-
-    fun updateJobServiceRepository(repository: JobServiceRepository) {
-        _jobServiceRepository = repository
-    }
 
     fun fetchJobDetail(uid: String) {
         if (uid.isEmpty()) {
@@ -38,7 +39,7 @@ class CleaningViewModel : ViewModel() {
             _uiState.value = CleaningUiState.Loading
 
             var services = emptyList<CleaningServiceModel>()
-            val servicesResult = _jobServiceRepository.getCleaningServices()
+            val servicesResult = jobServiceRepository.getCleaningServices()
             servicesResult.onSuccess {
                 services = it
                 Log.d("CleaningViewModel", "Fetched services: $it")
@@ -46,7 +47,7 @@ class CleaningViewModel : ViewModel() {
                 Log.e("CleaningViewModel", "Failed to fetch services: ${it.message}")
             }
 
-            val resultJob = cleaningRepository.getCleaningDetail(uid)
+            val resultJob = cleaningRemoteImpl.getCleaningDetail(uid)
             when (resultJob) {
                 is NetworkResult.Success -> {
                     _uiState.value = CleaningUiState.Success(resultJob.data, services)
@@ -79,7 +80,7 @@ class CleaningViewModel : ViewModel() {
 
                 Log.d("CleaningViewModel", "Applying with request: $request")
 
-                val result = cleaningRepository.applyForJob(request)
+                val result = cleaningRemoteImpl.applyForJob(request)
                 when (result) {
                     is NetworkResult.Success -> {
                         _applyState.value = true

@@ -5,11 +5,12 @@ import com.example.workerapp.data.source.JobServiceDataSource
 import com.example.workerapp.data.source.model.cleaning.CleaningServiceModel
 import com.example.workerapp.data.source.model.healthcare.HealthcareServiceModel
 import com.example.workerapp.data.source.remote.dto.NetworkResult
+import javax.inject.Inject
 
-class JobServiceRepositoryImpl(
-    private val local : JobServiceDataSource.Local,
-    private val remote : JobServiceDataSource.Remote
-) : JobServiceRepository  {
+class JobServiceRepositoryImpl @Inject constructor(
+    private val local: JobServiceDataSource.Local,
+    private val remote: JobServiceDataSource.Remote
+) : JobServiceRepository {
 
     override suspend fun getCleaningServices(): Result<List<CleaningServiceModel>> {
         return try {
@@ -93,22 +94,6 @@ class JobServiceRepositoryImpl(
             }
         } catch (e: Exception) {
             Result.failure(e)
-        }
-    }
-
-    companion object{
-        const val TAG = "JobServiceRepositoryImpl"
-
-        private var singleton: JobServiceRepositoryImpl? = null
-
-        fun getInstance(
-            local: JobServiceDataSource.Local,
-            remote: JobServiceDataSource.Remote
-        ): JobServiceRepositoryImpl {
-            if (singleton == null) {
-                singleton = JobServiceRepositoryImpl(local, remote)
-            }
-            return singleton!!
         }
     }
 }

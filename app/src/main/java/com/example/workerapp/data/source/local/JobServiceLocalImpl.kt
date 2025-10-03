@@ -4,8 +4,11 @@ import com.example.workerapp.data.source.JobServiceDataSource
 import com.example.workerapp.data.source.local.room.ServiceDao
 import com.example.workerapp.data.source.model.cleaning.CleaningServiceModel
 import com.example.workerapp.data.source.model.healthcare.HealthcareServiceModel
+import javax.inject.Inject
 
-class JobServiceLocalImpl(private val serviceDao: ServiceDao) : JobServiceDataSource.Local {
+class JobServiceLocalImpl @Inject constructor(
+    private val serviceDao: ServiceDao
+) : JobServiceDataSource.Local {
     override suspend fun getCleaningServices(): List<CleaningServiceModel> =
         serviceDao.getCleaningServices()
 
@@ -27,12 +30,5 @@ class JobServiceLocalImpl(private val serviceDao: ServiceDao) : JobServiceDataSo
 
     companion object {
         private var singleton: JobServiceLocalImpl? = null
-
-        fun getInstance(serviceDao: ServiceDao): JobServiceLocalImpl {
-            if (singleton == null) {
-                singleton = JobServiceLocalImpl(serviceDao)
-            }
-            return singleton!!
-        }
     }
 }

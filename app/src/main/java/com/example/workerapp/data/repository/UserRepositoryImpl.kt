@@ -12,8 +12,9 @@ import com.example.workerapp.data.source.remote.dto.request.UserRegisterRequest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-class UserRepositoryImpl(
+class UserRepositoryImpl @Inject constructor (
     private val local: UserDataSource.Local,
     private val remote: UserDataSource.Remote,
     private val tokenRepository: TokenRepository

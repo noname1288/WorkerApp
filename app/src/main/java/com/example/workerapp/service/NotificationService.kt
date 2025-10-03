@@ -8,13 +8,20 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.example.workerapp.MyApplication
 import com.example.workerapp.R
+import com.example.workerapp.data.TokenRepository
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class NotificationService : FirebaseMessagingService() {
+    @Inject
+    lateinit var tokenRepository: TokenRepository
+
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
         Log.d(TAG, "From: ${message.from}")
@@ -49,9 +56,6 @@ class NotificationService : FirebaseMessagingService() {
 
         //save to local data store
         CoroutineScope(Dispatchers.IO).launch {
-            val myApp = applicationContext as MyApplication
-            val tokenRepository = myApp.tokenRepository
-
             tokenRepository.saveFcmToken(token)
         }
     }

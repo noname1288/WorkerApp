@@ -4,8 +4,10 @@ import android.util.Log
 import com.example.workerapp.data.TokenRepository
 import com.example.workerapp.data.source.TokenDataSource
 import kotlinx.coroutines.flow.firstOrNull
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class TokenRepositoryImpl (
+class TokenRepositoryImpl @Inject constructor (
     private val local: TokenDataSource.Local
 ) : TokenRepository {
 

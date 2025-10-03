@@ -4,8 +4,13 @@ import com.example.workerapp.data.source.UserDataSource
 import com.example.workerapp.data.source.local.room.UserDao
 import com.example.workerapp.data.source.local.room.entity.UserLocalEntity
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class UserLocalImpl(private val userDao: UserDao) : UserDataSource.Local {
+@Singleton
+class UserLocalImpl @Inject constructor(
+    private val userDao: UserDao
+) : UserDataSource.Local {
     override suspend fun getUserProfile(): Flow<UserLocalEntity?> {
         return userDao.getUser()
     }
@@ -18,13 +23,4 @@ class UserLocalImpl(private val userDao: UserDao) : UserDataSource.Local {
         userDao.clearUsers()
     }
 
-    companion object{
-        private var singleton: UserLocalImpl? = null
-        fun getInstance(userDao: UserDao): UserLocalImpl{
-            if(singleton == null){
-                singleton = UserLocalImpl(userDao)
-            }
-            return singleton!!
-        }
-    }
 }

@@ -9,8 +9,11 @@ import com.example.workerapp.data.source.remote.dto.request.UserLoginRequest
 import com.example.workerapp.data.source.remote.dto.request.UserLoginWithGGRequest
 import com.example.workerapp.data.source.remote.dto.request.UserRegisterRequest
 import com.example.workerapp.data.source.remote.dto.response.UserWrapperResponse
+import javax.inject.Inject
 
-class UserRemoteImpl(private val userApi: UserApi) : UserDataSource.Remote {
+class UserRemoteImpl @Inject constructor(
+    private val userApi: UserApi
+) : UserDataSource.Remote {
     override suspend fun login(request: UserLoginRequest): NetworkResult<UserWrapperResponse> {
         try {
             val response = userApi.login(request)
@@ -81,11 +84,5 @@ class UserRemoteImpl(private val userApi: UserApi) : UserDataSource.Remote {
 
     companion object {
         const val TAG = "UserRemoteImpl"
-
-        var singleton: UserRemoteImpl? = null
-
-        fun getInstance(): UserRemoteImpl {
-            return singleton ?: UserRemoteImpl(RetrofitHelper.userApi).also { singleton = it }
-        }
     }
 }

@@ -5,12 +5,16 @@ import androidx.lifecycle.viewModelScope
 import com.example.workerapp.data.NotificationRepository
 import com.example.workerapp.data.repository.NotificationRepositoryImpl
 import com.example.workerapp.data.source.model.NotificationItem
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class NotificationViewModel : ViewModel() {
-    private val notificationRepository = NotificationRepositoryImpl.getInstance()
+@HiltViewModel
+class NotificationViewModel @Inject constructor(
+    private val notificationRepository: NotificationRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow<NotificationUiState>(NotificationUiState.Idle)
     val uiState: StateFlow<NotificationUiState> = _uiState

@@ -18,12 +18,15 @@ import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import com.google.firebase.auth.GoogleAuthProvider
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class AuthViewModel(
+@HiltViewModel
+class AuthViewModel @Inject constructor(
     private val tokenRepository: TokenRepository,
     private val userRepository: UserRepository
 ) : ViewModel() {
@@ -40,7 +43,6 @@ class AuthViewModel(
     fun checkUserLoggedIn() {
         viewModelScope.launch {
             val token = tokenRepository.getAccessToken()
-            val fcmTokenLocal = tokenRepository.getFcmToken()
 
             val result = runCatching {
                 userRepository.getUserProfile().first()
@@ -82,7 +84,7 @@ class AuthViewModel(
 
                 //update fcm token
                 val fcmTokenLocal = tokenRepository.getFcmToken()
-                if (fcmTokenLocal != null){
+                if (fcmTokenLocal != null) {
                     userRepository.saveFcmToken(fcmTokenLocal)
                 }
             }
@@ -108,7 +110,7 @@ class AuthViewModel(
 
                 //update fcm token
                 val fcmTokenLocal = tokenRepository.getFcmToken()
-                if (fcmTokenLocal != null){
+                if (fcmTokenLocal != null) {
                     userRepository.saveFcmToken(fcmTokenLocal)
                 }
             }.onFailure {
@@ -235,7 +237,7 @@ class AuthViewModel(
 
                 //update fcm token
                 val fcmTokenLocal = tokenRepository.getFcmToken()
-                if (fcmTokenLocal != null){
+                if (fcmTokenLocal != null) {
                     userRepository.saveFcmToken(fcmTokenLocal)
                 }
             }.onFailure {

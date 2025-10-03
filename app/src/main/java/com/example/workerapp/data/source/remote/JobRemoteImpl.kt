@@ -9,8 +9,11 @@ import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
 import com.example.workerapp.data.source.model.healthcare.HealthcareJobModel
 import com.example.workerapp.data.source.remote.dto.ApplicationWrapper
 import com.example.workerapp.data.source.remote.dto.NetworkResult
+import javax.inject.Inject
 
-class JobRemoteImpl(private val jobApi: JobApi) : JobDataSource.Remote {
+class JobRemoteImpl @Inject constructor(
+    private val jobApi: JobApi
+) : JobDataSource.Remote {
     override suspend fun getCleaningJobs(): NetworkResult<List<CleaningJobModel1>> {
         try {
             val result = jobApi.getCleaningJobs()
@@ -129,14 +132,5 @@ class JobRemoteImpl(private val jobApi: JobApi) : JobDataSource.Remote {
 
     companion object {
         private const val TAG = "JobRemoteImpl"
-
-        private var singleton: JobRemoteImpl? = null
-
-        fun getInstance(): JobRemoteImpl {
-            if (singleton == null) {
-                singleton = JobRemoteImpl(RetrofitHelper.jobApi)
-            }
-            return singleton!!
-        }
     }
 }

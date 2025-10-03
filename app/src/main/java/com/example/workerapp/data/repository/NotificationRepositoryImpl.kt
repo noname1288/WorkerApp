@@ -5,9 +5,11 @@ import com.example.workerapp.data.source.NotificationDataSource
 import com.example.workerapp.data.source.model.NotificationItem
 import com.example.workerapp.data.source.remote.NotificationRemoteImpl
 import com.example.workerapp.data.source.remote.dto.NetworkResult
+import javax.inject.Inject
 
-class NotificationRepositoryImpl(private val remote: NotificationDataSource.Remote) :
-    NotificationRepository {
+class NotificationRepositoryImpl @Inject constructor(
+    private val remote: NotificationDataSource.Remote
+) : NotificationRepository {
     override suspend fun getNotifications(): Result<List<NotificationItem>> {
         return try {
             when (val response = remote.getNotifications()) {
@@ -21,19 +23,6 @@ class NotificationRepositoryImpl(private val remote: NotificationDataSource.Remo
             }
         } catch (e: Exception) {
             Result.failure(e)
-        }
-    }
-
-    companion object {
-        private const val TAG = "NotificationRepositoryImpl"
-
-        private var instance: NotificationRepositoryImpl? = null
-
-        fun getInstance(): NotificationRepositoryImpl {
-            if (instance == null) {
-                instance = NotificationRepositoryImpl(remote = NotificationRemoteImpl.getInstance())
-            }
-            return instance!!
         }
     }
 }

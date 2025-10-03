@@ -7,8 +7,13 @@ import com.example.workerapp.data.source.TokenDataSource
 import com.example.workerapp.data.source.local.datastore.PrefKeys
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class TokenLocalImpl (private val dataStore: DataStore<Preferences>) : TokenDataSource.Local {
+class TokenLocalImpl @Inject constructor(
+    private val dataStore: DataStore<Preferences>
+) : TokenDataSource.Local {
+
     override fun getAccessToken(): Flow<String?> =
         dataStore.data.map { prefs -> prefs[PrefKeys.ACCESS_TOKEN] }
 

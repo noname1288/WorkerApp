@@ -7,14 +7,18 @@ import com.example.workerapp.data.source.model.base.JobModel1
 import com.example.workerapp.data.source.remote.JobRemoteImpl
 import com.example.workerapp.utils.TimeUtils
 import com.example.workerapp.utils.cached.UserSession
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import javax.inject.Inject
 
-class CalendarViewModel : ViewModel() {
-    private val jobRemoteImpl = JobRemoteImpl.getInstance()
+@HiltViewModel
+class CalendarViewModel @Inject constructor(
+    private val jobRemoteImpl: JobRemoteImpl
+) : ViewModel() {
 
     private val _morningJobs = MutableStateFlow(emptyList<JobModel1>())
     val morningJobs: StateFlow<List<JobModel1>> = _morningJobs

@@ -78,10 +78,6 @@ fun HealthcareDetailScreen(
     val applyState by viewModel.applyState.collectAsState()
     var confirmed by rememberSaveable { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        viewModel.updateJobServiceRepository(app.jobServiceRepository)
-    }
-
     LaunchedEffect(Unit, applyState) {
         when (applyState) {
             true -> {

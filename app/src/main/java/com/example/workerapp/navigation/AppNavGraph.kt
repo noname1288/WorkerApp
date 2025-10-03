@@ -1,9 +1,12 @@
 package com.example.workerapp.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -32,6 +35,7 @@ import com.example.workerapp.presentation.screens.profile.detail.ApplicationsScr
 import com.example.workerapp.ui.home.HomeViewModel
 import com.example.workerapp.utils.ServiceType
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun AppNavHost(
     navController: NavHostController,
@@ -58,11 +62,11 @@ fun AppNavHost(
         }
 
         composable(AppRoutes.HOME) {
-            val homeViewModel: HomeViewModel = viewModel()
+            val homeViewModel = hiltViewModel<HomeViewModel>()
             HomeScreen(navController = navController, viewModel = homeViewModel)
         }
         composable(AppRoutes.CALENDAR) {
-            val calendarViewModel: CalendarViewModel = viewModel()
+            val calendarViewModel = hiltViewModel<CalendarViewModel>()
             CalendarScreen(
                 viewModel = calendarViewModel,
                 navController = navController
@@ -72,7 +76,7 @@ fun AppNavHost(
             IncomeScreen()
         }
         composable(AppRoutes.NOTIFICATION) {
-            val notificationViewModel: NotificationViewModel = viewModel()
+            val notificationViewModel = hiltViewModel<NotificationViewModel>()
             NotificationScreenRoot(
                 notificationViewModel = notificationViewModel,
                 navController = navController
@@ -110,7 +114,7 @@ fun AppNavHost(
                 navArgument(DestinationArgs.ONLY_WATCH) { type = NavType.BoolType }
             )
         ) {
-            val cleaningViewModel: CleaningViewModel = viewModel()
+            val cleaningViewModel = hiltViewModel<CleaningViewModel>()
 
             val cleaningUid = it.arguments?.getString(DestinationArgs.JOB_ID) ?: ""
             val onlyWatch = it.arguments?.getBoolean(DestinationArgs.ONLY_WATCH) ?: false
@@ -129,7 +133,7 @@ fun AppNavHost(
                 navArgument(DestinationArgs.ONLY_WATCH) { type = NavType.BoolType }
             )
         ) {
-            val healthcareViewModel: HealthcareViewModel = viewModel()
+            val healthcareViewModel = hiltViewModel<HealthcareViewModel>()
 
             val healthcareUid = it.arguments?.getString(DestinationArgs.JOB_ID) ?: ""
             val onlyWatch = it.arguments?.getBoolean(DestinationArgs.ONLY_WATCH) ?: false

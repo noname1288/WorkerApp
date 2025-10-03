@@ -7,11 +7,15 @@ import com.example.workerapp.data.source.model.base.JobModel1
 import com.example.workerapp.data.source.remote.JobRemoteImpl
 import com.example.workerapp.data.source.remote.JobServiceRemoteImpl
 import com.example.workerapp.utils.ServiceType
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ServiceViewModel : ViewModel(){
-    private val _jobRemoteImpl = JobRemoteImpl.getInstance()
+@HiltViewModel
+class ServiceViewModel @Inject constructor(
+    private val jobRemoteImpl: JobRemoteImpl
+) : ViewModel(){
 
     private val _uiState = MutableStateFlow<ServiceUIState>(ServiceUIState.Idle)
     val uiState: MutableStateFlow<ServiceUIState> = _uiState
@@ -27,9 +31,9 @@ class ServiceViewModel : ViewModel(){
             _uiState.value = ServiceUIState.Loading
             try {
                 val result = when (_serviceTypeState.value){
-                    ServiceType.CleaningType -> _jobRemoteImpl.getCleaningJobs()
-                    ServiceType.HealthcareType -> _jobRemoteImpl.getHealthcareJobs()
-                    else -> _jobRemoteImpl.getCleaningJobs()
+                    ServiceType.CleaningType -> jobRemoteImpl.getCleaningJobs()
+                    ServiceType.HealthcareType -> jobRemoteImpl.getHealthcareJobs()
+                    else -> jobRemoteImpl.getCleaningJobs()
                 }
 
                 when(result){

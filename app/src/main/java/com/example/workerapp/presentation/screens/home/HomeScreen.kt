@@ -78,13 +78,8 @@ fun HomeScreen(
     viewModel: HomeViewModel
 ) {
     val context = LocalContext.current
-    val app = context.applicationContext as MyApplication
 
     val uiState by viewModel.homeUiState.collectAsState()
-
-    LaunchedEffect(Unit) {
-        viewModel.updateJobServiceRepository(app.jobServiceRepository)
-    }
 
     LaunchedEffect(Unit) {
         viewModel.fetchServices()

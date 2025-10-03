@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.gms.google.services)
     id("com.google.devtools.ksp")
+    id("com.google.dagger.hilt.android")
+
 }
 
 android {
@@ -42,24 +44,28 @@ android {
 }
 
 dependencies {
-    //messaging
-    implementation(libs.firebase.messaging)
-    // analytics
-    implementation(libs.firebase.analytics)
+    //hilt
+    implementation("com.google.dagger:hilt-android:2.57.1")
+    ksp("com.google.dagger:hilt-android-compiler:2.57.1")
+    implementation("androidx.hilt:hilt-navigation-compose:1.3.0")
+
+
     //room
     val room_version = "2.8.0"
-
     implementation("androidx.room:room-runtime:$room_version")
     ksp("androidx.room:room-compiler:$room_version")
     implementation("androidx.room:room-ktx:${room_version}")
 
     //datastore
     implementation("androidx.datastore:datastore-preferences:1.1.7")
-    // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
+
+    // okhttp
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    // https://mvnrepository.com/artifact/com.squareup.okhttp3/logging-interceptor
+
+    // logging-interceptor
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
-    // https://mvnrepository.com/artifact/com.squareup.retrofit2/retrofit
+
+    // retrofit2
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-moshi:2.11.0")
 
@@ -68,13 +74,20 @@ dependencies {
     ksp("com.squareup.moshi:moshi-kotlin-codegen:1.15.0")
     implementation("com.squareup.moshi:moshi-kotlin:1.15.0")
 
-    // https://mvnrepository.com/artifact/com.google.accompanist/accompanist-systemuicontroller
+    // accompanist-systemuicontroller
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.36.0")
-    //material-icons-extended
+
+    // material-icons-extended
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
+
     //coil
     implementation("io.coil-kt:coil-compose:2.7.0")
     implementation("io.coil-kt:coil-svg:2.7.0")
+
+    //messaging
+    implementation(libs.firebase.messaging)
+    // analytics
+    implementation(libs.firebase.analytics)
     //firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
@@ -82,11 +95,12 @@ dependencies {
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
+
     //navigation
     val nav_version = "2.9.3"
     implementation("androidx.navigation:navigation-compose:$nav_version")
 
-    ksp("androidx.room:room-compiler:2.5.0")
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

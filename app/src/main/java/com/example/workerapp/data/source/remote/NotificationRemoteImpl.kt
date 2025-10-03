@@ -5,8 +5,11 @@ import com.example.workerapp.data.source.model.NotificationItem
 import com.example.workerapp.data.source.NotificationDataSource
 import com.example.workerapp.data.source.remote.api.NotificationApi
 import com.example.workerapp.data.source.remote.dto.NetworkResult
+import javax.inject.Inject
 
-class NotificationRemoteImpl(private val notificationApi: NotificationApi) : NotificationDataSource.Remote {
+class NotificationRemoteImpl @Inject constructor(
+    private val notificationApi: NotificationApi
+) : NotificationDataSource.Remote {
     override suspend fun getNotifications(): NetworkResult<List<NotificationItem>> {
         try {
             val response = notificationApi.getAllNotifications()
@@ -18,21 +21,13 @@ class NotificationRemoteImpl(private val notificationApi: NotificationApi) : Not
                 Log.e(TAG, "getNotifications error: ${response.message}")
                 NetworkResult.Error(response.message)
             }
-        }catch (e: Exception){
+        } catch (e: Exception) {
             Log.e(TAG, "getNotifications Exception: ${e.message}")
             return NetworkResult.Error(e.message ?: "An unknown error occurred")
         }
     }
 
-    companion object{
+    companion object {
         private const val TAG = "NotificationRemoteImpl"
-
-        private var instance: NotificationRemoteImpl? = null
-        fun getInstance(): NotificationRemoteImpl {
-            if (instance == null) {
-                instance = NotificationRemoteImpl(RetrofitHelper.notificationApi)
-            }
-            return instance!!
-        }
     }
 }

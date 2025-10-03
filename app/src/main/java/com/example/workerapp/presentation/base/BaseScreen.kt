@@ -30,25 +30,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.workerapp.MyApplication
 import com.example.workerapp.R
 import com.example.workerapp.navigation.AppNavHost
 import com.example.workerapp.navigation.AppRoutes
 import com.example.workerapp.navigation.NavItem
-import com.example.workerapp.presentation.base.BaseViewModelFactory
 import com.example.workerapp.presentation.screens.authen.AuthViewModel
-import com.example.workerapp.presentation.screens.notification.RequestNotificationPermission
 import com.example.workerapp.presentation.screens.profile.ProfileViewModel
 import com.example.workerapp.utils.navigation.safeNavigate
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
 fun BaseScreen() {
-    val context = LocalContext.current
-    val app = context.applicationContext as MyApplication
 
     val startDestination = AppRoutes.SPLASH
 
@@ -71,15 +66,10 @@ fun BaseScreen() {
     /* *
     * Shared ViewModel
     * */
-    val authViewModelFactory = BaseViewModelFactory{
-        AuthViewModel(app.tokenRepository, app.userRepository)
-    }
-    val authViewModel: AuthViewModel = viewModel (factory = authViewModelFactory)
+    val authViewModel = hiltViewModel<AuthViewModel>()
 
-    val profileViewModelFactory = BaseViewModelFactory{
-        ProfileViewModel(app.tokenRepository)
-    }
-    val profileViewModel: ProfileViewModel = viewModel (factory = profileViewModelFactory)
+    val profileViewModel = hiltViewModel<ProfileViewModel>()
+
 
     val systemUiController = rememberSystemUiController()
     val useDarkIcons = true // vì nền trắng nên dùng icon tối

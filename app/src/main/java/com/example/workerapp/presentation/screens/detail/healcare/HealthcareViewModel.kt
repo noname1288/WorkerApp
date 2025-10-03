@@ -11,23 +11,22 @@ import com.example.workerapp.data.source.remote.JobRemoteImpl
 import com.example.workerapp.data.source.remote.dto.wrapper.HealthServiceWrapper
 import com.example.workerapp.utils.ServiceType
 import com.example.workerapp.utils.cached.UserSession
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class HealthcareViewModel : ViewModel() {
-    private val _healthcareRemote = JobRemoteImpl.getInstance()
-    private lateinit var _jobServiceRepository: JobServiceRepository
-
+@HiltViewModel
+class HealthcareViewModel @Inject constructor(
+    private val jobServiceRepository: JobServiceRepository,
+    private val healthcareRemoteImpl: JobRemoteImpl
+) : ViewModel() {
     private val _uiState = MutableStateFlow<HealthcareUiState>(HealthcareUiState.Idle)
     val uiState: MutableStateFlow<HealthcareUiState> = _uiState
 
     private val _applyState = MutableStateFlow<Boolean?>(null)
     val applyState: StateFlow<Boolean?> = _applyState
-
-    fun updateJobServiceRepository(repository: JobServiceRepository) {
-        _jobServiceRepository = repository
-    }
 
     fun updateApplyState(value: Boolean?) {
         _applyState.value = value
@@ -41,7 +40,7 @@ class HealthcareViewModel : ViewModel() {
         viewModelScope.launch {
             _uiState.value = HealthcareUiState.Loading
             try {
-                val result = _healthcareRemote.getHealthcareDetail(uid)
+                val result = healthcareRemoteImpl.getHealthcareDetail(uid)
 
                 when (result) {
                     is NetworkResult.Success -> {
@@ -67,7 +66,7 @@ class HealthcareViewModel : ViewModel() {
         val healthcareServices = mutableListOf<Pair<HealthcareServiceModel, Int>>()
 
         for (index in serviceWrappers) {
-            val res = _jobServiceRepository.getHealthcareServiceByUid(index.serviceID)
+            val res = jobServiceRepository.getHealthcareServiceByUid(index.serviceID)
             res.onSuccess {
                 healthcareServices.add(it to index.quantity)
             }.onFailure {
@@ -91,7 +90,7 @@ class HealthcareViewModel : ViewModel() {
                     serviceType = ServiceType.HealthcareType
                 )
 
-                val result = _healthcareRemote.applyForJob(request)
+                val result = healthcareRemoteImpl.applyForJob(request)
                 when (result) {
                     is NetworkResult.Success -> {
                         _applyState.value = true
