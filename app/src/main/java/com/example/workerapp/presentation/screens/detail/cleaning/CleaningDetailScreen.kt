@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.Map
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -45,7 +46,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.workerapp.MyApplication
 import com.example.workerapp.R
 import com.example.workerapp.data.source.model.base.UserModel
 import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
@@ -60,7 +60,8 @@ import com.example.workerapp.ui.detail.components.JobWorkflow
 import com.example.workerapp.ui.detail.components.WeeklySchedule
 import com.example.workerapp.utils.button.SlideToConfirmButton
 import com.example.workerapp.utils.components.CircleLoadingIndicator
-import com.example.workerapp.utils.navigation.popBackIfCan
+import com.example.workerapp.utils.ext.openGoogleMap
+import com.example.workerapp.utils.ext.popBackIfCan
 
 sealed class CleaningJobSection {
     data class UserInfo(val user: UserModel) : CleaningJobSection()
@@ -82,23 +83,24 @@ fun CleaningDetailScreen(
 ) {
     val tag = "CleaningDetailScreen"
     val context = LocalContext.current
-    val app = context.applicationContext as MyApplication
 
     var sections = emptyList<CleaningJobSection>()
 
     val uiState by viewModel.uiState.collectAsState()
     val applyState by viewModel.applyState.collectAsState()
     var confirmed by rememberSaveable { mutableStateOf(false) }
+    var jobAddress by rememberSaveable { mutableStateOf("") }
 
-    LaunchedEffect(Unit, applyState) {
+    LaunchedEffect(applyState) {
         when (applyState) {
             true -> {
                 Toast.makeText(context, "Ứng tuyển thành công!", Toast.LENGTH_LONG).show()
-                navController.popBackIfCan()
+//                navController.popBackIfCan()
             }
 
             false -> {
                 viewModel.updateApplyState(null)
+                confirmed = false
             }
 
             else -> {
@@ -111,6 +113,7 @@ fun CleaningDetailScreen(
         is CleaningUiState.Success -> {
             val jobDetail = (uiState as CleaningUiState.Success).job
             val services = (uiState as CleaningUiState.Success).services
+            jobAddress = jobDetail.location
             Log.d(tag, "CleaningDetailScreen: Fetched job detail: $jobDetail")
 
             sections = listOf(
@@ -160,9 +163,17 @@ fun CleaningDetailScreen(
                     navController.popBackIfCan()
                 }) {
                     Icon(
-                        Icons.Default.ArrowBackIosNew, contentDescription = "Back",
+                        Icons.Default.ArrowBackIosNew,
+                        contentDescription = "Back",
                         modifier = Modifier.size(20.dp)
                     )
+                }
+            },
+            actions = {
+                IconButton(onClick = {openGoogleMap(context, jobAddress)}) {
+                    Icon(Icons.Default.Map,
+                        contentDescription = "Go to Map",
+                        modifier = Modifier.size(20.dp))
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
@@ -181,7 +192,7 @@ fun CleaningDetailScreen(
                 when (section) {
                     is UserInfo -> {
                         item {
-                            ClientCard(user = section.user)
+                            ClientCard(user = section.user, onAddressClick = {openGoogleMap(context, section.user.location)})
                             Spacer(Modifier.height(12.dp))
                         }
                     }

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -42,8 +43,8 @@ import com.example.workerapp.ui.home.components.CleaningJobCard
 import com.example.workerapp.ui.home.components.HealthcareJobCard
 import com.example.workerapp.utils.ServiceType
 import com.example.workerapp.utils.components.CircleLoadingIndicator
-import com.example.workerapp.utils.navigation.navigateWithArgs
-import com.example.workerapp.utils.navigation.popBackIfCan
+import com.example.workerapp.utils.ext.navigateWithArgs
+import com.example.workerapp.utils.ext.popBackIfCan
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,27 +64,10 @@ fun ServiceDetailScreen(
     }
 
     val uiState by viewModel.uiState.collectAsState()
-    var jobs by rememberSaveable { mutableStateOf(emptyList<JobModel1>()) }
 
     LaunchedEffect(Unit) {
         viewModel.updateServiceType(serviceType)
         viewModel.fetchData()
-    }
-
-    when (uiState) {
-        is ServiceUIState.Error -> {
-            Toast.makeText(context, (uiState as ServiceUIState.Error).message, Toast.LENGTH_LONG)
-                .show()
-        }
-
-        ServiceUIState.Idle -> {}
-        ServiceUIState.Loading -> {
-            CircleLoadingIndicator()
-        }
-
-        is ServiceUIState.Success -> {
-            jobs = (uiState as ServiceUIState.Success).jobs
-        }
     }
 
     Column(modifier.fillMaxSize()) {
@@ -110,58 +94,76 @@ fun ServiceDetailScreen(
 
         Spacer(Modifier.height(12.dp))
 
-        LazyColumn(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            item {
-                if (jobs.isEmpty()) {
-                    Box(
-                        Modifier
-                            .height(300.dp)
-                            .fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) { Text("Không có công việc nào") }
+        when (uiState) {
+            is ServiceUIState.Error -> {
+                LaunchedEffect(uiState) {
+                    Toast.makeText(
+                        context,
+                        (uiState as ServiceUIState.Error).message,
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
 
-            jobs.forEach { job ->
-                when (serviceType) {
-                    ServiceType.CleaningType -> {
-                        item {
-                            CleaningJobCard(
-                                job as CleaningJobModel1,
-                                onClick = {
-                                    navController.navigateWithArgs(
-                                        route = AppRoutes.CLEANING_DETAIL,
-                                        args = arrayOf(job.uid, false)
-                                    )
-                                })
-                        }
-                    }
+            ServiceUIState.Idle -> {}
 
-                    ServiceType.HealthcareType -> {
-                        item {
-                            HealthcareJobCard(
-                                job as HealthcareJobModel,
-                                onClick = {
-                                    navController.navigateWithArgs(
-                                        route = AppRoutes.HEALTHCARE_DETAIL,
-                                        args = arrayOf(job.uid, false)
-                                    )
-                                })
-                        }
-                    }
+            ServiceUIState.Loading -> {
+                CircleLoadingIndicator()
+            }
 
-                    else -> {
+            is ServiceUIState.Success -> {
+                val jobs = (uiState as ServiceUIState.Success).jobs
+
+                LazyColumn(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    if (jobs.isEmpty()) {
                         item {
-                            Text("Loại dịch vụ không hợp lệ")
+                            Box(
+                                Modifier
+                                    .height(300.dp)
+                                    .fillMaxWidth(),
+                                contentAlignment = Alignment.Center
+                            ) { Text("Không có công việc nào") }
                         }
+                    } else {
+                        itemsIndexed(jobs) { index, job ->
+                            when (serviceType) {
+                                ServiceType.CleaningType -> {
+                                    CleaningJobCard(
+                                        job as CleaningJobModel1,
+                                        onClick = {
+                                            navController.navigateWithArgs(
+                                                route = AppRoutes.CLEANING_DETAIL,
+                                                args = arrayOf(job.uid, false)
+                                            )
+                                        })
+                                }
+
+                                ServiceType.HealthcareType -> {
+                                    HealthcareJobCard(
+                                        job as HealthcareJobModel,
+                                        onClick = {
+                                            navController.navigateWithArgs(
+                                                route = AppRoutes.HEALTHCARE_DETAIL,
+                                                args = arrayOf(job.uid, false)
+                                            )
+                                        })
+                                }
+
+                                else -> {
+                                    Text("Loại dịch vụ không hợp lệ")
+                                }
+                            }
+                        }
+
+                        item { Spacer(Modifier.height(24.dp)) }
                     }
                 }
             }
-
-            item { Spacer(Modifier.height(24.dp)) }
         }
+
+
     }
 }

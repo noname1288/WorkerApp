@@ -1,4 +1,4 @@
-package com.example.workerapp.ui.calendar
+package com.example.workerapp.presentation.screens.calendar
 
 import CalendarWeekPicker
 import android.util.Log
@@ -51,6 +51,8 @@ import androidx.navigation.NavController
 import com.example.workerapp.R
 import com.example.workerapp.data.source.model.base.JobModel1
 import com.example.workerapp.data.source.model.base.UserModel
+import com.example.workerapp.ui.calendar.CalendarUiState
+import com.example.workerapp.ui.calendar.CalendarViewModel
 import com.example.workerapp.utils.ServiceType
 import com.example.workerapp.utils.TimeUtils
 import com.example.workerapp.utils.components.CircleLoadingIndicator
@@ -120,7 +122,7 @@ fun CalendarScreen(
                     Toast.makeText(
                         context,
                         (taskUiState as CalendarUiState.Error).message,
-                        Toast.LENGTH_LONG
+                        Toast.LENGTH_SHORT
                     )
                         .show()
                 }

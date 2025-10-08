@@ -1,6 +1,7 @@
 package com.example.workerapp.ui.detail.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,9 +37,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.workerapp.R
 import com.example.workerapp.data.source.model.base.UserModel
+import com.example.workerapp.utils.ext.openGoogleMap
 
 @Composable
-fun ClientCard(user: UserModel) {
+fun ClientCard(user: UserModel, onAddressClick: () -> Unit = {}) {
     Card(
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
@@ -92,7 +94,7 @@ fun ClientCard(user: UserModel) {
                     Spacer(Modifier.height(4.dp))
                     ClientCardItem(Icons.Default.Email, user.email)
                     Spacer(Modifier.height(4.dp))
-                    ClientCardItem(Icons.Default.LocationOn, user.location)
+                    ClientCardItem(Icons.Default.LocationOn, user.location, onClick = { onAddressClick() })
                 }
             }
         }
@@ -104,7 +106,9 @@ fun ClientCardItem(
     icon: ImageVector,
     title: String = "",
     iconSize: Dp = 16.dp,
-    width: Dp = 8.dp) {
+    width: Dp = 8.dp,
+    onClick: () -> Unit = {}
+) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Icon(
             icon,
@@ -113,6 +117,6 @@ fun ClientCardItem(
             tint = colorResource(R.color.color_icon)
         )
         Spacer(Modifier.width(width))
-        Text(title, style = MaterialTheme.typography.bodyMedium, maxLines = 1)
+        Text(title, style = MaterialTheme.typography.bodyMedium, maxLines = 1, modifier = Modifier.clickable{onClick()})
     }
 }

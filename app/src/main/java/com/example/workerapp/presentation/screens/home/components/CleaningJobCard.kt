@@ -37,7 +37,7 @@ import com.example.workerapp.data.source.model.base.UserModel
 import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
 import com.example.workerapp.data.source.model.cleaning.DurationModel
 import com.example.workerapp.ui.theme.AppColors
-import com.example.workerapp.utils.toVND
+import com.example.workerapp.utils.ext.toVND
 
 @Composable
 fun CleaningJobCard(job: CleaningJobModel1, modifier: Modifier = Modifier, onClick: () -> Unit = {}) {

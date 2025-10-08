@@ -3,12 +3,13 @@ package com.example.workerapp.data.source.remote.api
 import com.example.workerapp.data.source.remote.dto.BaseJobResponse
 import com.example.workerapp.data.source.remote.dto.BaseJobsResponse
 import com.example.workerapp.data.source.remote.dto.request.ApplicationRequest
-import com.example.workerapp.data.source.remote.dto.response.ApplicationResponse
 import com.example.workerapp.data.source.model.base.JobModel1
 import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
 import com.example.workerapp.data.source.model.healthcare.HealthcareJobModel
 import com.example.workerapp.data.source.remote.dto.BaseApplicationResponse
+import com.example.workerapp.data.source.remote.dto.response.ApplicationResponse
 import com.example.workerapp.utils.annotation.AuthRequired
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -36,11 +37,11 @@ interface JobApi {
     @POST("orders/create")
     suspend fun applyForJob(
         @Body request: ApplicationRequest
-    ): ApplicationResponse
+    ): Response<ApplicationResponse>
 
-    @GET("schedules/{workerId}")
+    @AuthRequired
+    @GET("schedules")
     suspend fun getSchedules(
-        @Path("workerId") workerId: String,
         @Query("date") date: String,
     ): BaseJobsResponse<List<JobModel1>>
 

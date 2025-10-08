@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.workerapp.data.source.remote.dto.NetworkResult
 import com.example.workerapp.data.source.model.base.JobModel1
 import com.example.workerapp.data.source.remote.JobRemoteImpl
-import com.example.workerapp.data.source.remote.JobServiceRemoteImpl
 import com.example.workerapp.utils.ServiceType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,13 +13,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ServiceViewModel @Inject constructor(
-    private val jobRemoteImpl: JobRemoteImpl
+    private val _jobRemoteImpl: JobRemoteImpl
 ) : ViewModel(){
 
     private val _uiState = MutableStateFlow<ServiceUIState>(ServiceUIState.Idle)
     val uiState: MutableStateFlow<ServiceUIState> = _uiState
 
-    private val _serviceTypeState = MutableStateFlow<String>(ServiceType.CleaningType)
+    private val _serviceTypeState = MutableStateFlow(ServiceType.CleaningType)
 
     fun updateServiceType(newType: String){
         _serviceTypeState.value = newType
@@ -31,9 +30,10 @@ class ServiceViewModel @Inject constructor(
             _uiState.value = ServiceUIState.Loading
             try {
                 val result = when (_serviceTypeState.value){
-                    ServiceType.CleaningType -> jobRemoteImpl.getCleaningJobs()
-                    ServiceType.HealthcareType -> jobRemoteImpl.getHealthcareJobs()
-                    else -> jobRemoteImpl.getCleaningJobs()
+                    ServiceType.CleaningType -> _jobRemoteImpl.getCleaningJobs()
+                    ServiceType.HealthcareType -> _jobRemoteImpl.getHealthcareJobs()
+//                    ServiceType.MaintenanceType -> _jobRemoteImpl.getMaintenanceJobs()
+                    else -> _jobRemoteImpl.getCleaningJobs()
                 }
 
                 when(result){

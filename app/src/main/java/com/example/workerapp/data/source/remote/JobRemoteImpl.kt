@@ -7,8 +7,11 @@ import com.example.workerapp.data.source.remote.dto.request.ApplicationRequest
 import com.example.workerapp.data.source.model.base.JobModel1
 import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
 import com.example.workerapp.data.source.model.healthcare.HealthcareJobModel
+import com.example.workerapp.data.source.model.maintenance.MaintenanceJobModel
 import com.example.workerapp.data.source.remote.dto.ApplicationWrapper
 import com.example.workerapp.data.source.remote.dto.NetworkResult
+import com.example.workerapp.data.source.remote.dto.response.ApplicationResponse
+import com.example.workerapp.utils.ext.safeApiCall
 import javax.inject.Inject
 
 class JobRemoteImpl @Inject constructor(
@@ -78,20 +81,25 @@ class JobRemoteImpl @Inject constructor(
         }
     }
 
-    override suspend fun applyForJob(request: ApplicationRequest): NetworkResult<Boolean> {
-        return try {
-            val response = jobApi.applyForJob(request)
+    override suspend fun getMaintenanceJobs(): NetworkResult<List<MaintenanceJobModel>> {
+        TODO("Not yet implemented")
+    }
 
-            if (response.success) {
-                Log.d(TAG, "applyForJob: ${response.message}")
-                NetworkResult.Success(response.success)
-            } else {
-                Log.e(TAG, "applyForJob Error: ${response.message}")
-                NetworkResult.Error(response.message)
+    override suspend fun applyForJob(request: ApplicationRequest): NetworkResult<Boolean> {
+        val response = safeApiCall(
+            apiCall = { jobApi.applyForJob(request) },
+            tag = "applyForJob"
+        )
+
+        when(response){
+            is NetworkResult.Error -> {
+                Log.e(TAG, "applyForJob: ${response.message}")
+                return NetworkResult.Error(response.message)
             }
-        } catch (e: Exception) {
-            Log.e(TAG, "applyForJob Exception: ${e.message}")
-            NetworkResult.Error(e.message ?: "Unknown error")
+            is NetworkResult.Success -> {
+                Log.d(TAG, "applyForJob: ${response.data}")
+                return NetworkResult.Success(response.data.success)
+            }
         }
     }
 
@@ -100,7 +108,7 @@ class JobRemoteImpl @Inject constructor(
         date: String
     ): NetworkResult<List<JobModel1>> {
         return try {
-            val response = jobApi.getSchedules(workerId, date)
+            val response = jobApi.getSchedules(date)
             if (response.success) {
                 Log.d(TAG, "getSchedules: ${response.jobs}")
                 NetworkResult.Success(response.jobs ?: emptyList())
@@ -114,17 +122,17 @@ class JobRemoteImpl @Inject constructor(
         }
     }
 
-    override suspend fun getApplication(workerId: String) : NetworkResult<List<ApplicationWrapper>> {
+    override suspend fun getApplication(workerId: String): NetworkResult<List<ApplicationWrapper>> {
         try {
             val response = jobApi.getApplicationsByWorkerId(workerId)
-            if (response.success){
+            if (response.success) {
                 Log.d(TAG, "getApplication: ${response.orders}")
                 return NetworkResult.Success(response.orders)
-            }else {
+            } else {
                 Log.e(TAG, "getApplication Error: ${response.message}")
                 return NetworkResult.Error(response.message)
             }
-        }catch (e: Exception){
+        } catch (e: Exception) {
             Log.e(TAG, "getApplication Exception: ${e.message}")
             return NetworkResult.Error(e.message ?: "Unknown error")
         }

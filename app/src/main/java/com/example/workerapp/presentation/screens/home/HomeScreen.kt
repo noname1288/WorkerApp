@@ -1,6 +1,7 @@
 package com.example.workerapp.presentation.screens.home
 
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
@@ -34,6 +35,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,20 +50,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.example.workerapp.MyApplication
 import com.example.workerapp.R
 import com.example.workerapp.navigation.AppRoutes
-import com.example.workerapp.presentation.screens.notification.RequestNotificationPermission
 import com.example.workerapp.ui.home.HomeUiState
 import com.example.workerapp.ui.home.HomeViewModel
 import com.example.workerapp.utils.ServiceType
 import com.example.workerapp.utils.cached.UserSession
 import com.example.workerapp.utils.components.CircleLoadingIndicator
-import com.example.workerapp.utils.navigation.navigateWithArgs
+import com.example.workerapp.utils.ext.navigateWithArgs
 
 /**
  * Sealed class representing different sections of the Home screen
@@ -80,9 +81,14 @@ fun HomeScreen(
     val context = LocalContext.current
 
     val uiState by viewModel.homeUiState.collectAsState()
+    var shouldAskPermission by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
         viewModel.fetchServices()
+    }
+
+    LaunchedEffect(Unit) {
+        Log.d("HomeScreen", "$shouldAskPermission")
     }
 
     when (uiState) {
@@ -91,13 +97,12 @@ fun HomeScreen(
         }
 
         HomeUiState.Idle -> {}
+
         HomeUiState.Loading -> {
             CircleLoadingIndicator()
         }
 
-        is HomeUiState.Success -> {
-            Toast.makeText(context, (uiState as HomeUiState.Success).data, Toast.LENGTH_LONG).show()
-        }
+        is HomeUiState.Success -> {}
     }
 
     // Create list of sections to display
@@ -105,9 +110,6 @@ fun HomeScreen(
         HomeSection.Avatar,
         HomeSection.Category,
     )
-
-    //trigger to request notification permission
-    RequestNotificationPermission()
 
     Box(Modifier.fillMaxSize()) {
         // Background gradient

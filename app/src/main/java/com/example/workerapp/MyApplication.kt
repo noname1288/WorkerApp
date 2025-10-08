@@ -3,19 +3,6 @@ package com.example.workerapp
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import com.example.workerapp.data.JobServiceRepository
-import com.example.workerapp.data.TokenRepository
-import com.example.workerapp.data.UserRepository
-import com.example.workerapp.data.repository.JobServiceRepositoryImpl
-import com.example.workerapp.data.repository.TokenRepositoryImpl
-import com.example.workerapp.data.repository.UserRepositoryImpl
-import com.example.workerapp.data.source.local.JobServiceLocalImpl
-import com.example.workerapp.data.source.local.TokenLocalImpl
-import com.example.workerapp.data.source.local.UserLocalImpl
-import com.example.workerapp.data.source.local.room.AppDatabase
-import com.example.workerapp.data.source.remote.JobServiceRemoteImpl
-import com.example.workerapp.data.source.remote.UserRemoteImpl
-import com.example.workerapp.di.dataStore
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp

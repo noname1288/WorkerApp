@@ -19,10 +19,10 @@ fun RequestNotificationPermission(modifier: Modifier = Modifier) {
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { isGranted ->
-            if (isGranted){
-                Toast.makeText(context, "Permission granted ✅", Toast.LENGTH_SHORT).show()
-            }else {
-                Toast.makeText(context, "Permission denied ❌", Toast.LENGTH_SHORT).show()
+            if (isGranted) {
+                Toast.makeText(context, "Permission granted", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(context, "Permission denied", Toast.LENGTH_SHORT).show()
             }
         }
     )

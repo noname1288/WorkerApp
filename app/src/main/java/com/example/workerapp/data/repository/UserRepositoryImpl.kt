@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class UserRepositoryImpl @Inject constructor (
+class UserRepositoryImpl @Inject constructor(
     private val local: UserDataSource.Local,
     private val remote: UserDataSource.Remote,
     private val tokenRepository: TokenRepository
@@ -29,10 +29,13 @@ class UserRepositoryImpl @Inject constructor (
 
                 is NetworkResult.Success -> {
                     val user = response.data.user
-                    val token = response.data.token
+                    val accessToken = response.data.token
+                    val refreshToken = response.data.refreshToken
 
                     //save token to data store
-                    tokenRepository.saveAccessToken(token)
+                    tokenRepository.saveAccessToken(accessToken)
+                    tokenRepository.saveRefreshToken(refreshToken)
+
 
                     //Map UserWrapperResponse to UserLocalEntity
                     val userLocal = UserLocalEntity(

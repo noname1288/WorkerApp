@@ -7,6 +7,7 @@ import com.example.workerapp.data.source.remote.api.NotificationApi
 import com.example.workerapp.data.source.remote.api.ServiceApi
 import com.example.workerapp.data.source.remote.api.UserApi
 import com.example.workerapp.data.source.remote.interceptor.AuthInterceptor
+import com.example.workerapp.data.source.remote.interceptor.TokenAuthenticator
 import com.example.workerapp.utils.Constant
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -33,12 +34,16 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(tokenRepository: TokenRepository): OkHttpClient =
+    fun provideOkHttpClient(
+        tokenRepository: TokenRepository,
+        tokenAuthenticator: TokenAuthenticator
+    ): OkHttpClient =
         OkHttpClient.Builder()
             .addInterceptor(HttpLoggingInterceptor().apply {
                 level = HttpLoggingInterceptor.Level.BODY
             })
             .addInterceptor(AuthInterceptor(tokenRepository))
+            .authenticator(tokenAuthenticator)
             .build()
 
     @Provides

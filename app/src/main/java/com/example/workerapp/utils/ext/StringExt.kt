@@ -1,4 +1,4 @@
-package com.example.workerapp.utils
+package com.example.workerapp.utils.ext
 
 import java.text.NumberFormat
 import java.util.Locale

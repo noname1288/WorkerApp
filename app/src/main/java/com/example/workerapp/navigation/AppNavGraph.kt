@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -21,7 +20,7 @@ import com.example.workerapp.presentation.screens.service.ServiceViewModel
 import com.example.workerapp.presentation.screens.splash.SplashScreen
 import com.example.workerapp.presentation.screens.authen.LoginScreen
 import com.example.workerapp.presentation.screens.authen.RegisterScreen
-import com.example.workerapp.ui.calendar.CalendarScreen
+import com.example.workerapp.presentation.screens.calendar.CalendarScreen
 import com.example.workerapp.ui.calendar.CalendarViewModel
 import com.example.workerapp.presentation.screens.detail.cleaning.CleaningDetailScreen
 import com.example.workerapp.ui.detail.cleaning.CleaningViewModel
@@ -100,7 +99,7 @@ fun AppNavHost(
             val serviceType =
                 backStackEntry.arguments?.getString(DestinationArgs.SERVICE_TYPE)
                     ?: ServiceType.CleaningType
-            val serviceViewModel: ServiceViewModel = viewModel()
+            val serviceViewModel = hiltViewModel<ServiceViewModel>()
             ServiceDetailScreen(
                 serviceType = serviceType,
                 viewModel = serviceViewModel,

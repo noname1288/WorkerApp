@@ -12,6 +12,7 @@ class TokenRepositoryImpl @Inject constructor (
 ) : TokenRepository {
 
     override suspend fun getAccessToken(): String? = try {
+        Log.d(TAG, "getAccessToken: ${local.getAccessToken().firstOrNull()}")
         local.getAccessToken().firstOrNull()
     } catch (e: Exception) {
         e.printStackTrace()
@@ -19,6 +20,7 @@ class TokenRepositoryImpl @Inject constructor (
     }
 
     override suspend fun getRefreshToken(): String? = try {
+        Log.d(TAG, "getRefreshToken: ${local.getRefreshToken().firstOrNull()}")
         local.getRefreshToken().firstOrNull()
     } catch (e: Exception) {
         e.printStackTrace()
@@ -35,6 +37,7 @@ class TokenRepositoryImpl @Inject constructor (
 
     override suspend fun saveAccessToken(token: String) {
         try {
+            Log.d(TAG, "saveAccessToken: $token")
             local.saveAccessToken(token)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -43,6 +46,7 @@ class TokenRepositoryImpl @Inject constructor (
 
     override suspend fun saveRefreshToken(token: String) {
         try {
+            Log.d(TAG, "saveRefreshToken: $token")
             local.saveRefreshToken(token)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -51,6 +55,7 @@ class TokenRepositoryImpl @Inject constructor (
 
     override suspend fun saveFcmToken(fcmToken: String) {
         try {
+            Log.d(TAG, "saveFcmToken: $fcmToken")
             local.saveFcmToken(fcmToken)
         }catch (e: Exception) {
             e.printStackTrace()
@@ -59,6 +64,7 @@ class TokenRepositoryImpl @Inject constructor (
 
     override suspend fun clearAuthTokens() {
         try {
+            Log.d(TAG, "clearAuthTokens")
             local.clearAuthTokens()
         } catch (e: Exception) {
             e.printStackTrace()

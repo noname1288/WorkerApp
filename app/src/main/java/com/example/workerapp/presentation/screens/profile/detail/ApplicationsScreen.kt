@@ -38,7 +38,6 @@ import com.example.workerapp.data.source.remote.dto.ApplicationWrapper
 import com.example.workerapp.presentation.screens.profile.ApplicationsUiState
 import com.example.workerapp.presentation.screens.profile.ProfileViewModel
 import com.example.workerapp.utils.components.CircleLoadingIndicator
-import com.example.workerapp.utils.navigation.popBackIfCan
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

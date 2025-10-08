@@ -12,7 +12,6 @@ class JobServiceLocalImpl @Inject constructor(
     override suspend fun getCleaningServices(): List<CleaningServiceModel> =
         serviceDao.getCleaningServices()
 
-
     override suspend fun getHealthcareServices(): List<HealthcareServiceModel> =
         serviceDao.getHealthcareServices()
 
@@ -26,9 +25,5 @@ class JobServiceLocalImpl @Inject constructor(
 
     override suspend fun saveHealthcareServices(services: List<HealthcareServiceModel>) {
         services.map { service -> serviceDao.insertHealthcareService(service) }
-    }
-
-    companion object {
-        private var singleton: JobServiceLocalImpl? = null
     }
 }

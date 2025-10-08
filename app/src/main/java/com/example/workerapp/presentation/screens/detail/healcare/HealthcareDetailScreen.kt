@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.Map
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -45,7 +46,8 @@ import com.example.workerapp.ui.detail.components.JobDetailCard
 import com.example.workerapp.ui.detail.components.WeeklySchedule
 import com.example.workerapp.utils.button.SlideToConfirmButton
 import com.example.workerapp.utils.components.CircleLoadingIndicator
-import com.example.workerapp.utils.navigation.popBackIfCan
+import com.example.workerapp.utils.ext.openGoogleMap
+import com.example.workerapp.utils.ext.popBackIfCan
 
 sealed class HealthcareJobSection {
     data class UserInfo(val user: UserModel) : HealthcareJobSection()
@@ -77,6 +79,7 @@ fun HealthcareDetailScreen(
     val uiState by viewModel.uiState.collectAsState()
     val applyState by viewModel.applyState.collectAsState()
     var confirmed by rememberSaveable { mutableStateOf(false) }
+    var jobAddress by rememberSaveable { mutableStateOf("") }
 
     LaunchedEffect(Unit, applyState) {
         when (applyState) {
@@ -87,6 +90,7 @@ fun HealthcareDetailScreen(
 
             false -> {
                 viewModel.updateApplyState(null)
+                confirmed = false
             }
 
             else -> {
@@ -103,6 +107,7 @@ fun HealthcareDetailScreen(
         is HealthcareUiState.Success -> {
             val job = (uiState as HealthcareUiState.Success).data
             val serviceData = (uiState as HealthcareUiState.Success).serviceData
+            jobAddress = job.location
 
             sections = listOf(
                 HealthcareJobSection.UserInfo(job.user),
@@ -153,6 +158,13 @@ fun HealthcareDetailScreen(
                     )
                 }
             },
+            actions = {
+                IconButton(onClick = {openGoogleMap(context, jobAddress)}) {
+                    Icon(Icons.Default.Map,
+                        contentDescription = "Go to Map",
+                        modifier = Modifier.size(20.dp))
+                }
+            },
             colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
         )
 
@@ -169,7 +181,7 @@ fun HealthcareDetailScreen(
                 when (section) {
                     is HealthcareJobSection.UserInfo -> {
                         item {
-                            ClientCard(user = section.user)
+                            ClientCard(user = section.user, onAddressClick = {openGoogleMap(context, section.user.location)})
                             Spacer(Modifier.height(12.dp))
                         }
                     }

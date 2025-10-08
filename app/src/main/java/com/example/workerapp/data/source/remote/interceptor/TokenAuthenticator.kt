@@ -1,16 +1,19 @@
 package com.example.workerapp.data.source.remote.interceptor
 
-import com.example.workerapp.data.source.local.TokenLocalImpl
+import com.example.workerapp.data.TokenRepository
 import com.example.workerapp.data.source.remote.api.UserApi
+import com.example.workerapp.data.source.remote.dto.request.RefreshTokenRequest
 import kotlinx.coroutines.runBlocking
 import okhttp3.Authenticator
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.Route
+import javax.inject.Inject
+import javax.inject.Provider
 
-class TokenAuthenticator(
-    private val tokenLocalImpl: TokenLocalImpl,
-    private val userApi: UserApi
+class TokenAuthenticator @Inject constructor(
+    private val tokenRepository: TokenRepository,
+    private val userApiProvider: Provider<UserApi>
 ) : Authenticator {
     override fun authenticate(route: Route?, response: Response): Request? {
         // if we've already attempted to authenticate 3 times, give up
@@ -18,25 +21,31 @@ class TokenAuthenticator(
             return null
         }
 
-        // get the refresh token from DataStore
-        // call refresh token api
-        val refreshReponse = runBlocking {
+        val refreshResponse = runBlocking {
+            val refreshToken = tokenRepository.getRefreshToken()
+
+            if (refreshToken.isNullOrEmpty())
+                throw RuntimeException("Refresh token is null or empty")
+
             try {
-                //userApi.refreshToken("Bearer ${tokenLocalImpl.getRefreshToken()}")
+                userApiProvider.get().refreshToken(RefreshTokenRequest(refreshToken))
             } catch (e: Exception) {
                 null
             }
         }
 
-//        if (!refreshReponse.success) return null
+        if ( refreshResponse == null || !refreshResponse.success) return null
+
+        val newToken = refreshResponse.data.idToken
 
         runBlocking {
-            // save new token to DataStore
+            tokenRepository.saveAccessToken(newToken)
         }
 
         // use new access token to send request again
-
-        return null
+        return response.request.newBuilder()
+            .header("Authorization", "Bearer $newToken")
+            .build()
     }
 
     private fun responseCount(response: Response): Int {

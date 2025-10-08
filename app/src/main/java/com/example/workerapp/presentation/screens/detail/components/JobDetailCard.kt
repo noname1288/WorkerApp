@@ -19,7 +19,7 @@ import com.example.workerapp.data.source.model.base.JobModel1
 import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
 import com.example.workerapp.data.source.model.healthcare.HealthcareJobModel
 import com.example.workerapp.utils.components.InformationItem
-import com.example.workerapp.utils.toVND
+import com.example.workerapp.utils.ext.toVND
 import java.text.SimpleDateFormat
 import java.util.Locale
 

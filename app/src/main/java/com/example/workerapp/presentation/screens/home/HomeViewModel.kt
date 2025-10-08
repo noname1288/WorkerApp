@@ -32,8 +32,7 @@ class HomeViewModel @Inject constructor(
 
                 val result2 = jobServiceRepository.getHealthcareServices()
                 result2.onSuccess {
-                    _homeUiState.value =
-                        HomeUiState.Success("Fetched ${it.size} healthcare services")
+                    _homeUiState.value = HomeUiState.Success("Fetched ${it.size} healthcare services")
                 }.onFailure {
                     _homeUiState.value =
                         HomeUiState.Error(it.message ?: "Failed to fetch healthcare services")

@@ -1,5 +1,8 @@
-package com.example.workerapp.utils.navigation
+package com.example.workerapp.utils.ext
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.navigation.NavController
 import com.example.workerapp.navigation.AppRoutes
 
@@ -43,5 +46,19 @@ fun NavController.navigateWithArgs(
         launchSingleTop = true
         restoreState = restore
     }
+}
+
+fun openGoogleMap(context: Context, jobAddress: String) {
+    if (jobAddress.isNullOrEmpty())
+        return
+
+    // Dùng URL của Google Maps Web
+    val encodedAddress = Uri.encode(jobAddress)
+    val mapUrl = "https://www.google.com/maps/search/?api=1&query=$encodedAddress"
+
+    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(mapUrl))
+    context.startActivity(browserIntent)
+
+    context.startActivity(browserIntent)
 }
 

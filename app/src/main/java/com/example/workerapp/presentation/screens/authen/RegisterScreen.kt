@@ -48,7 +48,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.workerapp.R
 import com.example.workerapp.utils.components.CircleLoadingIndicator
-import com.example.workerapp.utils.navigation.popBackIfCan
+import com.example.workerapp.utils.ext.popBackIfCan
 
 @Composable
 fun RegisterScreen(

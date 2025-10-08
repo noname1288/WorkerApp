@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import com.example.workerapp.R
 import com.example.workerapp.data.source.model.healthcare.HealthcareJobModel
 import com.example.workerapp.ui.theme.AppColors
-import com.example.workerapp.utils.toVND
+import com.example.workerapp.utils.ext.toVND
 
 @Composable
 fun HealthcareJobCard(job: HealthcareJobModel, modifier: Modifier = Modifier, onClick: () -> Unit = {}) {

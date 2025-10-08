@@ -33,9 +33,8 @@ import com.example.workerapp.R
 import com.example.workerapp.navigation.AppRoutes
 import com.example.workerapp.presentation.screens.authen.AuthViewModel
 import com.example.workerapp.presentation.screens.authen.AuthenticationUIState
-import com.example.workerapp.presentation.screens.notification.RequestNotificationPermission
 import com.example.workerapp.utils.cached.UserSession
-import com.example.workerapp.utils.navigation.safeNavigate
+import com.example.workerapp.utils.ext.safeNavigate
 import kotlinx.coroutines.delay
 
 @Composable

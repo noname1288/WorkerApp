@@ -65,7 +65,7 @@ import androidx.navigation.NavController
 import com.example.workerapp.R
 import com.example.workerapp.navigation.AppRoutes
 import com.example.workerapp.utils.components.CircleLoadingIndicator
-import com.example.workerapp.utils.navigation.safeNavigate
+import com.example.workerapp.utils.ext.safeNavigate
 import kotlinx.coroutines.launch
 
 @Composable
