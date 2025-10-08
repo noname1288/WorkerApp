@@ -211,7 +211,7 @@ fun NotificationItem(item: NotificationItem = NotificationItem(), onClick: () ->
             Text(
                 item.title,
                 maxLines = 2,
-                style = MaterialTheme.typography.bodyMedium.copy(
+                style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.Bold
                 )
             )

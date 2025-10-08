@@ -17,6 +17,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.DocumentScanner
 import androidx.compose.material.icons.outlined.Domain
+import androidx.compose.material.icons.outlined.RateReview
+import androidx.compose.material.icons.outlined.Reviews
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.SupportAgent
 import androidx.compose.material.icons.outlined.WorkHistory
@@ -82,6 +84,9 @@ fun ProfileScreen(
                         SettingButtons(
                             onApplicationsClick = {
                                 navController.safeNavigate(AppRoutes.LIST_APPLICATIONS)
+                            },
+                            onReviewClick = {
+                                navController.safeNavigate(AppRoutes.REVIEW_SCREEN)
                             }
                         )
                         Spacer(Modifier.height(32.dp))
@@ -160,6 +165,7 @@ fun SettingButtons(
     modifier: Modifier = Modifier,
     onApplicationsClick: () -> Unit = {},
     onHistoryClick: () -> Unit = {},
+    onReviewClick: () -> Unit = {},
     onTermClick: () -> Unit = {},
     onSupportClick: () -> Unit = {},
     onSettingClick: () -> Unit = {}
@@ -178,6 +184,14 @@ fun SettingButtons(
             label = stringResource(R.string.job_history_title),
             leadingIcon = Icons.Outlined.WorkHistory,
             onClick = { onHistoryClick() }
+        )
+
+        HorizontalDivider()
+
+        CustomExtendedButton(
+            label = stringResource(R.string.review_title_from_customer),
+            leadingIcon = Icons.Outlined.RateReview,
+            onClick = { onReviewClick() }
         )
 
         HorizontalDivider()

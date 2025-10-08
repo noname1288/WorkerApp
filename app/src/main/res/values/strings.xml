@@ -41,5 +41,7 @@
     <string name="maintenance_service_body">Công việc bảo trì không chỉ đòi hỏi tay nghề mà còn giúp bạn giải quyết các vấn đề thực tế, mang lại sự tiện nghi cho khách hàng.</string>
     <string name="applied_job">Công việc đã ứng tuyển</string>
     <string name="list_applications_title">Công việc đã ứng tuyển</string>
+    <string name="review_title">Đánh giá</string>
+    <string name="review_title_from_customer">Xem đánh giá từ khách hàng</string>
 </resources>
 

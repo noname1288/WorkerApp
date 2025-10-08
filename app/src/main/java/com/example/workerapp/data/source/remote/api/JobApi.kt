@@ -6,6 +6,7 @@ import com.example.workerapp.data.source.remote.dto.request.ApplicationRequest
 import com.example.workerapp.data.source.model.base.JobModel1
 import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
 import com.example.workerapp.data.source.model.healthcare.HealthcareJobModel
+import com.example.workerapp.data.source.model.maintenance.MaintenanceJobModel
 import com.example.workerapp.data.source.remote.dto.BaseApplicationResponse
 import com.example.workerapp.data.source.remote.dto.response.ApplicationResponse
 import com.example.workerapp.utils.annotation.AuthRequired
@@ -32,6 +33,9 @@ interface JobApi {
     suspend fun getHealthcareJobByUid(
         @Path("uid") uid: String
     ): BaseJobResponse<HealthcareJobModel>
+
+    @GET("/jobs/maintenance")
+    suspend fun getMaintenanceJobs(): BaseJobsResponse<List<MaintenanceJobModel>>
 
     @AuthRequired
     @POST("orders/create")

@@ -31,6 +31,7 @@ import com.example.workerapp.presentation.screens.income.IncomeScreen
 import com.example.workerapp.presentation.screens.notification.NotificationViewModel
 import com.example.workerapp.presentation.screens.profile.ProfileViewModel
 import com.example.workerapp.presentation.screens.profile.detail.ApplicationsScreen
+import com.example.workerapp.presentation.screens.review.ReviewScreen
 import com.example.workerapp.ui.home.HomeViewModel
 import com.example.workerapp.utils.ServiceType
 
@@ -147,6 +148,10 @@ fun AppNavHost(
 
         composable(AppRoutes.LIST_APPLICATIONS) {
             ApplicationsScreen(viewModel = profileViewModel)
+        }
+
+        composable (AppRoutes.REVIEW_SCREEN){
+            ReviewScreen()
         }
     }
 }

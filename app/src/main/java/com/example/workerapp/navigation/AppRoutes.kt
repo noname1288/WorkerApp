@@ -28,4 +28,6 @@ object AppRoutes {
     const val HEALTHCARE_DETAIL = "${AppScreen.HEALTHCARE_SCREEN}/%s/%b"
 
     const val LIST_APPLICATIONS = "list_applications"
+
+    const val REVIEW_SCREEN = "review"
 }
