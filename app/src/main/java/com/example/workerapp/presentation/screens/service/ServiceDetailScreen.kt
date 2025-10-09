@@ -25,9 +25,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,12 +32,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.workerapp.data.source.model.base.JobModel1
 import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
 import com.example.workerapp.data.source.model.healthcare.HealthcareJobModel
+import com.example.workerapp.data.source.model.maintenance.MaintenanceJobModel
 import com.example.workerapp.navigation.AppRoutes
 import com.example.workerapp.ui.home.components.CleaningJobCard
-import com.example.workerapp.ui.home.components.HealthcareJobCard
+import com.example.workerapp.presentation.screens.home.components.HealthcareJobCard
+import com.example.workerapp.presentation.screens.home.components.MaintenanceJobCard
 import com.example.workerapp.utils.ServiceType
 import com.example.workerapp.utils.components.CircleLoadingIndicator
 import com.example.workerapp.utils.ext.navigateWithArgs
@@ -150,6 +148,15 @@ fun ServiceDetailScreen(
                                                 args = arrayOf(job.uid, false)
                                             )
                                         })
+                                }
+
+                                ServiceType.MaintenanceType -> {
+                                    MaintenanceJobCard(
+                                        job as MaintenanceJobModel,
+                                        onClick = {
+
+                                        }
+                                    )
                                 }
 
                                 else -> {

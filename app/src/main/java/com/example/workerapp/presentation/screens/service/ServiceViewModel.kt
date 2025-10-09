@@ -32,7 +32,7 @@ class ServiceViewModel @Inject constructor(
                 val result = when (_serviceTypeState.value){
                     ServiceType.CleaningType -> _jobRemoteImpl.getCleaningJobs()
                     ServiceType.HealthcareType -> _jobRemoteImpl.getHealthcareJobs()
-//                    ServiceType.MaintenanceType -> _jobRemoteImpl.getMaintenanceJobs()
+                    ServiceType.MaintenanceType -> _jobRemoteImpl.getMaintenanceJobs()
                     else -> _jobRemoteImpl.getCleaningJobs()
                 }
 

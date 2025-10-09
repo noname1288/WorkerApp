@@ -82,20 +82,33 @@ class JobRemoteImpl @Inject constructor(
     }
 
     override suspend fun getMaintenanceJobs(): NetworkResult<List<MaintenanceJobModel>> {
-        TODO("Not yet implemented")
+        return try {
+            val response = jobApi.getMaintenanceJobs()
+            if (response.success) {
+                Log.d(TAG, "getMaintenanceJobs: ${response.jobs}")
+                NetworkResult.Success(response.jobs ?: emptyList())
+            } else {
+                Log.e(TAG, "getMaintenanceJobs Error: ${response.message}")
+                NetworkResult.Error(response.message)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "getMaintenanceJobs Exception: ${e.message}")
+            NetworkResult.Error(e.message ?: "Unknown error")
+        }
     }
 
     override suspend fun applyForJob(request: ApplicationRequest): NetworkResult<Boolean> {
         val response = safeApiCall(
             apiCall = { jobApi.applyForJob(request) },
-            tag = "applyForJob"
+            tag = TAG
         )
 
-        when(response){
+        when (response) {
             is NetworkResult.Error -> {
                 Log.e(TAG, "applyForJob: ${response.message}")
                 return NetworkResult.Error(response.message)
             }
+
             is NetworkResult.Success -> {
                 Log.d(TAG, "applyForJob: ${response.data}")
                 return NetworkResult.Success(response.data.success)

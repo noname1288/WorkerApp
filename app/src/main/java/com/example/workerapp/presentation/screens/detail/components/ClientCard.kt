@@ -17,8 +17,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -94,8 +97,31 @@ fun ClientCard(user: UserModel, onAddressClick: () -> Unit = {}) {
                     Spacer(Modifier.height(4.dp))
                     ClientCardItem(Icons.Default.Email, user.email)
                     Spacer(Modifier.height(4.dp))
-                    ClientCardItem(Icons.Default.LocationOn, user.location, onClick = { onAddressClick() })
+                    ClientCardItem(
+                        Icons.Default.LocationOn,
+                        user.location,
+                        onClick = { onAddressClick() })
                 }
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            HorizontalDivider()
+
+            Spacer(Modifier.height(8.dp))
+
+            Row(Modifier.fillMaxWidth()) {
+                Button(
+                    onClick = {},
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.green))
+                ) { Text("Nhắn tin") }
+
+                Spacer(Modifier.width(16.dp))
+
+                Button(onClick = {}, modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.bg3))) { Text("Liên hệ") }
+
             }
         }
     }
@@ -117,6 +143,10 @@ fun ClientCardItem(
             tint = colorResource(R.color.color_icon)
         )
         Spacer(Modifier.width(width))
-        Text(title, style = MaterialTheme.typography.bodyMedium, maxLines = 1, modifier = Modifier.clickable{onClick()})
+        Text(
+            title,
+            style = MaterialTheme.typography.bodyMedium,
+            maxLines = 1,
+            modifier = Modifier.clickable { onClick() })
     }
 }

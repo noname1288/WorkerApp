@@ -34,7 +34,7 @@ interface JobApi {
         @Path("uid") uid: String
     ): BaseJobResponse<HealthcareJobModel>
 
-    @GET("/jobs/maintenance")
+    @GET("jobs/maintenance")
     suspend fun getMaintenanceJobs(): BaseJobsResponse<List<MaintenanceJobModel>>
 
     @AuthRequired

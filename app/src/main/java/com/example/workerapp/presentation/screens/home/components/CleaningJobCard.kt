@@ -1,10 +1,13 @@
 package com.example.workerapp.ui.home.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -12,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Accessibility
+import androidx.compose.material.icons.outlined.AirportShuttle
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Event
 import androidx.compose.material.icons.outlined.PersonOutline
@@ -25,8 +29,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -37,10 +43,15 @@ import com.example.workerapp.data.source.model.base.UserModel
 import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
 import com.example.workerapp.data.source.model.cleaning.DurationModel
 import com.example.workerapp.ui.theme.AppColors
+import com.example.workerapp.utils.components.CustomChip
 import com.example.workerapp.utils.ext.toVND
 
 @Composable
-fun CleaningJobCard(job: CleaningJobModel1, modifier: Modifier = Modifier, onClick: () -> Unit = {}) {
+fun CleaningJobCard(
+    job: CleaningJobModel1,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
+) {
 
     val iconJobInt = R.drawable.ic_cleaning_100
     val iconJob = painterResource(iconJobInt)
@@ -55,42 +66,44 @@ fun CleaningJobCard(job: CleaningJobModel1, modifier: Modifier = Modifier, onCli
         onClick = onClick
     ) {
         Column(Modifier.padding(16.dp)) {
-            Row() {
-                // Left icon block
-                Box(
-                    modifier = Modifier
-                        .size(56.dp)
-                        .background(colorGreen.copy(alpha = 0.08f), RoundedCornerShape(12.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        iconJob,
-                        contentDescription = null,
-                        tint = colorGreen,
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
 
-                Spacer(Modifier.width(16.dp))
+            Image(
+                painterResource(R.drawable.img_cleaning_service),
+                contentDescription = "Cleaning Service Image",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(130.dp)
+                    .clip(RoundedCornerShape(16.dp)),
+                contentScale = ContentScale.Crop
+            )
 
-                Column(Modifier.weight(1f)) {
-                    Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(20.dp))
 
-                    Text(
-                        text = job.location,
-                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-                    )
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = job.location,
+                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                    maxLines = 2,
+                    modifier = Modifier.weight(1f)
+                )
 
-                    Spacer(Modifier.height(8.dp))
-
-                    // Meta rows
-                    MetaRow(Icons.Outlined.PersonOutline, "Khách hàng: ${job.user.username}")
-                    MetaRow(Icons.Outlined.Accessibility, "Giới tính: ${job.user.gender}")
-                    MetaRow(Icons.Outlined.Event, "Ngày: " + job.listDays[0] + "  ·  " + job.startTime)
-                    MetaRow(Icons.Outlined.Schedule, "Tối đa: ${job.duration.workingHour} giờ")
-                    MetaRow(Icons.Outlined.Description, "${job.duration.description}")
-                }
+                CustomChip(status = job.status)
             }
+
+            Spacer(Modifier.height(8.dp))
+
+            // Meta rows
+            MetaRow(Icons.Outlined.PersonOutline, "Khách hàng: ${job.user.username}")
+            MetaRow(Icons.Outlined.Accessibility, "Giới tính: ${job.user.gender}")
+            MetaRow(Icons.Outlined.Event, "Ngày làm: " + job.listDays[0] + "  ·  " + job.startTime)
+            MetaRow(Icons.Outlined.AirportShuttle, "Giờ bắt đầu " + job.startTime)
+            MetaRow(Icons.Outlined.Schedule, "Tối đa: ${job.duration.workingHour} giờ")
+            MetaRow(Icons.Outlined.Description, "${job.duration.description}")
+
 
             Spacer(Modifier.height(4.dp))
 
@@ -98,9 +111,11 @@ fun CleaningJobCard(job: CleaningJobModel1, modifier: Modifier = Modifier, onCli
 
             Spacer(Modifier.height(4.dp))
 
-            Row(verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(horizontal = 16.dp)) {
-                if (job.isIroning){
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            ) {
+                if (job.isIroning) {
                     Icon(
                         painterResource(R.drawable.ic_ironing_100),
                         null,
@@ -108,7 +123,7 @@ fun CleaningJobCard(job: CleaningJobModel1, modifier: Modifier = Modifier, onCli
                         modifier = Modifier.size(24.dp)
                     )
                 }
-                if (job.isCooking){
+                if (job.isCooking) {
                     Icon(
                         painterResource(R.drawable.ic_cooking_64),
                         null,
@@ -119,7 +134,7 @@ fun CleaningJobCard(job: CleaningJobModel1, modifier: Modifier = Modifier, onCli
                 Spacer(Modifier.weight(1f))
                 Text(
                     text = job.price.toVND(),
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                     color = AppColors.Primary
                 )
             }
@@ -129,7 +144,7 @@ fun CleaningJobCard(job: CleaningJobModel1, modifier: Modifier = Modifier, onCli
 }
 
 @Composable
-private fun MetaRow(image: ImageVector, text: String) {
+fun MetaRow(image: ImageVector, text: String) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(vertical = 2.dp)
@@ -141,7 +156,11 @@ private fun MetaRow(image: ImageVector, text: String) {
             modifier = Modifier.size(18.dp)
         )
         Spacer(Modifier.width(8.dp))
-        Text(text, style = MaterialTheme.typography.bodyMedium, color = colorResource(R.color.subtext))
+        Text(
+            text,
+            style = MaterialTheme.typography.bodyMedium,
+            color = colorResource(R.color.subtext)
+        )
     }
 }
 
