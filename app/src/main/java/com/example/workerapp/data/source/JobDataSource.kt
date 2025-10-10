@@ -26,6 +26,7 @@ interface JobDataSource {
         suspend fun getHealthcareDetail(jobUid: String): NetworkResult<HealthcareJobModel>
 
         suspend fun getMaintenanceJobs(): NetworkResult<List<MaintenanceJobModel>>
+        suspend fun getMaintenanceDetail(jobUid: String) : NetworkResult<MaintenanceJobModel>
 
         suspend fun applyForJob(request: ApplicationRequest): NetworkResult<Boolean>
 

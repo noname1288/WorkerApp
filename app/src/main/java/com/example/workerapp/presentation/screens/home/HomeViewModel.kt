@@ -38,6 +38,25 @@ class HomeViewModel @Inject constructor(
                         HomeUiState.Error(it.message ?: "Failed to fetch healthcare services")
                     return@launch
                 }
+
+                val result3 = jobServiceRepository.getMaintenanceServices()
+                result3.onSuccess {
+                    _homeUiState.value = HomeUiState.Success("Fetched ${it.size} maintenance services")
+                }.onFailure {
+                    _homeUiState.value =
+                        HomeUiState.Error(it.message ?: "Failed to fetch maintenance services")
+                    return@launch
+                }
+
+                val result4 = jobServiceRepository.getPowers()
+                result4.onSuccess {
+                    _homeUiState.value = HomeUiState.Success("Fetched ${it.size} power services")
+                }.onFailure {
+                    _homeUiState.value =
+                        HomeUiState.Error(it.message ?: "Failed to fetch power services")
+                    return@launch
+                }
+
             } catch (e: Exception) {
                 _homeUiState.value = HomeUiState.Error(e.message ?: "Unknown error")
             }

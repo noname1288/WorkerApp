@@ -4,7 +4,10 @@ import com.example.workerapp.data.JobServiceRepository
 import com.example.workerapp.data.source.JobServiceDataSource
 import com.example.workerapp.data.source.model.cleaning.CleaningServiceModel
 import com.example.workerapp.data.source.model.healthcare.HealthcareServiceModel
+import com.example.workerapp.data.source.model.maintenance.MaintenanceServiceModel
+import com.example.workerapp.data.source.model.maintenance.PowerModel
 import com.example.workerapp.data.source.remote.dto.NetworkResult
+import com.example.workerapp.data.source.remote.mapper.mapMaintenanceToEntities
 import javax.inject.Inject
 
 class JobServiceRepositoryImpl @Inject constructor(
@@ -91,6 +94,61 @@ class JobServiceRepositoryImpl @Inject constructor(
                 Result.success(cached)
             } else {
                 Result.failure(Exception("Healthcare service $uid not found"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getMaintenanceServices(): Result<List<MaintenanceServiceModel>> {
+        return try{
+            val response = remote.getMaintenanceServices()
+
+            when (response) {
+                is NetworkResult.Error -> {
+                    val cached = local.getAllMaintenanceServices()
+
+                    if (cached.isNotEmpty()) {
+                        return Result.success(cached)
+                    } else {
+                        return Result.failure(Exception(response.message))
+                    }
+                }
+
+                is NetworkResult.Success -> {
+                    val serviceData = response.data
+
+                    serviceData.map { item ->
+                        val temp = mapMaintenanceToEntities(item)
+
+                        // Saving Maintenance Service into local database
+                        local.saveMaintenanceService(temp.first)
+                        //Saving Power Service List into local database
+                        local.savePowers(temp.second)
+                    }
+
+                    val cached = local.getAllMaintenanceServices()
+                    Result.success(cached)
+                }
+            }
+        }catch (e: Exception){
+            val cached = local.getAllMaintenanceServices()
+
+            return if (cached.isNotEmpty()) {
+                Result.success(cached)
+            } else {
+                Result.failure(e)
+            }
+        }
+    }
+
+    override suspend fun getPowers(): Result<List<PowerModel>> {
+        return try {
+            val cached = local.getAllPowers()
+            if (cached.isNotEmpty()) {
+                Result.success(cached)
+            } else {
+                Result.failure(Exception("No power data found"))
             }
         } catch (e: Exception) {
             Result.failure(e)

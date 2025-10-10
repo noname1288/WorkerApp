@@ -18,6 +18,7 @@ import com.example.workerapp.R
 import com.example.workerapp.data.source.model.base.JobModel1
 import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
 import com.example.workerapp.data.source.model.healthcare.HealthcareJobModel
+import com.example.workerapp.data.source.model.maintenance.MaintenanceJobModel
 import com.example.workerapp.utils.components.InformationItem
 import com.example.workerapp.utils.ext.toVND
 import java.text.SimpleDateFormat
@@ -82,6 +83,7 @@ fun JobDetailCard(job: JobModel1) {
                     )
 
                 }
+
                 is HealthcareJobModel -> {
                     InformationItem(
                         "Danh mục",
@@ -108,6 +110,30 @@ fun JobDetailCard(job: JobModel1) {
                         value = job.price.toVND(), isImportant = true
                     )
                 }
+
+                is MaintenanceJobModel -> {
+                    InformationItem(
+                        "Danh mục",
+                        value = "Sửa chữa, bảo trì"
+                    )
+                    InformationItem(
+                        "Giờ làm việc",
+                        value = "${job.startTime}"
+                    )
+                    InformationItem(
+                        "Ngày bắt đầu",
+                        value = sortDatesAscending(job.listDays)[0]
+                    )
+                    InformationItem(
+                        "Ngày kết thúc",
+                        value = sortDatesAscending(job.listDays)[sizeOfDays - 1]
+                    )
+                    InformationItem(
+                        "Thanh toán",
+                        value = job.price.toVND(), isImportant = true
+                    )
+                }
+
                 else -> {
                     // Xử lý nếu job không thuộc các loại trên
                     Text("Unknown Job Type")

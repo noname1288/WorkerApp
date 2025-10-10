@@ -71,7 +71,6 @@ fun HealthcareDetailScreen(
     navController: NavController
 ) {
     val context = LocalContext.current
-    val app = context.applicationContext as MyApplication
     val tag = "HealthcareDetailScreen"
 
     var sections = listOf<HealthcareJobSection>()

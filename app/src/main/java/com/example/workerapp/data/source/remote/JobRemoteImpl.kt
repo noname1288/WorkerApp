@@ -97,6 +97,23 @@ class JobRemoteImpl @Inject constructor(
         }
     }
 
+    override suspend fun getMaintenanceDetail(jobUid: String): NetworkResult<MaintenanceJobModel> {
+        return try {
+            val response = jobApi.getMaintenanceJobByUid(jobUid)
+
+            if (response.success) {
+                Log.d(TAG, "getMaintenanceDetail: ${response.job}")
+                NetworkResult.Success(response.job ?: MaintenanceJobModel())
+            } else {
+                Log.e(TAG, "getMaintenanceDetail Error: ${response.message}")
+                NetworkResult.Error(response.message)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "getMaintenanceDetail Exception: ${e.message}")
+            NetworkResult.Error(e.message ?: "Unknown error")
+        }
+    }
+
     override suspend fun applyForJob(request: ApplicationRequest): NetworkResult<Boolean> {
         val response = safeApiCall(
             apiCall = { jobApi.applyForJob(request) },

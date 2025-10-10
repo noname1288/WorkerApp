@@ -154,7 +154,10 @@ fun ServiceDetailScreen(
                                     MaintenanceJobCard(
                                         job as MaintenanceJobModel,
                                         onClick = {
-
+                                            navController.navigateWithArgs(
+                                                route = AppRoutes.MAINTENANCE_DETAIL,
+                                                args = arrayOf(job.uid, false)
+                                            )
                                         }
                                     )
                                 }
@@ -170,7 +173,5 @@ fun ServiceDetailScreen(
                 }
             }
         }
-
-
     }
 }

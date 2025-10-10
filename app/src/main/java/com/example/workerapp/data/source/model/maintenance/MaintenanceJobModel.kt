@@ -13,6 +13,7 @@ data class MaintenanceJobModel(
     override var user: UserModel = UserModel(),
     override var serviceType: String = ServiceType.MaintenanceType,
 
+    var services: List<MaintenanceServiceWrapper> = emptyList(),
     override var price: Double = 0.0,
     override var status: String = "",
     override var listDays: List<String> = emptyList(),
@@ -21,9 +22,8 @@ data class MaintenanceJobModel(
     override var startTime: String = "",
     override var location: String = "",
 
-    var services : List<MaintenanceServiceWrapper> = emptyList()
 
-) : JobModel1 (
+    ) : JobModel1(
     uid,
     user,
     serviceType,

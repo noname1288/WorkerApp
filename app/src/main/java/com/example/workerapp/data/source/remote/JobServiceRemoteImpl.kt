@@ -5,8 +5,8 @@ import com.example.workerapp.data.source.JobServiceDataSource
 import com.example.workerapp.data.source.remote.api.ServiceApi
 import com.example.workerapp.data.source.model.cleaning.CleaningServiceModel
 import com.example.workerapp.data.source.model.healthcare.HealthcareServiceModel
-import com.example.workerapp.data.source.model.maintenance.MaintenanceServiceModel
 import com.example.workerapp.data.source.remote.dto.NetworkResult
+import com.example.workerapp.data.source.remote.dto.response.MaintenanceServiceResponse
 import javax.inject.Inject
 
 class JobServiceRemoteImpl @Inject constructor(
@@ -44,7 +44,7 @@ class JobServiceRemoteImpl @Inject constructor(
         }
     }
 
-    override suspend fun getMaintenanceServices(): NetworkResult<List<MaintenanceServiceModel>> {
+    override suspend fun getMaintenanceServices(): NetworkResult<List<MaintenanceServiceResponse>> {
         return try {
             val response = serviceApi.getMaintenanceServices()
 

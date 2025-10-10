@@ -26,6 +26,8 @@ import com.example.workerapp.presentation.screens.detail.cleaning.CleaningDetail
 import com.example.workerapp.ui.detail.cleaning.CleaningViewModel
 import com.example.workerapp.presentation.screens.detail.healcare.HealthcareDetailScreen
 import com.example.workerapp.presentation.screens.detail.healcare.HealthcareViewModel
+import com.example.workerapp.presentation.screens.detail.maintenance.MaintenanceDetailScreen
+import com.example.workerapp.presentation.screens.detail.maintenance.MaintenanceViewModel
 import com.example.workerapp.presentation.screens.home.HomeScreen
 import com.example.workerapp.presentation.screens.income.IncomeScreen
 import com.example.workerapp.presentation.screens.notification.NotificationViewModel
@@ -145,12 +147,31 @@ fun AppNavHost(
                 navController = navController
             )
         }
+        composable(
+            route = "${AppScreen.MAINTENANCE_SCREEN}/{${DestinationArgs.JOB_ID}}/{${DestinationArgs.ONLY_WATCH}}",
+            arguments = listOf(
+                navArgument(DestinationArgs.JOB_ID) { type = NavType.StringType },
+                navArgument(DestinationArgs.ONLY_WATCH) { type = NavType.BoolType }
+            )
+        ) {
+            val maintenanceViewModel = hiltViewModel<MaintenanceViewModel>()
+
+            val maintenanceUid = it.arguments?.getString(DestinationArgs.JOB_ID) ?: ""
+            val onlyWatch = it.arguments?.getBoolean(DestinationArgs.ONLY_WATCH) ?: false
+
+            MaintenanceDetailScreen(
+                maintenanceUid = maintenanceUid,
+                isOnlyWatch = onlyWatch,
+                navController = navController,
+                viewModel = maintenanceViewModel
+            )
+        }
 
         composable(AppRoutes.LIST_APPLICATIONS) {
             ApplicationsScreen(viewModel = profileViewModel)
         }
 
-        composable (AppRoutes.REVIEW_SCREEN){
+        composable(AppRoutes.REVIEW_SCREEN) {
             ReviewScreen()
         }
     }

@@ -4,6 +4,8 @@ import com.example.workerapp.data.source.JobServiceDataSource
 import com.example.workerapp.data.source.local.room.ServiceDao
 import com.example.workerapp.data.source.model.cleaning.CleaningServiceModel
 import com.example.workerapp.data.source.model.healthcare.HealthcareServiceModel
+import com.example.workerapp.data.source.model.maintenance.MaintenanceServiceModel
+import com.example.workerapp.data.source.model.maintenance.PowerModel
 import javax.inject.Inject
 
 class JobServiceLocalImpl @Inject constructor(
@@ -20,10 +22,24 @@ class JobServiceLocalImpl @Inject constructor(
 
 
     override suspend fun saveCleaningServices(services: List<CleaningServiceModel>) {
-        services.map { service -> serviceDao.insertCleaningService(service) }
+        serviceDao.insertCleaningService(services)
     }
 
     override suspend fun saveHealthcareServices(services: List<HealthcareServiceModel>) {
-        services.map { service -> serviceDao.insertHealthcareService(service) }
+        serviceDao.insertHealthcareService(services)
+    }
+
+    override suspend fun getAllMaintenanceServices(): List<MaintenanceServiceModel> =
+        serviceDao.getAllMaintenance()
+
+    override suspend fun getAllPowers(): List<PowerModel> =
+        serviceDao.getAllPowers()
+
+    override suspend fun saveMaintenanceService(service: MaintenanceServiceModel) {
+        serviceDao.insertMaintenance(service)
+    }
+
+    override suspend fun savePowers(powers: List<PowerModel>) {
+        serviceDao.insertPowers(powers)
     }
 }

@@ -8,16 +8,11 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.collectAsState
-import androidx.lifecycle.lifecycleScope
 import com.example.workerapp.data.source.local.AppCache
 import com.example.workerapp.presentation.screens.notification.RequestNotificationPermission
 import com.example.workerapp.ui.base.BaseScreen
 import com.example.workerapp.ui.theme.WorkerAppTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -34,7 +29,7 @@ class MainActivity : ComponentActivity() {
         Log.d("LifecycleCheck", "onCreate() — PID: ${android.os.Process.myPid()}")
 
         setContent {
-            var isGrantedForNotification = appCache.getNotifiticationPermission().collectAsState(false)
+            var isGrantedForNotification = appCache.getNotificationPermission().collectAsState(false)
 
             if (!isGrantedForNotification.value){
                 RequestNotificationPermission()

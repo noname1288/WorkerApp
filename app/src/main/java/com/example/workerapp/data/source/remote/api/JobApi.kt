@@ -37,6 +37,11 @@ interface JobApi {
     @GET("jobs/maintenance")
     suspend fun getMaintenanceJobs(): BaseJobsResponse<List<MaintenanceJobModel>>
 
+    @GET("jobs/maintenance/{uid}")
+    suspend fun getMaintenanceJobByUid(
+        @Path("uid") uid: String
+    ) : BaseJobResponse<MaintenanceJobModel>
+
     @AuthRequired
     @POST("orders/create")
     suspend fun applyForJob(

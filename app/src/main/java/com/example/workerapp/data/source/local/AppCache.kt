@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class AppCache @Inject constructor(private val dataStore: DataStore<Preferences>) {
-    fun getNotifiticationPermission() : Flow<Boolean> =
+    fun getNotificationPermission() : Flow<Boolean> =
         dataStore.data.map { prefs -> prefs[PrefKeys.USER_NOTIFICATION] ?: false }
 
     suspend fun changeNotificationPermission(isGranted: Boolean) {

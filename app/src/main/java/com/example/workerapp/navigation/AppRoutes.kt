@@ -4,6 +4,7 @@ object AppScreen{
     const val SERVICE_SCREEN = "service_detail"
     const val CLEANING_SCREEN = "cleaning_detail"
     const val HEALTHCARE_SCREEN = "healthcare_detail"
+    const val MAINTENANCE_SCREEN = "maintenance_detail"
 }
 
 object DestinationArgs{
@@ -26,6 +27,7 @@ object AppRoutes {
     const val SERVICE_DETAIL = "${AppScreen.SERVICE_SCREEN}/%s"
     const val CLEANING_DETAIL = "${AppScreen.CLEANING_SCREEN}/%s/%b"
     const val HEALTHCARE_DETAIL = "${AppScreen.HEALTHCARE_SCREEN}/%s/%b"
+    const val MAINTENANCE_DETAIL = "${AppScreen.MAINTENANCE_SCREEN}/%s/%b"
 
     const val LIST_APPLICATIONS = "list_applications"
 
