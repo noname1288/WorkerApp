@@ -3,6 +3,7 @@ package com.example.workerapp.data.source.remote.interceptor
 import com.example.workerapp.data.TokenRepository
 import com.example.workerapp.data.source.remote.api.UserApi
 import com.example.workerapp.data.source.remote.dto.request.RefreshTokenRequest
+import com.example.workerapp.session.SessionManager
 import kotlinx.coroutines.runBlocking
 import okhttp3.Authenticator
 import okhttp3.Request
@@ -13,7 +14,8 @@ import javax.inject.Provider
 
 class TokenAuthenticator @Inject constructor(
     private val tokenRepository: TokenRepository,
-    private val userApiProvider: Provider<UserApi>
+    private val userApiProvider: Provider<UserApi>,
+    private val sessionManager: SessionManager
 ) : Authenticator {
     override fun authenticate(route: Route?, response: Response): Request? {
         // if we've already attempted to authenticate 3 times, give up
@@ -34,7 +36,10 @@ class TokenAuthenticator @Inject constructor(
             }
         }
 
-        if ( refreshResponse == null || !refreshResponse.success) return null
+        if ( refreshResponse == null || !refreshResponse.success) {
+            runBlocking { sessionManager.notifyTokenExpired() }
+            return null
+        }
 
         val newToken = refreshResponse.data.idToken
 

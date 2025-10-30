@@ -7,8 +7,8 @@ import com.squareup.moshi.JsonClass
 @Entity(tableName = "power_service")
 @JsonClass(generateAdapter = true)
 data class PowerModel(
-    @PrimaryKey val uid: String,
-    val name: String,
-    val price: Int,
-    val priceAction: Int,
+    @PrimaryKey val uid: String = "",
+    val name: String = "",
+    val price: Int = 0,
+    val priceAction: Int = 0,
 )

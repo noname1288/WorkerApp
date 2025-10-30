@@ -18,7 +18,7 @@ import com.example.workerapp.R
 import com.example.workerapp.data.source.model.base.JobModel1
 import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
 import com.example.workerapp.data.source.model.healthcare.HealthcareJobModel
-import com.example.workerapp.data.source.model.maintenance.MaintenanceJobModel
+import com.example.workerapp.data.source.model.maintenance.MaintenanceJobResponse
 import com.example.workerapp.utils.components.InformationItem
 import com.example.workerapp.utils.ext.toVND
 import java.text.SimpleDateFormat
@@ -111,7 +111,7 @@ fun JobDetailCard(job: JobModel1) {
                     )
                 }
 
-                is MaintenanceJobModel -> {
+                is MaintenanceJobResponse -> {
                     InformationItem(
                         "Danh mục",
                         value = "Sửa chữa, bảo trì"

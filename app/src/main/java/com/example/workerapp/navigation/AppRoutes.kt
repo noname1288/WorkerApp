@@ -20,9 +20,13 @@ object AppRoutes {
     const val INCOME = "income"
     const val NOTIFICATION = "notification"
     const val PROFILE = "profile"
+    const val PROFILE_DETAIL = "profile_detail"
 
     const val LOGIN = "login"
     const val REGISTER = "register"
+    const val CHANGE_PASSWORD = "change_password"
+    const val FORGOT_PASSWORD = "forgot_password"
+
 
     const val SERVICE_DETAIL = "${AppScreen.SERVICE_SCREEN}/%s"
     const val CLEANING_DETAIL = "${AppScreen.CLEANING_SCREEN}/%s/%b"
@@ -32,4 +36,6 @@ object AppRoutes {
     const val LIST_APPLICATIONS = "list_applications"
 
     const val REVIEW_SCREEN = "review"
+    const val MAP_SCREEN = "map_screen"
+
 }

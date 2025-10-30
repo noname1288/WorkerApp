@@ -5,7 +5,7 @@
     <string name="login_title">Đăng nhập</string>
     <string name="login_body">*Vui lòng đăng nhập</string>
     <string name="type_here_1">"Vui lòng nhập email... "</string>
-    <string name="forgot_password_title">Quên mật khẩu?</string>
+    <string name="forgot_password_title">Quên mật khẩu</string>
     <string name="ban_chua_co_tai_khoan">Bạn chưa có tài khoản?</string>
     <string name="register_action">Đăng ký</string>
     <string name="search_hint">Tìm kiếm công việc</string>
@@ -43,5 +43,11 @@
     <string name="list_applications_title">Công việc đã ứng tuyển</string>
     <string name="review_title">Đánh giá</string>
     <string name="review_title_from_customer">Xem đánh giá từ khách hàng</string>
+    <string name="service_name">Thông tin thiết bị</string>
+    <string name="save_title">Lưu thay đổi</string>
+    <string name="change_password_title">Thay đổi mật khẩu</string>
+    <string name="forgot_password_content">Vui lòng nhập email, chúng tôi sẽ giúp bạn lấy lại mật khẩu</string>
+    <string name="request_title">Gửi yêu cầu</string>
+    <string name="map_title">Map</string>
 </resources>
 

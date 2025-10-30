@@ -121,10 +121,13 @@ class JobServiceRepositoryImpl @Inject constructor(
                     serviceData.map { item ->
                         val temp = mapMaintenanceToEntities(item)
 
-                        // Saving Maintenance Service into local database
-                        local.saveMaintenanceService(temp.first)
-                        //Saving Power Service List into local database
-                        local.savePowers(temp.second)
+//                        // Saving Maintenance Service into local database
+//                        local.saveMaintenanceService(temp.first)
+//                        //Saving Power Service List into local database
+//                        local.savePowers(temp.second)
+
+                        //saving Maintenance Service + Powers using transaction
+                        local.saveMaintenanceServiceWithPowers(temp.first, temp.second)
                     }
 
                     val cached = local.getAllMaintenanceServices()
@@ -139,6 +142,34 @@ class JobServiceRepositoryImpl @Inject constructor(
             } else {
                 Result.failure(e)
             }
+        }
+    }
+
+    override suspend fun getMaintenanceServiceByUid(uid: String): Result<MaintenanceServiceModel> {
+        return try {
+            val cached = local.getMaintenanceServiceByUid(uid)
+
+            if (cached != null){
+                Result.success(cached)
+            } else {
+                Result.failure(Exception("Maintenance service $uid not found"))
+            }
+        }catch (e: Exception){
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getPowerModelByUid(uid: String): Result<PowerModel> {
+        return try {
+            val cached = local.getPowerByUid(uid)
+
+            if (cached != null){
+                Result.success(cached)
+            } else {
+                Result.failure(Exception("Maintenance service $uid not found"))
+            }
+        }catch (e: Exception){
+            Result.failure(e)
         }
     }
 

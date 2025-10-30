@@ -1,6 +1,7 @@
 package com.example.workerapp.presentation.screens.profile
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -15,19 +16,26 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CrisisAlert
 import androidx.compose.material.icons.outlined.DocumentScanner
 import androidx.compose.material.icons.outlined.Domain
 import androidx.compose.material.icons.outlined.RateReview
-import androidx.compose.material.icons.outlined.Reviews
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.SupportAgent
 import androidx.compose.material.icons.outlined.WorkHistory
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -66,6 +74,8 @@ fun ProfileScreen(
         ProfileSection.Logout
     )
 
+    var showLogoutDialog by remember { mutableStateOf(false) }
+
     LazyColumn(
         modifier
             .fillMaxSize()
@@ -74,7 +84,11 @@ fun ProfileScreen(
             when (section) {
                 is ProfileSection.Avatar -> {
                     item {
-                        ProfileHeader()
+                        ProfileHeader(
+                            onProfileClick = {
+                                navController.safeNavigate(AppRoutes.PROFILE_DETAIL)
+                            }
+                        )
                         Spacer(Modifier.height(16.dp))
                     }
                 }
@@ -83,10 +97,13 @@ fun ProfileScreen(
                     item {
                         SettingButtons(
                             onApplicationsClick = {
-                                navController.safeNavigate(AppRoutes.LIST_APPLICATIONS)
+                                navController.navigate(AppRoutes.LIST_APPLICATIONS)
                             },
                             onReviewClick = {
-                                navController.safeNavigate(AppRoutes.REVIEW_SCREEN)
+                                navController.navigate(AppRoutes.REVIEW_SCREEN)
+                            },
+                            onPasswordChangeClick = {
+                                navController.navigate(AppRoutes.CHANGE_PASSWORD)
                             }
                         )
                         Spacer(Modifier.height(32.dp))
@@ -97,14 +114,8 @@ fun ProfileScreen(
                     item {
                         Button(
                             onClick = {
-                                authViewModel.logout()
 
-                                navController.safeNavigate(
-                                    AppRoutes.LOGIN,
-                                    popUpToRoute = AppRoutes.LOGIN,
-                                    inclusive = false,
-                                    restore = false
-                                )
+                                showLogoutDialog = true
                             },
                             shape = RoundedCornerShape(0.dp),
                             colors = ButtonDefaults.buttonColors(
@@ -120,11 +131,51 @@ fun ProfileScreen(
                 }
             }
         }
+
+        if (showLogoutDialog) {
+            item {
+                AlertDialog(
+                    icon = {
+                        Icon(Icons.Default.CrisisAlert, contentDescription = "Example Icon")
+                    },
+                    title = { Text("Thông báo") },
+                    text = { Text("Bạn có chắc chắn muốn đăng xuất không?") },
+                    onDismissRequest = { showLogoutDialog = false },
+                    dismissButton = {
+                        TextButton(
+                            onClick = {
+                                showLogoutDialog = false
+                            }
+                        ) {
+                            Text("Huỷ")
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                showLogoutDialog = false
+
+                                authViewModel.logout()
+
+                                navController.safeNavigate(
+                                    AppRoutes.LOGIN,
+                                    popUpToRoute = AppRoutes.LOGIN,
+                                    inclusive = false,
+                                    restore = false
+                                )
+                            }
+                        ) {
+                            Text("Đăng xuất")
+                        }
+                    }
+                )
+            }
+        }
     }
 }
 
 @Composable
-fun ProfileHeader() {
+fun ProfileHeader(onProfileClick: () -> Unit = {}) {
     Row(
         Modifier
             .fillMaxWidth()
@@ -154,7 +205,10 @@ fun ProfileHeader() {
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.Bold,
                     color = colorResource(R.color.green)
-                )
+                ),
+                modifier = Modifier.clickable {
+                    onProfileClick()
+                }
             )
         }
     }
@@ -168,7 +222,7 @@ fun SettingButtons(
     onReviewClick: () -> Unit = {},
     onTermClick: () -> Unit = {},
     onSupportClick: () -> Unit = {},
-    onSettingClick: () -> Unit = {}
+    onPasswordChangeClick: () -> Unit = {}
 ) {
     Column(modifier.fillMaxWidth()) {
 
@@ -213,9 +267,9 @@ fun SettingButtons(
         HorizontalDivider()
 
         CustomExtendedButton(
-            label = stringResource(R.string.setting_title),
+            label = stringResource(R.string.change_password_title),
             leadingIcon = Icons.Outlined.Settings,
-            onClick = { onSettingClick() }
+            onClick = { onPasswordChangeClick() }
         )
 
     }

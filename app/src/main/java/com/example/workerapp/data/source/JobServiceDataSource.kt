@@ -33,11 +33,17 @@ interface JobServiceDataSource {
         * */
         suspend fun getAllMaintenanceServices(): List<MaintenanceServiceModel>
 
+        suspend fun getMaintenanceServiceByUid(uid: String): MaintenanceServiceModel?
+
         suspend fun getAllPowers(): List<PowerModel>
+
+        suspend fun getPowerByUid(uid: String): PowerModel?
 
         suspend fun saveMaintenanceService(service: MaintenanceServiceModel)
 
         suspend fun savePowers(powers: List<PowerModel>)
+
+        suspend fun saveMaintenanceServiceWithPowers(service: MaintenanceServiceModel, powers: List<PowerModel>)
 
     }
 

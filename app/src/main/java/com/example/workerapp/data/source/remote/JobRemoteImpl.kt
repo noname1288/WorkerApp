@@ -7,10 +7,9 @@ import com.example.workerapp.data.source.remote.dto.request.ApplicationRequest
 import com.example.workerapp.data.source.model.base.JobModel1
 import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
 import com.example.workerapp.data.source.model.healthcare.HealthcareJobModel
-import com.example.workerapp.data.source.model.maintenance.MaintenanceJobModel
-import com.example.workerapp.data.source.remote.dto.ApplicationWrapper
+import com.example.workerapp.data.source.model.maintenance.MaintenanceJobResponse
+import com.example.workerapp.data.source.remote.dto.ApplicationDto
 import com.example.workerapp.data.source.remote.dto.NetworkResult
-import com.example.workerapp.data.source.remote.dto.response.ApplicationResponse
 import com.example.workerapp.utils.ext.safeApiCall
 import javax.inject.Inject
 
@@ -81,7 +80,7 @@ class JobRemoteImpl @Inject constructor(
         }
     }
 
-    override suspend fun getMaintenanceJobs(): NetworkResult<List<MaintenanceJobModel>> {
+    override suspend fun getMaintenanceJobs(): NetworkResult<List<MaintenanceJobResponse>> {
         return try {
             val response = jobApi.getMaintenanceJobs()
             if (response.success) {
@@ -97,13 +96,13 @@ class JobRemoteImpl @Inject constructor(
         }
     }
 
-    override suspend fun getMaintenanceDetail(jobUid: String): NetworkResult<MaintenanceJobModel> {
+    override suspend fun getMaintenanceDetail(jobUid: String): NetworkResult<MaintenanceJobResponse> {
         return try {
             val response = jobApi.getMaintenanceJobByUid(jobUid)
 
             if (response.success) {
                 Log.d(TAG, "getMaintenanceDetail: ${response.job}")
-                NetworkResult.Success(response.job ?: MaintenanceJobModel())
+                NetworkResult.Success(response.job ?: MaintenanceJobResponse())
             } else {
                 Log.e(TAG, "getMaintenanceDetail Error: ${response.message}")
                 NetworkResult.Error(response.message)
@@ -152,7 +151,7 @@ class JobRemoteImpl @Inject constructor(
         }
     }
 
-    override suspend fun getApplication(workerId: String): NetworkResult<List<ApplicationWrapper>> {
+    override suspend fun getApplication(workerId: String): NetworkResult<List<ApplicationDto>> {
         try {
             val response = jobApi.getApplicationsByWorkerId(workerId)
             if (response.success) {

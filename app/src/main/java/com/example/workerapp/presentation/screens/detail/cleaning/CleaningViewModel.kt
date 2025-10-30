@@ -86,6 +86,7 @@ class CleaningViewModel @Inject constructor(
                         _applyState.value = true
                     }
 
+
                     is NetworkResult.Error -> {
                         _applyState.value = false
                         _uiState.value = CleaningUiState.Error(result.message)

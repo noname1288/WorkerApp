@@ -9,9 +9,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.workerapp.data.TokenRepository
 import com.example.workerapp.data.UserRepository
 import com.example.workerapp.data.source.local.room.entity.UserLocalEntity
+import com.example.workerapp.data.source.remote.dto.request.ChangePasswordRequest
 import com.example.workerapp.data.source.remote.dto.request.UserLoginRequest
 import com.example.workerapp.data.source.remote.dto.request.UserLoginWithGGRequest
 import com.example.workerapp.data.source.remote.dto.request.UserRegisterRequest
+import com.example.workerapp.session.SessionManager
 import com.example.workerapp.utils.cached.UserSession
 import com.example.workerapp.utils.locator.AppLocator
 import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
@@ -21,49 +23,45 @@ import com.google.firebase.auth.GoogleAuthProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val tokenRepository: TokenRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val sessionManager: SessionManager
 ) : ViewModel() {
 
-    private val _loginState = MutableStateFlow<AuthenticationUIState>(AuthenticationUIState.Idle)
-    val loginState: StateFlow<AuthenticationUIState> = _loginState
+    private val _loginUiState = MutableStateFlow<AuthenticationUIState>(AuthenticationUIState.Idle)
+    val loginUiState: StateFlow<AuthenticationUIState> = _loginUiState
 
-    private val _registerState = MutableStateFlow<AuthenticationUIState>(AuthenticationUIState.Idle)
-    val registerState: StateFlow<AuthenticationUIState> = _registerState
+    private val _registerUiState =
+        MutableStateFlow<AuthenticationUIState>(AuthenticationUIState.Idle)
+    val registerUiState: StateFlow<AuthenticationUIState> = _registerUiState
 
     private val _splashState = MutableStateFlow<AuthenticationUIState>(AuthenticationUIState.Idle)
     val splashState: StateFlow<AuthenticationUIState> = _splashState
 
-    fun checkUserLoggedIn() {
+    private val _changePasswordUiState =
+        MutableStateFlow<AuthenticationUIState>(AuthenticationUIState.Idle)
+    val changePasswordUiState: StateFlow<AuthenticationUIState> = _changePasswordUiState
+
+    val loggedIn = sessionManager.isLoggedIn
+    val tokenExpiredEvent = sessionManager.tokenExpired
+
+    fun checkLoginStatus() {
         viewModelScope.launch {
-            val token = tokenRepository.getAccessToken()
+            sessionManager.checkLoginStatus()
 
-            val result = runCatching {
-                userRepository.getUserProfile().first()
-            }.getOrNull()
-
-            if (result != null) {
-                result.onSuccess { user ->
-                    if (!token.isNullOrEmpty() && user != null) {
-                        Log.d(TAG, "Token from storage: $token")
-                        _splashState.value = AuthenticationUIState.Success(user)
-                    } else {
-                        Log.d(TAG, "No token found in storage or user is null")
-                        _splashState.value = AuthenticationUIState.Error("No token or user null")
-                    }
-                }.onFailure { e ->
-                    Log.e(TAG, "Error retrieving user profile: ${e.message}")
-                    _splashState.value = AuthenticationUIState.Error("Error: ${e.message}")
+            if (loggedIn.value) {
+                val user = userRepository.getUserProfile().firstOrNull()?.let {
+                    _splashState.value = AuthenticationUIState.Success(it)
+                    UserSession.saveState(it.uid, it.username, it.email, it.avatar)
                 }
             } else {
-                Log.d(TAG, "User profile result is null")
-                _splashState.value = AuthenticationUIState.Error("User profile null")
+                _splashState.value = AuthenticationUIState.Error("Not logged in")
             }
         }
     }
@@ -72,38 +70,12 @@ class AuthViewModel @Inject constructor(
         val request = UserLoginRequest(email, password)
 
         viewModelScope.launch {
-            _loginState.value = AuthenticationUIState.Loading
+            _loginUiState.value = AuthenticationUIState.Loading
 
             val result = userRepository.login(request)
 
             result.onSuccess {
-                _loginState.value = AuthenticationUIState.Success(it)
-
-                //update session
-                UserSession.saveState(it.uid, it.username, it.email, it.avatar)
-
-                //update fcm token
-                val fcmTokenLocal = tokenRepository.getFcmToken()
-                if (fcmTokenLocal != null) {
-                    userRepository.saveFcmToken(fcmTokenLocal)
-                }
-            }
-                .onFailure {
-                    _loginState.value = AuthenticationUIState.Error(it.message ?: "Login failed")
-                }
-        }
-    }
-
-    fun registerWithForm(displayName: String, email: String, password: String, avatar: String?) {
-        val request = UserRegisterRequest(displayName, email, password, null)
-
-        viewModelScope.launch {
-            _registerState.value = AuthenticationUIState.Loading
-
-            val result = userRepository.register(request)
-
-            result.onSuccess {
-                _registerState.value = AuthenticationUIState.Success(it)
+                _loginUiState.value = AuthenticationUIState.Success(it)
 
                 //update session
                 UserSession.saveState(it.uid, it.username, it.email, it.avatar)
@@ -114,15 +86,49 @@ class AuthViewModel @Inject constructor(
                     userRepository.saveFcmToken(fcmTokenLocal)
                 }
             }.onFailure {
-                _registerState.value =
+                _loginUiState.value =
+                    AuthenticationUIState.Error(it.message ?: "Login failed")
+            }
+        }
+    }
+
+    fun registerWithForm(
+        displayName: String,
+        email: String,
+        password: String,
+        avatar: String?
+    ) {
+        val request = UserRegisterRequest(displayName, email, password, null)
+
+        viewModelScope.launch {
+            _registerUiState.value = AuthenticationUIState.Loading
+
+            val result = userRepository.register(request)
+
+            result.onSuccess {
+                _registerUiState.value = AuthenticationUIState.Success(it)
+
+                //update session
+                UserSession.saveState(it.uid, it.username, it.email, it.avatar)
+
+                //update fcm token
+                val fcmTokenLocal = tokenRepository.getFcmToken()
+                if (fcmTokenLocal != null) {
+                    userRepository.saveFcmToken(fcmTokenLocal)
+                }
+            }.onFailure {
+                _registerUiState.value =
                     AuthenticationUIState.Error(it.message ?: "Registration failed")
             }
         }
     }
 
+
+
+
     fun clearState() {
-        _loginState.value = AuthenticationUIState.Idle
-        _registerState.value = AuthenticationUIState.Idle
+        _loginUiState.value = AuthenticationUIState.Idle
+        _registerUiState.value = AuthenticationUIState.Idle
         _splashState.value = AuthenticationUIState.Idle
     }
 
@@ -175,7 +181,7 @@ class AuthViewModel @Inject constructor(
             UserSession.logOut()
 
             //clear token in local storage
-            tokenRepository.clearAuthTokens()
+            sessionManager.logout()
 
             //clear user profile in local database
             userRepository.clearUserProfile()
@@ -198,7 +204,7 @@ class AuthViewModel @Inject constructor(
                                 Log.d(TAG, "Firebase ID Token: $firebaseIdToken")
                                 //call api to save in BE
                                 if (firebaseIdToken == null) {
-                                    _loginState.value =
+                                    _loginUiState.value =
                                         AuthenticationUIState.Error("Firebase ID Token is null")
                                 } else {
                                     callApiLoginWithGoogle(firebaseIdToken)
@@ -209,7 +215,7 @@ class AuthViewModel @Inject constructor(
                         }
                 } else {
                     Log.e(TAG, "FIREBASE: signInWithCredential - failure", task.exception)
-                    _loginState.value = AuthenticationUIState.Error(
+                    _loginUiState.value = AuthenticationUIState.Error(
                         task.exception?.message ?: "Firebase authentication failed"
                     )
                 }
@@ -217,20 +223,20 @@ class AuthViewModel @Inject constructor(
             }
             .addOnFailureListener {
                 Log.e(TAG, "FIREBASE: signInWithCredential - failure", it)
-                _loginState.value =
+                _loginUiState.value =
                     AuthenticationUIState.Error(it.message ?: "Firebase authentication failed")
             }
     }
 
     private fun callApiLoginWithGoogle(idToken: String) {
         viewModelScope.launch {
-            _loginState.value = AuthenticationUIState.Loading
+            _loginUiState.value = AuthenticationUIState.Loading
 
             val request = UserLoginWithGGRequest(idToken)
             val result = userRepository.loginWithGoogle(request)
 
             result.onSuccess {
-                _loginState.value = AuthenticationUIState.Success(it)
+                _loginUiState.value = AuthenticationUIState.Success(it)
 
                 //update session
                 UserSession.saveState(it.uid, it.username, it.email, it.avatar)
@@ -241,7 +247,7 @@ class AuthViewModel @Inject constructor(
                     userRepository.saveFcmToken(fcmTokenLocal)
                 }
             }.onFailure {
-                _loginState.value =
+                _loginUiState.value =
                     AuthenticationUIState.Error(it.message ?: "Login with Google failed")
             }
         }

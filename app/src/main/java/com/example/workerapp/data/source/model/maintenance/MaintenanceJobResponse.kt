@@ -2,18 +2,18 @@ package com.example.workerapp.data.source.model.maintenance
 
 import com.example.workerapp.data.source.model.base.JobModel1
 import com.example.workerapp.data.source.model.base.UserModel
-import com.example.workerapp.data.source.remote.dto.wrapper.MaintenanceServiceWrapper
+import com.example.workerapp.data.source.remote.dto.wrapper.MaintenanceServiceDto
 import com.example.workerapp.utils.ServiceType
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-data class MaintenanceJobModel(
+data class MaintenanceJobResponse(
     override var uid: String = "",
 
     override var user: UserModel = UserModel(),
     override var serviceType: String = ServiceType.MaintenanceType,
 
-    var services: List<MaintenanceServiceWrapper> = emptyList(),
+    var services: List<MaintenanceServiceDto> = emptyList(),
     override var price: Double = 0.0,
     override var status: String = "",
     override var listDays: List<String> = emptyList(),
@@ -21,9 +21,7 @@ data class MaintenanceJobModel(
     override var createdAt: String = "",
     override var startTime: String = "",
     override var location: String = "",
-
-
-    ) : JobModel1(
+) : JobModel1(
     uid,
     user,
     serviceType,

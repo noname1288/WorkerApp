@@ -17,7 +17,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -38,15 +37,14 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.workerapp.R
-import com.example.workerapp.utils.ext.openGoogleMap
 import com.example.workerapp.utils.ext.popBackIfCan
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReviewScreen(modifier: Modifier = Modifier) {
+fun ReviewScreen(modifier: Modifier = Modifier, navController: NavController) {
     val tag = "ReviewScreen"
     val context = LocalContext.current
 
@@ -61,7 +59,7 @@ fun ReviewScreen(modifier: Modifier = Modifier) {
             windowInsets = WindowInsets(0, 0, 0, 0),
             navigationIcon = {
                 IconButton(onClick = {
-
+                    navController.popBackIfCan()
                 }) {
                     Icon(
                         Icons.Default.ArrowBackIosNew,
@@ -175,10 +173,4 @@ fun RatingBar(rating: Double) {
             color = colorResource(R.color.subtext)
         ))
     }
-}
-
-@Preview (showBackground = true, showSystemUi = true)
-@Composable
-fun Prev11(modifier: Modifier = Modifier) {
-    ReviewScreen()
 }

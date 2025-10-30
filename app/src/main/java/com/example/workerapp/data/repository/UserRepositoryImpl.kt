@@ -6,12 +6,14 @@ import com.example.workerapp.data.UserRepository
 import com.example.workerapp.data.source.UserDataSource
 import com.example.workerapp.data.source.local.room.entity.UserLocalEntity
 import com.example.workerapp.data.source.remote.dto.NetworkResult
+import com.example.workerapp.data.source.remote.dto.request.ChangePasswordRequest
+import com.example.workerapp.data.source.remote.dto.request.ForgotPasswordRequest
 import com.example.workerapp.data.source.remote.dto.request.UserLoginRequest
 import com.example.workerapp.data.source.remote.dto.request.UserLoginWithGGRequest
 import com.example.workerapp.data.source.remote.dto.request.UserRegisterRequest
+import com.example.workerapp.data.source.remote.dto.request.UserUpdateRequest
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.map
+import okhttp3.MultipartBody
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
@@ -207,19 +209,115 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getUserProfile(): Flow<Result<UserLocalEntity?>> {
+    override suspend fun changePassword(request: ChangePasswordRequest): Result<Unit> {
+        return try {
+            val response = remote.changePassword(request)
+
+            when(response){
+                is NetworkResult.Error -> {
+                    Log.d(TAG, "changePassword - Error: ${response.message}")
+                    Result.failure(Exception(response.message))
+                }
+                is NetworkResult.Success<Unit> -> {
+                    Log.d(TAG, "changePassword - Password changed successfully")
+                    Result.success(Unit)
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "changePassword - Exception: ${e.message}")
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun sendEmail(request: ForgotPasswordRequest): Result<Unit> {
+        try {
+            val response = remote.sendEmail(request)
+
+            when(response){
+                is NetworkResult.Error -> {
+                    Log.d(TAG, "sendEmail - Error: ${response.message}")
+                    return Result.failure(Exception(response.message))
+                }
+                is NetworkResult.Success<Unit> -> {
+                    Log.d(TAG, "sendEmail - Email sent successfully")
+                    return Result.success(Unit)
+                }
+            }
+        } catch (e: Exception){
+            Log.e(TAG, "sendEmail - Exception: ${e.message}")
+            return Result.failure(e)
+        }
+    }
+
+    override fun getUserProfile(): Flow<UserLocalEntity?> {
         return local.getUserProfile()
-            .map { user ->
-                Result.success(user)
-            }
-            .catch { e ->
-                emit(Result.failure(e))
-            }
     }
 
     override suspend fun saveUserProfile(user: UserLocalEntity) {
         local.saveUserProfile(user)
+    }
 
+    override suspend fun updateProfile(request: UserUpdateRequest): Result<UserLocalEntity> {
+        return try {
+            val result = remote.updateProfile(request)
+
+            when (result) {
+                is NetworkResult.Error -> {
+                    Result.failure(Exception(result.message))
+                }
+
+                is NetworkResult.Success -> {
+                    val updatedUser = result.data
+
+                    val userLocal = UserLocalEntity(
+                        updatedUser.uid,
+                        updatedUser.username,
+                        updatedUser.gender,
+                        updatedUser.dob,
+                        updatedUser.avatar,
+                        updatedUser.tel,
+                        updatedUser.location,
+                        updatedUser.email,
+                        updatedUser.provider,
+                        updatedUser.emailVerified,
+                        updatedUser.requiresProfileUpdate,
+                        updatedUser.role,
+                        updatedUser.lastLogin
+                    )
+
+                    local.saveUserProfile(userLocal)
+
+                    Result.success(userLocal)
+                }
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun uploadImage(
+        userUid: String,
+        imagePart: MultipartBody.Part
+    ): Result<String> {
+        try {
+            val response = remote.uploadImage(imagePart)
+
+            when (response) {
+                is NetworkResult.Error -> {
+                    return Result.failure(Exception(response.message))
+                }
+
+                is NetworkResult.Success<String> -> {
+                    val imageUrl = response.data
+
+                    local.updateAvatar(userUid, imageUrl)
+
+                    return Result.success(imageUrl)
+                }
+            }
+        } catch (e: Exception) {
+            return Result.failure(e)
+        }
     }
 
     override suspend fun clearUserProfile() {

@@ -12,6 +12,8 @@ import com.example.workerapp.data.source.local.AppCache
 import com.example.workerapp.presentation.screens.notification.RequestNotificationPermission
 import com.example.workerapp.ui.base.BaseScreen
 import com.example.workerapp.ui.theme.WorkerAppTheme
+import com.example.workerapp.utils.ManifestUtils
+import com.google.android.libraries.places.api.Places
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -25,8 +27,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        Log.d("MainActivity", "onCreate called")
-        Log.d("LifecycleCheck", "onCreate() — PID: ${android.os.Process.myPid()}")
+        val apiKey = ManifestUtils.getApiKeyFromManifest(this)
+
+        if (!Places.isInitialized()) {
+            Places.initialize(applicationContext, apiKey)
+        }
 
         setContent {
             var isGrantedForNotification = appCache.getNotificationPermission().collectAsState(false)

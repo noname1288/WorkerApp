@@ -311,7 +311,7 @@ fun CustomAvatarRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         AsyncImage(
-            model = UserSession.userProfilePicUrl, // Thay URL này bằng URL ảnh của bạn
+            model = UserSession.userProfilePicUrl,
             contentDescription = null,
             error = painterResource(R.drawable.ic_launcher_background),
             modifier = Modifier

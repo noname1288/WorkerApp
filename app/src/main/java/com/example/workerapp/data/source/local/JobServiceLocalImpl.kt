@@ -32,8 +32,14 @@ class JobServiceLocalImpl @Inject constructor(
     override suspend fun getAllMaintenanceServices(): List<MaintenanceServiceModel> =
         serviceDao.getAllMaintenance()
 
+    override suspend fun getMaintenanceServiceByUid(uid: String): MaintenanceServiceModel? =
+        serviceDao.getMaintenanceByUid(uid)
+
     override suspend fun getAllPowers(): List<PowerModel> =
         serviceDao.getAllPowers()
+
+    override suspend fun getPowerByUid(uid: String): PowerModel? =
+        serviceDao.getPowerByUid(uid)
 
     override suspend fun saveMaintenanceService(service: MaintenanceServiceModel) {
         serviceDao.insertMaintenance(service)
@@ -41,5 +47,12 @@ class JobServiceLocalImpl @Inject constructor(
 
     override suspend fun savePowers(powers: List<PowerModel>) {
         serviceDao.insertPowers(powers)
+    }
+
+    override suspend fun saveMaintenanceServiceWithPowers(
+        service: MaintenanceServiceModel,
+        powers: List<PowerModel>
+    ) {
+        serviceDao.insertMaintenanceServiceWithPowers(service, powers)
     }
 }

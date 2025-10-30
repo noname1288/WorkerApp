@@ -1,4 +1,4 @@
-package com.example.workerapp.presentation.screens.profile.detail
+package com.example.workerapp.presentation.screens.profile.application
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
@@ -33,19 +33,21 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.workerapp.R
-import com.example.workerapp.data.source.remote.dto.ApplicationWrapper
+import com.example.workerapp.data.source.remote.dto.ApplicationDto
 import com.example.workerapp.presentation.screens.profile.ApplicationsUiState
 import com.example.workerapp.presentation.screens.profile.ProfileViewModel
 import com.example.workerapp.utils.components.CircleLoadingIndicator
+import com.example.workerapp.utils.ext.popBackIfCan
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ApplicationsScreen(modifier: Modifier = Modifier, viewModel: ProfileViewModel) {
+fun ApplicationsScreen(modifier: Modifier = Modifier, viewModel: ProfileViewModel, navcontroler: NavController) {
     val context = LocalContext.current
 
     val uiState by viewModel.applicationsState.collectAsState()
-    var applicationList by rememberSaveable { mutableStateOf(listOf<ApplicationWrapper>()) }
+    var applicationList by rememberSaveable { mutableStateOf(listOf<ApplicationDto>()) }
 
     LaunchedEffect(Unit) {
         viewModel.fetchApplications()
@@ -81,7 +83,9 @@ fun ApplicationsScreen(modifier: Modifier = Modifier, viewModel: ProfileViewMode
                 },
                 windowInsets = WindowInsets(0, 0, 0, 0),
                 navigationIcon = {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = {
+                        navcontroler.popBackIfCan()
+                    }) {
                         Icon(
                             Icons.Default.ArrowBackIosNew, contentDescription = "Back",
                             modifier = Modifier.size(20.dp)
@@ -108,11 +112,9 @@ fun ApplicationsScreen(modifier: Modifier = Modifier, viewModel: ProfileViewMode
 }
 
 @Composable
-fun ApplicationItem(applicationWrapper: ApplicationWrapper) {
+fun ApplicationItem(applicationWrapper: ApplicationDto) {
     Card(
-        Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+        Modifier.fillMaxWidth()
     ) {
         Column(Modifier.padding(16.dp)) {
             Text(

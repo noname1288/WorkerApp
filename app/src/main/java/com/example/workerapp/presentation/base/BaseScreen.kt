@@ -1,6 +1,8 @@
 package com.example.workerapp.ui.base
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -41,6 +43,7 @@ import com.example.workerapp.presentation.screens.profile.ProfileViewModel
 import com.example.workerapp.utils.ext.safeNavigate
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun BaseScreen() {
 
@@ -49,7 +52,6 @@ fun BaseScreen() {
     val showBottomBar = listOf(
         AppRoutes.HOME,
         AppRoutes.CALENDAR,
-        AppRoutes.INCOME,
         AppRoutes.NOTIFICATION,
         AppRoutes.PROFILE
     )
@@ -124,14 +126,6 @@ fun CustomNavigationBar(
             false,
             0,
             AppRoutes.CALENDAR
-        ),
-        NavItem(
-            stringResource(R.string.income_title),
-            R.drawable.ic_filled_money,
-            R.drawable.ic_money,
-            false,
-            0,
-            AppRoutes.INCOME
         ),
         NavItem(
             stringResource(R.string.notification_title),

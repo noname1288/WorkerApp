@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
 import com.example.workerapp.data.source.model.healthcare.HealthcareJobModel
-import com.example.workerapp.data.source.model.maintenance.MaintenanceJobModel
+import com.example.workerapp.data.source.model.maintenance.MaintenanceJobResponse
 import com.example.workerapp.navigation.AppRoutes
 import com.example.workerapp.ui.home.components.CleaningJobCard
 import com.example.workerapp.presentation.screens.home.components.HealthcareJobCard
@@ -152,7 +152,7 @@ fun ServiceDetailScreen(
 
                                 ServiceType.MaintenanceType -> {
                                     MaintenanceJobCard(
-                                        job as MaintenanceJobModel,
+                                        job as MaintenanceJobResponse,
                                         onClick = {
                                             navController.navigateWithArgs(
                                                 route = AppRoutes.MAINTENANCE_DETAIL,

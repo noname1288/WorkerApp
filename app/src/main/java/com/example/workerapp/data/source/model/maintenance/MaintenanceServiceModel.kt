@@ -9,9 +9,9 @@ import com.squareup.moshi.JsonClass
 @Entity(tableName = "maintenance_service")
 @JsonClass(generateAdapter = true)
 data class MaintenanceServiceModel(
-    @PrimaryKey val uid: String,
-    val serviceName: String,
+    @PrimaryKey val uid: String = "",
+    val serviceName: String = "",
     val serviceType: String = ServiceType.MaintenanceType,
-    val image: String,
-    val maintenance: String,
+    val image: String = "",
+    val maintenance: String = "",
 )

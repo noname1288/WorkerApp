@@ -16,7 +16,7 @@ object TimeUtils {
         val instant = Instant.ofEpochMilli(timestamp)
         val zone = ZoneId.systemDefault()
 
-        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm").withZone(zone)
+        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withZone(zone)
 
         return formatter.format(instant)
     }

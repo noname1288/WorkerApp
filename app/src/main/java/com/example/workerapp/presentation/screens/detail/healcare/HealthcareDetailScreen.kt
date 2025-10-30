@@ -80,11 +80,11 @@ fun HealthcareDetailScreen(
     var confirmed by rememberSaveable { mutableStateOf(false) }
     var jobAddress by rememberSaveable { mutableStateOf("") }
 
-    LaunchedEffect(Unit, applyState) {
+    LaunchedEffect(applyState) {
         when (applyState) {
             true -> {
                 Toast.makeText(context, "Ứng tuyển thành công!", Toast.LENGTH_LONG).show()
-                navController.popBackIfCan()
+//                navController.popBackIfCan()
             }
 
             false -> {
@@ -96,10 +96,6 @@ fun HealthcareDetailScreen(
                 viewModel.fetchJobDetail(healthcareUid)
             }
         }
-    }
-
-    LaunchedEffect(Unit) {
-        viewModel.fetchJobDetail(healthcareUid)
     }
 
     when (uiState) {

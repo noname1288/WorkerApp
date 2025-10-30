@@ -1,32 +1,21 @@
 package com.example.workerapp.presentation.screens.home.components
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccessTime
-import androidx.compose.material.icons.outlined.Accessibility
-import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Event
-import androidx.compose.material.icons.outlined.LockClock
 import androidx.compose.material.icons.outlined.PersonOutline
-import androidx.compose.material.icons.outlined.Schedule
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,21 +29,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.max
 import com.example.workerapp.R
 import com.example.workerapp.data.source.model.base.UserModel
-import com.example.workerapp.data.source.model.maintenance.MaintenanceJobModel
-import com.example.workerapp.data.source.remote.dto.wrapper.MaintenanceServiceWrapper
-import com.example.workerapp.data.source.remote.dto.wrapper.PowerWrapper
+import com.example.workerapp.data.source.model.maintenance.MaintenanceJobResponse
+import com.example.workerapp.data.source.remote.dto.wrapper.MaintenanceServiceDto
+import com.example.workerapp.data.source.remote.dto.wrapper.PowerDto
 import com.example.workerapp.ui.home.components.MetaRow
 import com.example.workerapp.ui.theme.AppColors
-import com.example.workerapp.utils.JobStatus
 import com.example.workerapp.utils.components.CustomChip
 import com.example.workerapp.utils.ext.toVND
 
 @Composable
 fun MaintenanceJobCard(
-    job: MaintenanceJobModel,
+    job: MaintenanceJobResponse,
     onClick: () -> Unit = {}
 ) {
     Card(
@@ -125,7 +112,7 @@ fun MaintenanceJobCard(
 @Composable
 fun PreviewMaiJobCard(modifier: Modifier = Modifier) {
 
-    val instance = MaintenanceJobModel(
+    val instance = MaintenanceJobResponse(
         uid = "OZH00M1FBDVuksGsWnDp", user = UserModel(
             uid = "1V7M4UearWduxecpeigS9yXlxpv2",
             username = "Phạm Thanh Sơn",
@@ -150,25 +137,25 @@ fun PreviewMaiJobCard(modifier: Modifier = Modifier) {
         startTime = "16:09",
         location = "Ng. 285 Khuất Duy Tiến",
         services = listOf(
-            MaintenanceServiceWrapper(
+            MaintenanceServiceDto(
                 uid = "Pntsvw5ILpxwdO7e1Gyg",
                 powers = listOf(
-                    PowerWrapper( // Assuming the class is named PowerModel
+                    PowerDto( // Assuming the class is named PowerModel
                         uid = "ho4Igxp5I6FOXwJ7nleM",
                         quantity = 2,
                         quantityAction = 1
                     ),
-                    PowerWrapper(
+                    PowerDto(
                         uid = "yaTNIssSIUbIF9Avc6rg",
                         quantity = 3,
                         quantityAction = 0
                     )
                 )
             ),
-            MaintenanceServiceWrapper(
+            MaintenanceServiceDto(
                 uid = "O45WyERwfZsJxywdbDHR",
                 powers = listOf(
-                    PowerWrapper(
+                    PowerDto(
                         uid = "5Dqdejv4R9FgL6Hic11f",
                         quantity = 1,
                         quantityAction = 0

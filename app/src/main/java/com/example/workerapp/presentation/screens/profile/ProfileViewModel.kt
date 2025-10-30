@@ -4,12 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.workerapp.data.TokenRepository
 import com.example.workerapp.data.source.remote.JobRemoteImpl
-import com.example.workerapp.data.source.remote.dto.ApplicationWrapper
+import com.example.workerapp.data.source.remote.dto.ApplicationDto
 import com.example.workerapp.data.source.remote.dto.NetworkResult
 import com.example.workerapp.utils.cached.UserSession
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import okhttp3.MultipartBody
+import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
@@ -20,6 +22,11 @@ class ProfileViewModel @Inject constructor(
 
     private val _applicationsState = MutableStateFlow<ApplicationsUiState>(ApplicationsUiState.Idle)
     val applicationsState: MutableStateFlow<ApplicationsUiState> = _applicationsState
+
+//
+//    val file = File(imageUri.path!!) // ảnh bạn chọn
+//    val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
+//    val multipartBody = MultipartBody.Part
 
     fun fetchApplications() {
         val userUid = UserSession.uid
@@ -57,6 +64,6 @@ class ProfileViewModel @Inject constructor(
 sealed class ApplicationsUiState {
     object Idle : ApplicationsUiState()
     object Loading : ApplicationsUiState()
-    data class Success(val data: List<ApplicationWrapper>) : ApplicationsUiState()
+    data class Success(val data: List<ApplicationDto>) : ApplicationsUiState()
     data class Error(val message: String) : ApplicationsUiState()
 }

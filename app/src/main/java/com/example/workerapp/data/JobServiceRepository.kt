@@ -15,5 +15,8 @@ interface JobServiceRepository {
 
     suspend fun getMaintenanceServices() : Result<List<MaintenanceServiceModel>>
 
+    suspend fun getMaintenanceServiceByUid(uid: String) : Result<MaintenanceServiceModel>
+    suspend fun getPowerModelByUid(uid: String) : Result<PowerModel>
+
     suspend fun getPowers() : Result<List<PowerModel>>
 }

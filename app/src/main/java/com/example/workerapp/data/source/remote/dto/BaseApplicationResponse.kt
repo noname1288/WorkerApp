@@ -7,13 +7,13 @@ import com.squareup.moshi.JsonClass
 data class BaseApplicationResponse(
     val success: Boolean,
     val message: String,
-    val orders: List<ApplicationWrapper>
+    val orders: List<ApplicationDto>
 )
 
 @JsonClass(generateAdapter = true)
-data class ApplicationWrapper(
+data class ApplicationDto(
     val uid: String,
-    val job: JobModel1,
+    val job: JobModel1?,
     val isReview: Boolean,
     val status: String,
     val createdAt: String,

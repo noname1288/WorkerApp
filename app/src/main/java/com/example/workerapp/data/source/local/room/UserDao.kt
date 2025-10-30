@@ -15,6 +15,9 @@ interface UserDao {
     @Query("SELECT * FROM users LIMIT 1")
     fun getUser(): Flow<UserLocalEntity?>
 
+    @Query("UPDATE users SET avatar= :avatarUrl WHERE uid= :uid")
+    suspend fun updateAvatar(uid: String, avatarUrl: String)
+
     @Query("DELETE FROM users")
     suspend fun clearUsers()
 }

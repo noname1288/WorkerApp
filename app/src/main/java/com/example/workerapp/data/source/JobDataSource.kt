@@ -5,9 +5,8 @@ import com.example.workerapp.data.source.remote.dto.request.ApplicationRequest
 import com.example.workerapp.data.source.model.base.JobModel1
 import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
 import com.example.workerapp.data.source.model.healthcare.HealthcareJobModel
-import com.example.workerapp.data.source.model.maintenance.MaintenanceJobModel
-import com.example.workerapp.data.source.remote.dto.ApplicationWrapper
-import com.example.workerapp.data.source.remote.dto.response.ApplicationResponse
+import com.example.workerapp.data.source.model.maintenance.MaintenanceJobResponse
+import com.example.workerapp.data.source.remote.dto.ApplicationDto
 
 interface JobDataSource {
     /* *
@@ -25,14 +24,14 @@ interface JobDataSource {
         suspend fun getHealthcareJobs(): NetworkResult<List<HealthcareJobModel>>
         suspend fun getHealthcareDetail(jobUid: String): NetworkResult<HealthcareJobModel>
 
-        suspend fun getMaintenanceJobs(): NetworkResult<List<MaintenanceJobModel>>
-        suspend fun getMaintenanceDetail(jobUid: String) : NetworkResult<MaintenanceJobModel>
+        suspend fun getMaintenanceJobs(): NetworkResult<List<MaintenanceJobResponse>>
+        suspend fun getMaintenanceDetail(jobUid: String) : NetworkResult<MaintenanceJobResponse>
 
         suspend fun applyForJob(request: ApplicationRequest): NetworkResult<Boolean>
 
         suspend fun getSchedules(workerId: String, date: String): NetworkResult<List<JobModel1>>
 
-        suspend fun getApplication(workerId: String) : NetworkResult<List<ApplicationWrapper>>
+        suspend fun getApplication(workerId: String) : NetworkResult<List<ApplicationDto>>
     }
 }
 

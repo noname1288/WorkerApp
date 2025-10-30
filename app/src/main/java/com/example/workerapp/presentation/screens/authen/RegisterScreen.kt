@@ -57,7 +57,7 @@ fun RegisterScreen(
 ) {
     val context = LocalContext.current
 
-    val registerState by viewModel.registerState.collectAsState()
+    val registerState by viewModel.registerUiState.collectAsState()
 
     var displayName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }

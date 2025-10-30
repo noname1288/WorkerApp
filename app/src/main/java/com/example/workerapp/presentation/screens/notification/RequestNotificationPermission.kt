@@ -16,16 +16,25 @@ fun RequestNotificationPermission(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val permission = android.Manifest.permission.POST_NOTIFICATIONS
 
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = { isGranted ->
+//    val launcher = rememberLauncherForActivityResult(
+//        contract = ActivityResultContracts.RequestPermission(),
+//        onResult = { isGranted ->
+//            if (isGranted) {
+//                Toast.makeText(context, "Permission granted", Toast.LENGTH_SHORT).show()
+//            } else {
+//                Toast.makeText(context, "Permission denied", Toast.LENGTH_SHORT).show()
+//            }
+//        }
+//    )
+
+    val launcher =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) {
                 Toast.makeText(context, "Permission granted", Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(context, "Permission denied", Toast.LENGTH_SHORT).show()
             }
         }
-    )
 
     LaunchedEffect(Unit) {
         launcher.launch(permission)

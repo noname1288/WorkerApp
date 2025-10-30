@@ -79,7 +79,7 @@ fun LoginScreen(
     val credentialManager = remember { CredentialManager.create(context) }
 
     val scrollState = rememberScrollState()
-    val loginState by viewModel.loginState.collectAsState()
+    val loginState by viewModel.loginUiState.collectAsState()
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -145,7 +145,7 @@ fun LoginScreen(
             textAlign = TextAlign.End,
             modifier = Modifier
                 .clickable {
-                    Toast.makeText(context, "clicked quên mật khẩu", Toast.LENGTH_SHORT).show()
+                    navController.safeNavigate(AppRoutes.FORGOT_PASSWORD, popUpToRoute = AppRoutes.LOGIN)
                 }
                 .fillMaxWidth()
         )
