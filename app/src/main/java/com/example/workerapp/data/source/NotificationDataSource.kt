@@ -14,5 +14,7 @@ interface NotificationDataSource {
      */
     interface Remote{
         suspend fun getNotifications() : NetworkResult<List<NotificationItem>>
+
+        suspend fun markNotificationAsRead(notificationId: String) : NetworkResult<Unit>
     }
 }

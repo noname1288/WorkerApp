@@ -19,46 +19,6 @@ class ProfileViewModel @Inject constructor(
     private val tokenRepository: TokenRepository,
     private val jobRemoteImpl: JobRemoteImpl
 ) : ViewModel() {
-
-    private val _applicationsState = MutableStateFlow<ApplicationsUiState>(ApplicationsUiState.Idle)
-    val applicationsState: MutableStateFlow<ApplicationsUiState> = _applicationsState
-
-//
-//    val file = File(imageUri.path!!) // ảnh bạn chọn
-//    val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
-//    val multipartBody = MultipartBody.Part
-
-    fun fetchApplications() {
-        val userUid = UserSession.uid
-
-        if (userUid.isNullOrEmpty()) {
-            _applicationsState.value = ApplicationsUiState.Error("User not logged in")
-            return
-        }
-
-        viewModelScope.launch {
-            _applicationsState.value = ApplicationsUiState.Loading
-
-            try {
-                val result = jobRemoteImpl.getApplication(userUid)
-
-                when (result) {
-                    is NetworkResult.Error -> {
-                        _applicationsState.value = ApplicationsUiState.Error(result.message)
-                    }
-
-                    is NetworkResult.Success -> {
-                        _applicationsState.value = ApplicationsUiState.Success(result.data)
-                    }
-                }
-            } catch (e: Exception) {
-                _applicationsState.value = ApplicationsUiState.Error(e.message ?: "Unknown error")
-            }
-        }
-
-
-    }
-
 }
 
 sealed class ApplicationsUiState {

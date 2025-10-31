@@ -1,4 +1,4 @@
-package com.example.workerapp.presentation.screens.profile.application
+package com.example.workerapp.presentation.screens.application
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
@@ -43,7 +43,7 @@ import com.example.workerapp.utils.ext.popBackIfCan
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ApplicationsScreen(modifier: Modifier = Modifier, viewModel: ProfileViewModel, navcontroler: NavController) {
+fun ApplicationsScreen(modifier: Modifier = Modifier, viewModel: ApplicationViewModel, navcontroler: NavController) {
     val context = LocalContext.current
 
     val uiState by viewModel.applicationsState.collectAsState()

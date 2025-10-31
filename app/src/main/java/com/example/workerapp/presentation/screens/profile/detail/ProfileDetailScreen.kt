@@ -71,7 +71,6 @@ import com.example.workerapp.utils.TimeUtils
 import com.example.workerapp.utils.components.CircleLoadingIndicator
 import com.example.workerapp.utils.components.DatePickerModal
 import com.example.workerapp.utils.ext.popBackIfCan
-import com.example.workerapp.utils.ext.safeNavigate
 import com.google.maps.android.compose.GoogleMap
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
@@ -335,7 +334,10 @@ fun ProfileDetailScreen(
 
             item {
                 Button(
-                    onClick = { showConfirmDialog = true },
+                    onClick = {
+                        showConfirmDialog = true
+                        viewModel.updateProfile()
+                    },
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = colorResource(R.color.light_orange_icon)
@@ -402,7 +404,7 @@ fun ProfileDetailScreen(
             Box(
                 Modifier
                     .fillMaxSize()
-                    .background(Color.LightGray),
+                    .background(Color.LightGray.copy(alpha = 0.5f)),
                 contentAlignment = Alignment.Center
             ) {
                 CircleLoadingIndicator()

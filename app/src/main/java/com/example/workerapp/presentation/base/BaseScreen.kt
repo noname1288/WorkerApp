@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,6 +40,7 @@ import com.example.workerapp.navigation.AppNavHost
 import com.example.workerapp.navigation.AppRoutes
 import com.example.workerapp.navigation.NavItem
 import com.example.workerapp.presentation.screens.authen.AuthViewModel
+import com.example.workerapp.presentation.screens.notification.NotificationViewModel
 import com.example.workerapp.presentation.screens.profile.ProfileViewModel
 import com.example.workerapp.utils.ext.safeNavigate
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -68,12 +70,13 @@ fun BaseScreen() {
     * Shared ViewModel
     * */
     val authViewModel = hiltViewModel<AuthViewModel>()
-
     val profileViewModel = hiltViewModel<ProfileViewModel>()
-
+    val notificationViewModel = hiltViewModel<NotificationViewModel>()
 
     val systemUiController = rememberSystemUiController()
     val useDarkIcons = true // vì nền trắng nên dùng icon tối
+
+    val hasUnreadNotification by notificationViewModel.hasUnread.collectAsState()
 
     SideEffect {
         systemUiController.setSystemBarsColor(
@@ -88,8 +91,13 @@ fun BaseScreen() {
             if (isShowBottomBar)
                 CustomNavigationBar(
                     selectedRoute = currentRoute,
+                    hasUnreadNotification = hasUnreadNotification,
                     onItemSelected = { route ->
-                        navController.safeNavigate(route, popUpToRoute = AppRoutes.HOME, restore = true)
+                        navController.safeNavigate(
+                            route,
+                            popUpToRoute = AppRoutes.HOME,
+                            restore = true
+                        )
                     }
                 )
         },
@@ -99,6 +107,7 @@ fun BaseScreen() {
             navController,
             authViewModel,
             profileViewModel,
+            notificationViewModel,
             startDestination,
             innerPadding
         )
@@ -108,14 +117,15 @@ fun BaseScreen() {
 @Composable
 fun CustomNavigationBar(
     selectedRoute: String,
-    onItemSelected: (String) -> Unit
+    onItemSelected: (String) -> Unit,
+    hasUnreadNotification: Boolean
 ) {
     val navItemList = listOf<NavItem>(
         NavItem(
             stringResource(R.string.home_title),
             R.drawable.ic_filled_home,
             R.drawable.ic_home,
-            true,
+            false,
             0,
             AppRoutes.HOME
         ),
@@ -131,8 +141,8 @@ fun CustomNavigationBar(
             stringResource(R.string.notification_title),
             R.drawable.ic_filled_notification,
             R.drawable.ic_notification,
-            false,
-            2,
+            hasUnreadNotification,
+            0,
             AppRoutes.NOTIFICATION
         ),
         NavItem(

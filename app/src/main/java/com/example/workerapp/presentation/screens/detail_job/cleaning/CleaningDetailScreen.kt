@@ -1,4 +1,4 @@
-package com.example.workerapp.presentation.screens.detail.cleaning
+package com.example.workerapp.presentation.screens.detail_job.cleaning
 
 import android.util.Log
 import android.widget.Toast
@@ -50,8 +50,8 @@ import com.example.workerapp.R
 import com.example.workerapp.data.source.model.base.UserModel
 import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
 import com.example.workerapp.data.source.model.cleaning.CleaningServiceModel
-import com.example.workerapp.presentation.screens.detail.cleaning.CleaningJobSection.JobDetails
-import com.example.workerapp.presentation.screens.detail.cleaning.CleaningJobSection.UserInfo
+import com.example.workerapp.presentation.screens.detail_job.cleaning.CleaningJobSection.JobDetails
+import com.example.workerapp.presentation.screens.detail_job.cleaning.CleaningJobSection.UserInfo
 import com.example.workerapp.ui.detail.cleaning.CleaningUiState
 import com.example.workerapp.ui.detail.cleaning.CleaningViewModel
 import com.example.workerapp.ui.detail.components.ClientCard

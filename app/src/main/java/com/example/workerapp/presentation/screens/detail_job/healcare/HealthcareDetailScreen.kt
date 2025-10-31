@@ -1,4 +1,4 @@
-package com.example.workerapp.presentation.screens.detail.healcare
+package com.example.workerapp.presentation.screens.detail_job.healcare
 
 import android.util.Log
 import android.widget.Toast
@@ -35,12 +35,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.workerapp.MyApplication
 import com.example.workerapp.R
 import com.example.workerapp.data.source.model.base.UserModel
 import com.example.workerapp.data.source.model.healthcare.HealthcareJobModel
 import com.example.workerapp.data.source.model.healthcare.HealthcareServiceModel
-import com.example.workerapp.presentation.screens.detail.components.HealthcareServiceItem
+import com.example.workerapp.presentation.screens.detail_job.components.HealthcareServiceItem
 import com.example.workerapp.ui.detail.components.ClientCard
 import com.example.workerapp.ui.detail.components.JobDetailCard
 import com.example.workerapp.ui.detail.components.WeeklySchedule

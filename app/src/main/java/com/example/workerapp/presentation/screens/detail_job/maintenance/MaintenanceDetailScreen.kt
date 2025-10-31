@@ -1,4 +1,4 @@
-package com.example.workerapp.presentation.screens.detail.maintenance
+package com.example.workerapp.presentation.screens.detail_job.maintenance
 
 import android.util.Log
 import android.widget.Toast

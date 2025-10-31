@@ -8,5 +8,5 @@ data class NotificationItem(
     val title: String = "",
     val content: String = "",
     val createdAt: String = "",
-    var isRead: Boolean = false,
+    val isRead: Boolean = false,
 )

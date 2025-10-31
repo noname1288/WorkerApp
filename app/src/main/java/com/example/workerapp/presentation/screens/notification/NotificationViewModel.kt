@@ -7,7 +7,10 @@ import com.example.workerapp.data.repository.NotificationRepositoryImpl
 import com.example.workerapp.data.source.model.NotificationItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,6 +25,11 @@ class NotificationViewModel @Inject constructor(
     private val _listItems = MutableStateFlow<List<NotificationItem>>(emptyList())
     val listItems: StateFlow<List<NotificationItem>> = _listItems
 
+    // Biến dùng để hiển thị chấm đỏ hoặc badge
+    val hasUnread = listItems.map { list ->
+        list.any { !it.isRead }
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
     fun fetchAllNotifications() {
         viewModelScope.launch {
             _uiState.value = NotificationUiState.Loading
@@ -34,6 +42,25 @@ class NotificationViewModel @Inject constructor(
                 _uiState.value =
                     NotificationUiState.Error(it.message ?: "An unknown error occurred")
             }
+        }
+    }
+
+    fun markAsRead(notificationId: String) {
+        viewModelScope.launch {
+            val currentList = _listItems.value
+            // Cập nhật tạm thời để UI phản hồi nhanh
+            _listItems.value = currentList.map { n ->
+                if (n.uid == notificationId) n.copy(isRead = true) else n
+            }
+
+            val result = notificationRepository.markNotificationAsRead(notificationId)
+            result.onFailure {
+                // Rollback nếu BE báo lỗi
+                _listItems.value = currentList
+                _uiState.value = NotificationUiState.Error(it.message ?: "Không thể đánh dấu đã đọc")
+            }
+            // Đồng bộ lại UI state
+            _uiState.value = NotificationUiState.Success(_listItems.value)
         }
     }
 }

@@ -12,6 +12,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.workerapp.presentation.screens.application.ApplicationViewModel
 import com.example.workerapp.presentation.screens.authen.AuthViewModel
 import com.example.workerapp.presentation.screens.change_password.ChangePasswordScreen
 import com.example.workerapp.presentation.screens.notification.NotificationScreenRoot
@@ -24,12 +25,12 @@ import com.example.workerapp.presentation.screens.authen.RegisterScreen
 import com.example.workerapp.presentation.screens.calendar.CalendarScreen
 import com.example.workerapp.presentation.screens.change_password.ChangePasswordViewModel
 import com.example.workerapp.ui.calendar.CalendarViewModel
-import com.example.workerapp.presentation.screens.detail.cleaning.CleaningDetailScreen
+import com.example.workerapp.presentation.screens.detail_job.cleaning.CleaningDetailScreen
 import com.example.workerapp.ui.detail.cleaning.CleaningViewModel
-import com.example.workerapp.presentation.screens.detail.healcare.HealthcareDetailScreen
-import com.example.workerapp.presentation.screens.detail.healcare.HealthcareViewModel
-import com.example.workerapp.presentation.screens.detail.maintenance.MaintenanceDetailScreen
-import com.example.workerapp.presentation.screens.detail.maintenance.MaintenanceViewModel
+import com.example.workerapp.presentation.screens.detail_job.healcare.HealthcareDetailScreen
+import com.example.workerapp.presentation.screens.detail_job.healcare.HealthcareViewModel
+import com.example.workerapp.presentation.screens.detail_job.maintenance.MaintenanceDetailScreen
+import com.example.workerapp.presentation.screens.detail_job.maintenance.MaintenanceViewModel
 import com.example.workerapp.presentation.screens.forgot_password.ForgotPasswordScreen
 import com.example.workerapp.presentation.screens.forgot_password.ForgotPasswordViewModel
 import com.example.workerapp.presentation.screens.home.HomeScreen
@@ -37,7 +38,8 @@ import com.example.workerapp.presentation.screens.income.IncomeScreen
 import com.example.workerapp.presentation.screens.map.MapScreen
 import com.example.workerapp.presentation.screens.notification.NotificationViewModel
 import com.example.workerapp.presentation.screens.profile.ProfileViewModel
-import com.example.workerapp.presentation.screens.profile.application.ApplicationsScreen
+import com.example.workerapp.presentation.screens.application.ApplicationsScreen
+import com.example.workerapp.presentation.screens.notification.NotificationDetailScreen
 import com.example.workerapp.presentation.screens.profile.detail.ProfileDetailScreen
 import com.example.workerapp.presentation.screens.profile.detail.ProfileDetailViewModel
 import com.example.workerapp.presentation.screens.review.ReviewScreen
@@ -50,6 +52,7 @@ fun AppNavHost(
     navController: NavHostController,
     authViewModel: AuthViewModel,
     profileViewModel: ProfileViewModel,
+    notificationViewModel: NotificationViewModel,
     startDestination: String,
     innerPadding: PaddingValues
 ) {
@@ -95,7 +98,6 @@ fun AppNavHost(
             IncomeScreen()
         }
         composable(AppRoutes.NOTIFICATION) {
-            val notificationViewModel = hiltViewModel<NotificationViewModel>()
             NotificationScreenRoot(
                 notificationViewModel = notificationViewModel,
                 navController = navController
@@ -191,8 +193,21 @@ fun AppNavHost(
             )
         }
 
+        composable (
+            route = "${AppScreen.NOTIFICATION_SCREEN}/{${DestinationArgs.NOTIFICATION_ID}}",
+            arguments = listOf(
+                navArgument(DestinationArgs.NOTIFICATION_ID) { type = NavType.StringType}
+            )
+        ) {
+
+            val notificationId = it.arguments?.getString(DestinationArgs.NOTIFICATION_ID) ?: ""
+
+            NotificationDetailScreen(notificationId = notificationId)
+        }
+
         composable(AppRoutes.LIST_APPLICATIONS) {
-            ApplicationsScreen(viewModel = profileViewModel, navcontroler = navController)
+            val applicationViewModel = hiltViewModel<ApplicationViewModel>()
+            ApplicationsScreen(viewModel = applicationViewModel, navcontroler = navController)
         }
 
         composable(AppRoutes.REVIEW_SCREEN) {

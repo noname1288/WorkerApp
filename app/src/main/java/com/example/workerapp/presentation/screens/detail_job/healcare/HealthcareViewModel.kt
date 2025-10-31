@@ -1,4 +1,4 @@
-package com.example.workerapp.presentation.screens.detail.healcare
+package com.example.workerapp.presentation.screens.detail_job.healcare
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

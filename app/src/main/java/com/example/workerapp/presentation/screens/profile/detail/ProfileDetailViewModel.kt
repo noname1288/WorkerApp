@@ -9,7 +9,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.workerapp.data.UserRepository
 import com.example.workerapp.data.source.local.room.entity.UserLocalEntity
 import com.example.workerapp.data.source.remote.dto.request.UserUpdateRequest
-import com.example.workerapp.utils.cached.UserSession
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,6 +25,8 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import javax.inject.Inject
 import android.os.Parcelable
+import androidx.core.net.toUri
+import com.example.workerapp.utils.cached.UserSession
 import kotlinx.parcelize.Parcelize
 
 @HiltViewModel
@@ -58,18 +59,11 @@ class ProfileDetailViewModel @Inject constructor(
     fun onTelChange(v: String)      { _form.update { it.copy(tel = v) }.also { persist() } }
     fun onDobChange(v: String)      { _form.update { it.copy(dob = v) }.also { persist() } }
     fun onLocationChange(v: String) { _form.update { it.copy(location = v) }.also { persist() } }
-    fun onImagePicked(uri: String?)    { _form.update { it.copy(imageUri = uri) }.also { persist() } }
+    fun onImagePicked(imagePath: String?)    { _form.update { it.copy(imagePath = imagePath) }.also { persist() } }
     fun onLocationPicked(address: String, lat: Double, lng: Double) =
         _form.update { it.copy(location = address, lat = lat, lng = lng) }.also { persist() }
 
-    fun updateProfile(
-        username: String,
-        gender: String,
-        tel: String,
-        dob: String,
-        location: String,
-        imageUri: Uri?
-    ) {
+    fun updateProfile() {
         viewModelScope.launch {
             _profileDetailState.value = ProfileDetailUiState.Loading
             try {
@@ -80,8 +74,15 @@ class ProfileDetailViewModel @Inject constructor(
                     return@launch
                 } else {
                     // Upload avatar nếu có ảnh mới
-                    val avatarUrl = if (imageUri != null) {
-                        val result = uploadAvatar(imageUri)
+                    val username = _form.value.username
+                    val gender = _form.value.gender
+                    val dob = _form.value.dob
+                    val tel = _form.value.tel
+                    val location = _form.value.location
+                    var imageString = _form.value.imagePath
+
+                    val avatarUrl = if (imageString != null) {
+                        val result = uploadAvatar(imageString.toUri())
                         if (result.isFailure) {
                             _profileDetailState.value = ProfileDetailUiState.Error(
                                 result.exceptionOrNull()?.message ?: "Upload avatar failed"
@@ -104,7 +105,16 @@ class ProfileDetailViewModel @Inject constructor(
                         role = currentUser.role
                     )
 
-                    userRepository.updateProfile(request)
+                    val result = userRepository.updateProfile(request)
+                    result.onSuccess {
+                        UserSession.saveState(currentUser.uid, username, currentUser.email, avatarUrl)
+
+                        _profileDetailState.value =
+                            ProfileDetailUiState.Success("Update profile successfully")
+                    }.onFailure {
+                        _profileDetailState.value =
+                            ProfileDetailUiState.Error(it.message ?: "Update profile failed")
+                    }
                 }
             } catch (e: Exception) {
                 _profileDetailState.value =
@@ -147,29 +157,6 @@ class ProfileDetailViewModel @Inject constructor(
         val requestFile = file.asRequestBody(mimeType.toMediaTypeOrNull())
         return MultipartBody.Part.createFormData("image", file.name, requestFile)
     }
-
-    fun updateImage(uri: Uri) {
-        viewModelScope.launch {
-            _profileDetailState.value = ProfileDetailUiState.Loading
-
-            try {
-                UserSession.uid?.let {
-                    val response = userRepository.uploadImage(it, uriToMultipart(uri))
-
-                    response.onFailure {
-                        _profileDetailState.value =
-                            ProfileDetailUiState.Error(it.message ?: "Upload image failed")
-                    }.onSuccess {
-                        _profileDetailState.value =
-                            ProfileDetailUiState.Success("Đồng bộ ảnh đại diện thành công")
-                    }
-                }
-            } catch (e: Exception) {
-                _profileDetailState.value =
-                    ProfileDetailUiState.Error(e.message ?: "Upload image failed")
-            }
-        }
-    }
 }
 
 @Parcelize
@@ -181,7 +168,7 @@ data class ProfileFormState(
     val location: String = "",     // địa chỉ hiển thị
     val lat: Double? = null,       // toạ độ chọn từ map
     val lng: Double? = null,
-    val imageUri: String? = null
+    val imagePath: String? = null
 ) : Parcelable
 
 sealed class ProfileDetailUiState {

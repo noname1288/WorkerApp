@@ -13,7 +13,7 @@ data class BaseApplicationResponse(
 @JsonClass(generateAdapter = true)
 data class ApplicationDto(
     val uid: String,
-    val job: JobModel1?,
+    val job: JobModel1,
     val isReview: Boolean,
     val status: String,
     val createdAt: String,

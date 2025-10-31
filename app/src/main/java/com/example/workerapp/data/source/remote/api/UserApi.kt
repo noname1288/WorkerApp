@@ -58,7 +58,7 @@ interface UserApi {
     ): Response<UploadingImageResponse>
 
     @AuthRequired
-    @POST("users/update")
+    @PUT("users/update")
     suspend fun updateProfile(
         @Body request: UserUpdateRequest
     ): Response<UserUpdateResponse>

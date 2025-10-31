@@ -4,4 +4,6 @@ import com.example.workerapp.data.source.model.NotificationItem
 
 interface NotificationRepository {
     suspend fun getNotifications(): Result<List<NotificationItem>>
+
+    suspend fun markNotificationAsRead(notificationId: String): Result<Unit>
 }

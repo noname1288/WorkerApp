@@ -5,12 +5,14 @@ object AppScreen{
     const val CLEANING_SCREEN = "cleaning_detail"
     const val HEALTHCARE_SCREEN = "healthcare_detail"
     const val MAINTENANCE_SCREEN = "maintenance_detail"
+    const val NOTIFICATION_SCREEN = "notification_detail"
 }
 
 object DestinationArgs{
     const val SERVICE_TYPE = "serviceType"
     const val JOB_ID = "jobId"
     const val ONLY_WATCH = "onlyWatch"
+    const val NOTIFICATION_ID = "notificationId"
 }
 
 object AppRoutes {
@@ -32,6 +34,7 @@ object AppRoutes {
     const val CLEANING_DETAIL = "${AppScreen.CLEANING_SCREEN}/%s/%b"
     const val HEALTHCARE_DETAIL = "${AppScreen.HEALTHCARE_SCREEN}/%s/%b"
     const val MAINTENANCE_DETAIL = "${AppScreen.MAINTENANCE_SCREEN}/%s/%b"
+    const val NOTIFICATION_DETAIL = "${AppScreen.NOTIFICATION_SCREEN}/%s"
 
     const val LIST_APPLICATIONS = "list_applications"
 

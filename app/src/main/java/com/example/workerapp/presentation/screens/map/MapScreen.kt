@@ -80,37 +80,48 @@ fun MapScreen(
     val mapProps = MapProperties(isMyLocationEnabled = hasLocationPermission)
     val uiSettings = MapUiSettings(myLocationButtonEnabled = true, zoomControlsEnabled = false)
 
+    var unAvailability = pickedAddress.isNullOrEmpty()
+
     // ---- Khi được cấp quyền, hoặc khi user yêu cầu cập nhật vị trí, thì lấy current location & animate camera ----
     LaunchedEffect(hasLocationPermission, requestUpdatePosition) {
-        if (hasLocationPermission && requestUpdatePosition) {
-            val cts = CancellationTokenSource()
-            try {
-                val loc = fused.getCurrentLocation(
-                    Priority.PRIORITY_HIGH_ACCURACY,
-                    cts.token
-                ).await()
+        if (hasLocationPermission) {
+            if (requestUpdatePosition) {
+                val cts = CancellationTokenSource()
+                try {
+                    val loc = fused.getCurrentLocation(
+                        Priority.PRIORITY_HIGH_ACCURACY,
+                        cts.token
+                    ).await()
 
-                loc?.let {
-                    val here = LatLng(it.latitude, it.longitude)
-                    pickedLatLng = here
-                    // Reverse geocode (tùy chọn)
-                    val g = Geocoder(context, Locale.getDefault())
-                    pickedAddress = g.getFromLocation(here.latitude, here.longitude, 1)
-                        ?.firstOrNull()?.getAddressLine(0) ?: "Vị trí hiện tại"
+                    loc?.let {
+                        val here = LatLng(it.latitude, it.longitude)
+                        pickedLatLng = here
+                        val g = Geocoder(context, Locale.getDefault())
+                        pickedAddress = g.getFromLocation(here.latitude, here.longitude, 1)
+                            ?.firstOrNull()?.getAddressLine(0) ?: "Vị trí hiện tại"
 
-                    cameraPositionState.animate(
-                        CameraUpdateFactory.newCameraPosition(
-                            CameraPosition(here, 16f, 0f, 0f)
-                        ),
-                        durationMs = 800
-                    )
+                        cameraPositionState.animate(
+                            CameraUpdateFactory.newCameraPosition(
+                                CameraPosition(here, 16f, 0f, 0f)
+                            ),
+                            durationMs = 800
+                        )
+                    }
+                } catch (_: SecurityException) {
+                } catch (_: Exception) {
+                } finally {
+                    requestUpdatePosition = false
                 }
-            } catch (_: SecurityException) {
-                // Quyền có thể bị thu hồi giữa chừng
-            } catch (_: Exception) {
-                // Timeout/khác
-            } finally {
-                requestUpdatePosition = false
+            } else if (pickedLatLng == null) {
+                // 🗺️ Mặc định zoom đến Hà Nội nếu đã có quyền nhưng chưa có vị trí
+                val hanoi = LatLng(21.0278, 105.8342)
+                pickedLatLng = hanoi
+                pickedAddress = "Hà Nội, Việt Nam"
+                cameraPositionState.move(
+                    CameraUpdateFactory.newCameraPosition(
+                        CameraPosition(hanoi, 12f, 0f, 0f)
+                    )
+                )
             }
         }
     }
@@ -177,6 +188,7 @@ fun MapScreen(
                     }
                     navController.popBackStack()
                 },
+                enabled = !unAvailability,
                 modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp)
             ) { Text("Chọn vị trí này") }
 

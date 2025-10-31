@@ -1,4 +1,4 @@
-package com.example.workerapp.presentation.screens.detail.components
+package com.example.workerapp.presentation.screens.detail_job.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -38,7 +38,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import com.example.workerapp.R
 import com.example.workerapp.data.source.model.healthcare.HealthcareServiceModel
-import com.example.workerapp.data.source.remote.dto.wrapper.HealthServiceWrapper
 
 @Composable
 fun HealthcareServiceItem(

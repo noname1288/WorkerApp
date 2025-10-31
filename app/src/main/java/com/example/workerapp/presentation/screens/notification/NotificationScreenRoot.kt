@@ -179,7 +179,11 @@ fun NotificationScreen(
                     Text("Không có thông báo nào")
                 } else {
                     listItems.forEach { item ->
-                        NotificationItem(item, onClick = {})
+                        NotificationItem(item, onClick = {
+                            viewModel.markAsRead(item.uid)
+
+//                            navController.navigateWithArgs(AppRoutes.NOTIFICATION_DETAIL, item.uid)
+                        })
                         HorizontalDivider()
                     }
                 }

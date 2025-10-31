@@ -25,4 +25,22 @@ class NotificationRepositoryImpl @Inject constructor(
             Result.failure(e)
         }
     }
+
+    override suspend fun markNotificationAsRead(notificationId: String): Result<Unit> {
+        try {
+            val response = remote.markNotificationAsRead(notificationId)
+
+            return when (response) {
+                is NetworkResult.Success -> {
+                    Result.success(Unit)
+                }
+
+                is NetworkResult.Error -> {
+                    Result.failure(Exception(response.message))
+                }
+            }
+        } catch (e: Exception) {
+            return Result.failure(e)
+        }
+    }
 }
