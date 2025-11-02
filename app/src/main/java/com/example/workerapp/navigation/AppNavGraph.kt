@@ -39,7 +39,6 @@ import com.example.workerapp.presentation.screens.map.MapScreen
 import com.example.workerapp.presentation.screens.notification.NotificationViewModel
 import com.example.workerapp.presentation.screens.profile.ProfileViewModel
 import com.example.workerapp.presentation.screens.application.ApplicationsScreen
-import com.example.workerapp.presentation.screens.notification.NotificationDetailScreen
 import com.example.workerapp.presentation.screens.profile.detail.ProfileDetailScreen
 import com.example.workerapp.presentation.screens.profile.detail.ProfileDetailViewModel
 import com.example.workerapp.presentation.screens.review.ReviewScreen
@@ -191,18 +190,6 @@ fun AppNavHost(
                 navController = navController,
                 viewModel = maintenanceViewModel
             )
-        }
-
-        composable (
-            route = "${AppScreen.NOTIFICATION_SCREEN}/{${DestinationArgs.NOTIFICATION_ID}}",
-            arguments = listOf(
-                navArgument(DestinationArgs.NOTIFICATION_ID) { type = NavType.StringType}
-            )
-        ) {
-
-            val notificationId = it.arguments?.getString(DestinationArgs.NOTIFICATION_ID) ?: ""
-
-            NotificationDetailScreen(notificationId = notificationId)
         }
 
         composable(AppRoutes.LIST_APPLICATIONS) {

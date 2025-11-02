@@ -66,7 +66,7 @@ class HealthcareViewModel @Inject constructor(
         val healthcareServices = mutableListOf<Pair<HealthcareServiceModel, Int>>()
 
         for (index in serviceWrappers) {
-            val res = jobServiceRepository.getHealthcareServiceByUid(index.serviceID)
+            val res = jobServiceRepository.getHealthcareServiceByUid(index.uid)
             res.onSuccess {
                 healthcareServices.add(it to index.quantity)
             }.onFailure {
@@ -97,11 +97,12 @@ class HealthcareViewModel @Inject constructor(
                     }
 
                     is NetworkResult.Error -> {
+                        _applyState.value = false
                         _uiState.value = HealthcareUiState.Error(result.message)
                     }
                 }
             } catch (e: Exception) {
-                _applyState.value = true
+                _applyState.value = false
                 _uiState.value = HealthcareUiState.Error(e.message ?: "Unknown error")
             }
         }
@@ -114,8 +115,6 @@ sealed class HealthcareUiState {
     data class Success(
         val data: HealthcareJobModel,
         val serviceData: List<Pair<HealthcareServiceModel, Int>>
-    ) :
-        HealthcareUiState()
-
+    ) : HealthcareUiState()
     data class Error(val message: String) : HealthcareUiState()
 }

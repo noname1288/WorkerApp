@@ -4,6 +4,6 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class HealthServiceWrapper(
-    var serviceID: String = "",
+    var uid: String = "",
     var quantity: Int = 0,
 )

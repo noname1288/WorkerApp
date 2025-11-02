@@ -2,20 +2,25 @@ package com.example.workerapp.data.source.remote
 
 import android.util.Log
 import com.example.workerapp.data.source.JobDataSource
-import com.example.workerapp.data.source.remote.api.JobApi
-import com.example.workerapp.data.source.remote.dto.request.ApplicationRequest
 import com.example.workerapp.data.source.model.base.JobModel1
 import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
 import com.example.workerapp.data.source.model.healthcare.HealthcareJobModel
 import com.example.workerapp.data.source.model.maintenance.MaintenanceJobResponse
+import com.example.workerapp.data.source.remote.api.JobApi
 import com.example.workerapp.data.source.remote.dto.ApplicationDto
 import com.example.workerapp.data.source.remote.dto.NetworkResult
-import com.example.workerapp.utils.ext.safeApiCall
+import com.example.workerapp.data.source.remote.dto.request.ApplicationRequest
+import com.example.workerapp.data.source.remote.dto.response.ApiErrorResponse
+import com.squareup.moshi.Moshi
 import javax.inject.Inject
 
 class JobRemoteImpl @Inject constructor(
-    private val jobApi: JobApi
+    private val jobApi: JobApi,
+    moshi: Moshi
 ) : JobDataSource.Remote {
+
+    private val errorAdapter = moshi.adapter(ApiErrorResponse::class.java)
+
     override suspend fun getCleaningJobs(): NetworkResult<List<CleaningJobModel1>> {
         try {
             val result = jobApi.getCleaningJobs()
@@ -114,21 +119,25 @@ class JobRemoteImpl @Inject constructor(
     }
 
     override suspend fun applyForJob(request: ApplicationRequest): NetworkResult<Boolean> {
-        val response = safeApiCall(
-            apiCall = { jobApi.applyForJob(request) },
-            tag = TAG
-        )
+        val response = jobApi.applyForJob(request)
 
-        when (response) {
-            is NetworkResult.Error -> {
-                Log.e(TAG, "applyForJob: ${response.message}")
-                return NetworkResult.Error(response.message)
-            }
+        return if (response.isSuccessful) {
+            val body = response.body()
 
-            is NetworkResult.Success -> {
-                Log.d(TAG, "applyForJob: ${response.data}")
-                return NetworkResult.Success(response.data.success)
+            if (body != null && body.success) {
+                Log.d(TAG, "applyForJob: ${body.message}")
+                NetworkResult.Success(true)
+            } else {
+                Log.e(TAG, "applyForJob Error: ${body?.message ?: "Empty response body"}")
+                NetworkResult.Error(body?.message ?: "Empty response body")
             }
+        } else {
+            val errorMessage = response.errorBody()?.string()
+                ?.let { json -> errorAdapter.fromJson(json)?.error }
+                ?: response.message()
+                ?: "Request failed with status code ${response.code()}"
+
+            NetworkResult.Error(errorMessage)
         }
     }
 

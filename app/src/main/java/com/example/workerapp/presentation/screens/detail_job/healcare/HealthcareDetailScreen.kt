@@ -126,11 +126,7 @@ fun HealthcareDetailScreen(
             }
         }
 
-        HealthcareUiState.Idle -> {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Idle")
-            }
-        }
+        HealthcareUiState.Idle -> {}
     }
 
     Column(modifier.fillMaxSize()) {
