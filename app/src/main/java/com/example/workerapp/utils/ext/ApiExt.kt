@@ -1,12 +1,12 @@
 package com.example.workerapp.utils.ext
 
+import android.util.Log
+import com.example.workerapp.data.source.remote.dto.NetworkResult
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import retrofit2.Response
 import java.io.IOException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import android.util.Log
-import com.example.workerapp.data.source.remote.dto.NetworkResult
 
 suspend fun <T> safeApiCall(
     apiCall: suspend () -> Response<T>,

@@ -3,11 +3,11 @@ package com.example.workerapp.presentation.screens.detail_job.healthcare
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.workerapp.data.JobServiceRepository
-import com.example.workerapp.data.source.remote.dto.NetworkResult
-import com.example.workerapp.data.source.remote.dto.request.ApplicationRequest
 import com.example.workerapp.data.source.model.healthcare.HealthcareJobModel
 import com.example.workerapp.data.source.model.healthcare.HealthcareServiceModel
 import com.example.workerapp.data.source.remote.JobRemoteImpl
+import com.example.workerapp.data.source.remote.dto.NetworkResult
+import com.example.workerapp.data.source.remote.dto.request.ApplicationRequest
 import com.example.workerapp.data.source.remote.dto.wrapper.HealthServiceWrapper
 import com.example.workerapp.utils.ServiceType
 import com.example.workerapp.utils.cached.UserSession

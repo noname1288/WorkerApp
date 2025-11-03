@@ -1,7 +1,6 @@
 package com.example.workerapp.data.source.local.room
 
 import androidx.room.TypeConverter
-import androidx.room.TypeConverters
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 

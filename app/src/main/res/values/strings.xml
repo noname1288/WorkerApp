@@ -49,5 +49,6 @@
     <string name="forgot_password_content">Vui lòng nhập email, chúng tôi sẽ giúp bạn lấy lại mật khẩu</string>
     <string name="request_title">Gửi yêu cầu</string>
     <string name="map_title">Map</string>
+    <string name="policy_title">Chính sách</string>
 </resources>
 

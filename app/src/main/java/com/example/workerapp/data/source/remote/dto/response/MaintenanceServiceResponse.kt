@@ -1,7 +1,6 @@
 package com.example.workerapp.data.source.remote.dto.response
 
 import com.example.workerapp.data.source.model.maintenance.PowerModel
-import com.example.workerapp.utils.ServiceType
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)

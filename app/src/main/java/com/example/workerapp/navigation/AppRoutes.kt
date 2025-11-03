@@ -39,6 +39,7 @@ object AppRoutes {
     const val LIST_APPLICATIONS = "list_applications"
 
     const val REVIEW_SCREEN = "review"
+    const val POLICY_SCREEN = "policy"
     const val MAP_SCREEN = "map_screen"
 
 }

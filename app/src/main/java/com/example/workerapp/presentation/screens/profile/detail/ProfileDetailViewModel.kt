@@ -2,13 +2,16 @@ package com.example.workerapp.presentation.screens.profile.detail
 
 import android.app.Application
 import android.net.Uri
+import android.os.Parcelable
 import android.webkit.MimeTypeMap
+import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.workerapp.data.UserRepository
 import com.example.workerapp.data.source.local.room.entity.UserLocalEntity
 import com.example.workerapp.data.source.remote.dto.request.UserUpdateRequest
+import com.example.workerapp.utils.cached.UserSession
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,15 +22,12 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.parcelize.Parcelize
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import javax.inject.Inject
-import android.os.Parcelable
-import androidx.core.net.toUri
-import com.example.workerapp.utils.cached.UserSession
-import kotlinx.parcelize.Parcelize
 
 @HiltViewModel
 class ProfileDetailViewModel @Inject constructor(

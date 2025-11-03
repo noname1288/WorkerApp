@@ -1,8 +1,6 @@
 package com.example.workerapp.data.source.local.room
 
-import android.content.Context
 import androidx.room.Database
-import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.workerapp.data.source.local.room.entity.UserLocalEntity
@@ -10,7 +8,6 @@ import com.example.workerapp.data.source.model.cleaning.CleaningServiceModel
 import com.example.workerapp.data.source.model.healthcare.HealthcareServiceModel
 import com.example.workerapp.data.source.model.maintenance.MaintenanceServiceModel
 import com.example.workerapp.data.source.model.maintenance.PowerModel
-import com.example.workerapp.utils.Constant
 
 @Database(
     entities = [UserLocalEntity::class, CleaningServiceModel::class, HealthcareServiceModel::class, MaintenanceServiceModel:: class, PowerModel::class],

@@ -1,13 +1,11 @@
 package com.example.workerapp.utils.components
 
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.unit.dp
 import com.example.workerapp.R
 import com.example.workerapp.utils.JobStatus
 

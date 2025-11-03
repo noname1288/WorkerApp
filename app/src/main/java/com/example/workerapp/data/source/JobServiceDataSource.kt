@@ -1,10 +1,10 @@
 package com.example.workerapp.data.source
 
-import com.example.workerapp.data.source.remote.dto.NetworkResult
 import com.example.workerapp.data.source.model.cleaning.CleaningServiceModel
 import com.example.workerapp.data.source.model.healthcare.HealthcareServiceModel
 import com.example.workerapp.data.source.model.maintenance.MaintenanceServiceModel
 import com.example.workerapp.data.source.model.maintenance.PowerModel
+import com.example.workerapp.data.source.remote.dto.NetworkResult
 import com.example.workerapp.data.source.remote.dto.response.MaintenanceServiceResponse
 
 interface JobServiceDataSource {

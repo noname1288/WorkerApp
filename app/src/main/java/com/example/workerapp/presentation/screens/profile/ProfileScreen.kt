@@ -104,6 +104,9 @@ fun ProfileScreen(
                             },
                             onPasswordChangeClick = {
                                 navController.navigate(AppRoutes.CHANGE_PASSWORD)
+                            },
+                            onTermClick = {
+                                navController.navigate(AppRoutes.POLICY_SCREEN)
                             }
                         )
                         Spacer(Modifier.height(32.dp))

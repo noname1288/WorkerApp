@@ -13,20 +13,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.workerapp.presentation.screens.application.ApplicationViewModel
+import com.example.workerapp.presentation.screens.application.ApplicationsScreen
 import com.example.workerapp.presentation.screens.authen.AuthViewModel
-import com.example.workerapp.presentation.screens.change_password.ChangePasswordScreen
-import com.example.workerapp.presentation.screens.notification.NotificationScreenRoot
-import com.example.workerapp.presentation.screens.profile.ProfileScreen
-import com.example.workerapp.presentation.screens.service.ServiceDetailScreen
-import com.example.workerapp.presentation.screens.service.ServiceViewModel
-import com.example.workerapp.presentation.screens.splash.SplashScreen
 import com.example.workerapp.presentation.screens.authen.LoginScreen
 import com.example.workerapp.presentation.screens.authen.RegisterScreen
 import com.example.workerapp.presentation.screens.calendar.CalendarScreen
+import com.example.workerapp.presentation.screens.change_password.ChangePasswordScreen
 import com.example.workerapp.presentation.screens.change_password.ChangePasswordViewModel
-import com.example.workerapp.ui.calendar.CalendarViewModel
 import com.example.workerapp.presentation.screens.detail_job.cleaning.CleaningDetailScreen
-import com.example.workerapp.ui.detail.cleaning.CleaningViewModel
 import com.example.workerapp.presentation.screens.detail_job.healthcare.HealthcareDetailScreen
 import com.example.workerapp.presentation.screens.detail_job.healthcare.HealthcareViewModel
 import com.example.workerapp.presentation.screens.detail_job.maintenance.MaintenanceDetailScreen
@@ -36,13 +30,21 @@ import com.example.workerapp.presentation.screens.forgot_password.ForgotPassword
 import com.example.workerapp.presentation.screens.home.HomeScreen
 import com.example.workerapp.presentation.screens.income.IncomeScreen
 import com.example.workerapp.presentation.screens.map.MapScreen
+import com.example.workerapp.presentation.screens.notification.NotificationScreenRoot
 import com.example.workerapp.presentation.screens.notification.NotificationViewModel
+import com.example.workerapp.presentation.screens.policy.PolicyScreen
+import com.example.workerapp.presentation.screens.policy.PolicyViewModel
+import com.example.workerapp.presentation.screens.profile.ProfileScreen
 import com.example.workerapp.presentation.screens.profile.ProfileViewModel
-import com.example.workerapp.presentation.screens.application.ApplicationsScreen
 import com.example.workerapp.presentation.screens.profile.detail.ProfileDetailScreen
 import com.example.workerapp.presentation.screens.profile.detail.ProfileDetailViewModel
 import com.example.workerapp.presentation.screens.review.ReviewScreen
 import com.example.workerapp.presentation.screens.review.ReviewViewModel
+import com.example.workerapp.presentation.screens.service.ServiceDetailScreen
+import com.example.workerapp.presentation.screens.service.ServiceViewModel
+import com.example.workerapp.presentation.screens.splash.SplashScreen
+import com.example.workerapp.ui.calendar.CalendarViewModel
+import com.example.workerapp.ui.detail.cleaning.CleaningViewModel
 import com.example.workerapp.ui.home.HomeViewModel
 import com.example.workerapp.utils.ServiceType
 
@@ -73,14 +75,14 @@ fun AppNavHost(
             RegisterScreen(navController = navController, viewModel = authViewModel)
         }
 
-        composable (AppRoutes.CHANGE_PASSWORD) {
+        composable(AppRoutes.CHANGE_PASSWORD) {
             val changePasswordViewModel = hiltViewModel<ChangePasswordViewModel>()
-            ChangePasswordScreen(navController = navController, viewmodel = changePasswordViewModel )
+            ChangePasswordScreen(navController = navController, viewmodel = changePasswordViewModel)
         }
 
-        composable (AppRoutes.FORGOT_PASSWORD) {
+        composable(AppRoutes.FORGOT_PASSWORD) {
             val forgotPasswordViewModel = hiltViewModel<ForgotPasswordViewModel>()
-            ForgotPasswordScreen(navController = navController, viewModel = forgotPasswordViewModel )
+            ForgotPasswordScreen(navController = navController, viewModel = forgotPasswordViewModel)
         }
 
         composable(AppRoutes.HOME) {
@@ -111,9 +113,9 @@ fun AppNavHost(
             )
         }
 
-        composable  (AppRoutes.PROFILE_DETAIL){
+        composable(AppRoutes.PROFILE_DETAIL) {
             val profileDetailViewModel = hiltViewModel<ProfileDetailViewModel>()
-            ProfileDetailScreen(navController = navController, viewModel =  profileDetailViewModel)
+            ProfileDetailScreen(navController = navController, viewModel = profileDetailViewModel)
         }
 
         composable(
@@ -203,7 +205,12 @@ fun AppNavHost(
             ReviewScreen(navController = navController, viewModel = reviewViewModel)
         }
 
-        composable (AppRoutes.MAP_SCREEN) {
+        composable(AppRoutes.POLICY_SCREEN) {
+            val policyViewModel = hiltViewModel<PolicyViewModel>()
+            PolicyScreen(viewModel = policyViewModel, navController = navController)
+        }
+
+        composable(AppRoutes.MAP_SCREEN) {
             MapScreen(navController = navController)
         }
     }

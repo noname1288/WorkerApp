@@ -4,12 +4,11 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.workerapp.data.JobServiceRepository
-import com.example.workerapp.data.UserRepository
-import com.example.workerapp.data.source.remote.dto.NetworkResult
-import com.example.workerapp.data.source.remote.dto.request.ApplicationRequest
 import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
 import com.example.workerapp.data.source.model.cleaning.CleaningServiceModel
 import com.example.workerapp.data.source.remote.JobRemoteImpl
+import com.example.workerapp.data.source.remote.dto.NetworkResult
+import com.example.workerapp.data.source.remote.dto.request.ApplicationRequest
 import com.example.workerapp.utils.ServiceType
 import com.example.workerapp.utils.cached.UserSession
 import dagger.hilt.android.lifecycle.HiltViewModel

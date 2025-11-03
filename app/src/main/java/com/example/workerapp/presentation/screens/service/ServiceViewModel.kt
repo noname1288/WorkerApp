@@ -2,9 +2,9 @@ package com.example.workerapp.presentation.screens.service
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.workerapp.data.source.remote.dto.NetworkResult
 import com.example.workerapp.data.source.model.base.JobModel1
 import com.example.workerapp.data.source.remote.JobRemoteImpl
+import com.example.workerapp.data.source.remote.dto.NetworkResult
 import com.example.workerapp.utils.ServiceType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

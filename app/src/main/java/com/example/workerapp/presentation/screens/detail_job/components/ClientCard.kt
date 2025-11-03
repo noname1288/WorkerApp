@@ -40,7 +40,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.workerapp.R
 import com.example.workerapp.data.source.model.base.UserModel
-import com.example.workerapp.utils.ext.openGoogleMap
 
 @Composable
 fun ClientCard(user: UserModel, onAddressClick: () -> Unit = {}) {

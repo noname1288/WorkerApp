@@ -1,7 +1,6 @@
 package com.example.workerapp.data.source.model.maintenance
 
 import androidx.room.Entity
-import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.example.workerapp.utils.ServiceType
 import com.squareup.moshi.JsonClass

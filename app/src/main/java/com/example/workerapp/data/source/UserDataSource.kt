@@ -9,11 +9,9 @@ import com.example.workerapp.data.source.remote.dto.request.UserLoginRequest
 import com.example.workerapp.data.source.remote.dto.request.UserLoginWithGGRequest
 import com.example.workerapp.data.source.remote.dto.request.UserRegisterRequest
 import com.example.workerapp.data.source.remote.dto.request.UserUpdateRequest
-import com.example.workerapp.data.source.remote.dto.response.UploadingImageResponse
 import com.example.workerapp.data.source.remote.dto.response.UserWrapperResponse
 import kotlinx.coroutines.flow.Flow
 import okhttp3.MultipartBody
-import retrofit2.Response
 
 interface UserDataSource {
     /* *

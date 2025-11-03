@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Map
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
@@ -27,7 +26,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -40,7 +38,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.workerapp.R
 import com.example.workerapp.presentation.screens.profile.detail.MapResult
-import com.example.workerapp.utils.ext.openGoogleMap
 import com.example.workerapp.utils.ext.popBackIfCan
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority

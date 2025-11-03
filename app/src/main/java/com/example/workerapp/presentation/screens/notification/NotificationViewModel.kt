@@ -3,7 +3,6 @@ package com.example.workerapp.presentation.screens.notification
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.workerapp.data.NotificationRepository
-import com.example.workerapp.data.repository.NotificationRepositoryImpl
 import com.example.workerapp.data.source.model.NotificationItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

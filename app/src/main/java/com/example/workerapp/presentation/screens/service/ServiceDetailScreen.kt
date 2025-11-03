@@ -36,9 +36,9 @@ import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
 import com.example.workerapp.data.source.model.healthcare.HealthcareJobModel
 import com.example.workerapp.data.source.model.maintenance.MaintenanceJobResponse
 import com.example.workerapp.navigation.AppRoutes
-import com.example.workerapp.ui.home.components.CleaningJobCard
 import com.example.workerapp.presentation.screens.home.components.HealthcareJobCard
 import com.example.workerapp.presentation.screens.home.components.MaintenanceJobCard
+import com.example.workerapp.ui.home.components.CleaningJobCard
 import com.example.workerapp.utils.ServiceType
 import com.example.workerapp.utils.components.CircleLoadingIndicator
 import com.example.workerapp.utils.ext.navigateWithArgs

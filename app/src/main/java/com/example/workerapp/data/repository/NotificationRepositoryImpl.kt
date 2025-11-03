@@ -3,7 +3,6 @@ package com.example.workerapp.data.repository
 import com.example.workerapp.data.NotificationRepository
 import com.example.workerapp.data.source.NotificationDataSource
 import com.example.workerapp.data.source.model.NotificationItem
-import com.example.workerapp.data.source.remote.NotificationRemoteImpl
 import com.example.workerapp.data.source.remote.dto.NetworkResult
 import javax.inject.Inject
 
