@@ -81,6 +81,7 @@ fun MaintenanceDetailScreen(
         when (applyState) {
             true -> {
                 Toast.makeText(context, "Ứng tuyển thành công!", Toast.LENGTH_LONG).show()
+                navController.popBackIfCan()
             }
 
             false -> {

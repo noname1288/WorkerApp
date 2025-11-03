@@ -1,4 +1,4 @@
-package com.example.workerapp.presentation.screens.detail_job.healcare
+package com.example.workerapp.presentation.screens.detail_job.healthcare
 
 import android.util.Log
 import android.widget.Toast
@@ -83,7 +83,7 @@ fun HealthcareDetailScreen(
         when (applyState) {
             true -> {
                 Toast.makeText(context, "Ứng tuyển thành công!", Toast.LENGTH_LONG).show()
-//                navController.popBackIfCan()
+                navController.popBackIfCan()
             }
 
             false -> {

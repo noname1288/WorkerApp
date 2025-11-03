@@ -5,6 +5,6 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class ReviewWrapperLayer(
-    val rating: Float,
+    val rating: Double,
     val reviews: List<ReviewModel>
 )

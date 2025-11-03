@@ -7,5 +7,5 @@ import com.squareup.moshi.JsonClass
 data class BaseReviewResponse(
     val success: Boolean,
     val message: String,
-    val experiences: List<ReviewResponse>
+    val experiences: ReviewResponse
 )

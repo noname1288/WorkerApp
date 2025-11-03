@@ -53,10 +53,15 @@ fun CleaningJobCard(
     onClick: () -> Unit = {}
 ) {
 
-    val iconJobInt = R.drawable.ic_cleaning_100
-    val iconJob = painterResource(iconJobInt)
-
-    val colorGreen = colorResource(R.color.green)
+    val imageResource = if (job.isCooking && job.isIroning){
+        R.drawable.all_cleaning
+    }else if (job.isCooking){
+        R.drawable.cooking_horizon
+    }else if (job.isIroning){
+        R.drawable.laundry_service
+    }else {
+        R.drawable.cleaning
+    }
 
     Card(
         modifier = modifier,
@@ -68,7 +73,7 @@ fun CleaningJobCard(
         Column(Modifier.padding(16.dp)) {
 
             Image(
-                painterResource(R.drawable.img_cleaning_service),
+                painterResource(imageResource),
                 contentDescription = "Cleaning Service Image",
                 modifier = Modifier
                     .fillMaxWidth()
@@ -91,6 +96,8 @@ fun CleaningJobCard(
                     modifier = Modifier.weight(1f)
                 )
 
+                Spacer(Modifier.width(4.dp))
+
                 CustomChip(status = job.status)
             }
 
@@ -100,8 +107,8 @@ fun CleaningJobCard(
             MetaRow(Icons.Outlined.PersonOutline, "Khách hàng: ${job.user.username}")
             MetaRow(Icons.Outlined.Accessibility, "Giới tính: ${job.user.gender}")
             MetaRow(Icons.Outlined.Event, "Ngày làm: " + job.listDays[0] + "  ·  " + job.startTime)
-            MetaRow(Icons.Outlined.AirportShuttle, "Giờ bắt đầu " + job.startTime)
-            MetaRow(Icons.Outlined.Schedule, "Tối đa: ${job.duration.workingHour} giờ")
+            MetaRow(Icons.Outlined.AirportShuttle, "Giờ bắt đầu: " + job.startTime)
+            MetaRow(Icons.Outlined.Schedule, "Thời gian tối đa: ${job.duration.workingHour} giờ")
             MetaRow(Icons.Outlined.Description, "${job.duration.description}")
 
 
@@ -120,8 +127,9 @@ fun CleaningJobCard(
                         painterResource(R.drawable.ic_ironing_100),
                         null,
                         tint = colorResource(R.color.orange_primary),
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(20.dp)
                     )
+                    Spacer(Modifier.width(8.dp))
                 }
                 if (job.isCooking) {
                     Icon(
@@ -161,45 +169,5 @@ fun MetaRow(image: ImageVector, text: String) {
             style = MaterialTheme.typography.bodyMedium,
             color = colorResource(R.color.subtext)
         )
-    }
-}
-
-@Preview
-@Composable
-fun prevJobCard() {
-    val currentTime = System.currentTimeMillis()
-
-    val cleaningJob = CleaningJobModel1(
-        uid = "EbduE5a5WVcFl2IVhdHb",
-        user = UserModel(
-            uid = "1V7M4UearWduxecpeigS9yXlxpv2",
-            gender = "Nam",
-            tel = "0123456789",
-            location = "Chưa cập nhật",
-            avatar = "https://res.cloudinary.com/dvofgx21o/image/upload/v1757499777/jobs/kvfljiervclampbfosyr.png",
-            username = "Phạm Thanh Sơn",
-            dob = "08/05/2007",
-            email = "sonpt2304@gmail.com",
-            role = "user"
-        ),
-        serviceType = "CLEANING",
-        price = 290000.0,
-        status = "Hiring",
-        location = "21°01'49.4\"N 105°51'08.3\"E",
-        isCooking = true,
-        isIroning = false,
-        listDays = listOf("24/09/2025", "26/09/2025", "29/09/2025"),
-        createdAt = "13/09/2025",
-        startTime = "18:42",
-        duration = DurationModel(
-            uid = "h2fbtVAtaPQSYtIUelnV",
-            workingHour = 3,
-            description = "Tối đa 85m2 hoặc 3 phòng",
-            fee = 288000.0
-        )
-    )
-
-    CleaningJobCard(job = cleaningJob) {
-
     }
 }

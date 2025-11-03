@@ -7,6 +7,6 @@ import com.squareup.moshi.JsonClass
 data class ReviewModel(
     val uid: String,
     val user: UserModel,
-    val rating: Float,
+    val rating: Double,
     val comment: String,
 )

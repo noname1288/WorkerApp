@@ -4,6 +4,7 @@ import com.example.workerapp.data.TokenRepository
 import com.example.workerapp.data.source.remote.adapter.JobModelAdapter
 import com.example.workerapp.data.source.remote.api.JobApi
 import com.example.workerapp.data.source.remote.api.NotificationApi
+import com.example.workerapp.data.source.remote.api.ReviewApi
 import com.example.workerapp.data.source.remote.api.ServiceApi
 import com.example.workerapp.data.source.remote.api.UserApi
 import com.example.workerapp.data.source.remote.interceptor.AuthInterceptor
@@ -19,6 +20,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import retrofit2.create
 import javax.inject.Singleton
 
 @Module
@@ -82,5 +84,10 @@ object NetworkModule {
     @Singleton
     fun provideNotificationApi(retrofit: Retrofit): NotificationApi =
         retrofit.create(NotificationApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideReviewApi(retrofit: Retrofit): ReviewApi =
+        retrofit.create(ReviewApi::class.java)
 }
 

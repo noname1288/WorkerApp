@@ -106,7 +106,12 @@ fun ServiceDetailScreen(
             ServiceUIState.Idle -> {}
 
             ServiceUIState.Loading -> {
-                CircleLoadingIndicator()
+                Box(
+                    Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircleLoadingIndicator()
+                }
             }
 
             is ServiceUIState.Success -> {

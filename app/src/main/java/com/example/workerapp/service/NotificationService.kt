@@ -29,7 +29,6 @@ class NotificationService : FirebaseMessagingService() {
         if (notificationItem != null) {
             showNotification(notificationItem.title ?: "My App", notificationItem.body ?: "My body")
         }
-
     }
 
     private fun showNotification(title: String, message: String) {

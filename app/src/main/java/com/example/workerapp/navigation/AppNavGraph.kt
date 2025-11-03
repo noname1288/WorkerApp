@@ -27,8 +27,8 @@ import com.example.workerapp.presentation.screens.change_password.ChangePassword
 import com.example.workerapp.ui.calendar.CalendarViewModel
 import com.example.workerapp.presentation.screens.detail_job.cleaning.CleaningDetailScreen
 import com.example.workerapp.ui.detail.cleaning.CleaningViewModel
-import com.example.workerapp.presentation.screens.detail_job.healcare.HealthcareDetailScreen
-import com.example.workerapp.presentation.screens.detail_job.healcare.HealthcareViewModel
+import com.example.workerapp.presentation.screens.detail_job.healthcare.HealthcareDetailScreen
+import com.example.workerapp.presentation.screens.detail_job.healthcare.HealthcareViewModel
 import com.example.workerapp.presentation.screens.detail_job.maintenance.MaintenanceDetailScreen
 import com.example.workerapp.presentation.screens.detail_job.maintenance.MaintenanceViewModel
 import com.example.workerapp.presentation.screens.forgot_password.ForgotPasswordScreen
@@ -42,6 +42,7 @@ import com.example.workerapp.presentation.screens.application.ApplicationsScreen
 import com.example.workerapp.presentation.screens.profile.detail.ProfileDetailScreen
 import com.example.workerapp.presentation.screens.profile.detail.ProfileDetailViewModel
 import com.example.workerapp.presentation.screens.review.ReviewScreen
+import com.example.workerapp.presentation.screens.review.ReviewViewModel
 import com.example.workerapp.ui.home.HomeViewModel
 import com.example.workerapp.utils.ServiceType
 
@@ -198,7 +199,8 @@ fun AppNavHost(
         }
 
         composable(AppRoutes.REVIEW_SCREEN) {
-            ReviewScreen(navController = navController)
+            val reviewViewModel = hiltViewModel<ReviewViewModel>()
+            ReviewScreen(navController = navController, viewModel = reviewViewModel)
         }
 
         composable (AppRoutes.MAP_SCREEN) {

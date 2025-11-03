@@ -125,7 +125,7 @@ class MaintenanceViewModel @Inject constructor(
                     }
                 }
             } catch (e: Exception) {
-                _applyState.value = true
+                _applyState.value = false
                 _uiState.value = MaintenanceDetailUIState.Error(e.message ?: "Unknown error")
             }
         }
