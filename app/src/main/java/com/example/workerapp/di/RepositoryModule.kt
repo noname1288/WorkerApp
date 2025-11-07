@@ -1,12 +1,14 @@
 package com.example.workerapp.di
 
 import com.example.workerapp.data.JobServiceRepository
+import com.example.workerapp.data.ChatRepository
 import com.example.workerapp.data.NotificationRepository
 import com.example.workerapp.data.ReviewRepository
 import com.example.workerapp.data.SystemRepository
 import com.example.workerapp.data.TokenRepository
 import com.example.workerapp.data.UserRepository
 import com.example.workerapp.data.repository.JobServiceRepositoryImpl
+import com.example.workerapp.data.repository.ChatRepositoryImpl
 import com.example.workerapp.data.repository.NotificationRepositoryImpl
 import com.example.workerapp.data.repository.ReviewRepositoryImpl
 import com.example.workerapp.data.repository.SystemRepositoryImpl
@@ -57,4 +59,10 @@ abstract class RepositoryModule{
     abstract fun bindSystemRepository(
         impl: SystemRepositoryImpl
     ) : SystemRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindMessageRepository(
+        impl: ChatRepositoryImpl
+    ) : ChatRepository
 }

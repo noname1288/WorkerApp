@@ -25,5 +25,6 @@
     <color name="bg1">#ADC5F6</color>
     <color name="bg2">#F5C1A7</color>
     <color name="bg3">#6B81F2</color>
-</resources>
+    <color name="blue_button">#5C7CFA</color>
+    </resources>
 

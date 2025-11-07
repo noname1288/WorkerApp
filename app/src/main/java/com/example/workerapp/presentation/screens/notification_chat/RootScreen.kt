@@ -1,4 +1,4 @@
-package com.example.workerapp.presentation.screens.notification
+package com.example.workerapp.presentation.screens.notification_chat
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -26,6 +26,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.workerapp.R
+import com.example.workerapp.presentation.screens.notification_chat.chat.ChatView
+import com.example.workerapp.presentation.screens.notification_chat.notification.NotificationView
 
 enum class NotificationDestinationType {
     Message, Notification
@@ -38,9 +40,9 @@ data class NotificationTabDestination(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotificationScreenRoot(
+fun ScreenRoot(
     modifier: Modifier = Modifier,
-    notificationViewModel: NotificationViewModel,
+    rootViewModel: RootViewModel,
     navController: NavController
 ) {
     val destinations = listOf(
@@ -101,12 +103,12 @@ fun NotificationScreenRoot(
             when (selectedDestination) {
                 0 -> {
                     NotificationView(
-                        viewModel = notificationViewModel,
+                        viewModel = rootViewModel,
                     )
                 }
 
                 1 -> {
-                    Text("Chat Screen")
+                    ChatView(navController = navController, viewModel = rootViewModel)
                 }
             }
         }

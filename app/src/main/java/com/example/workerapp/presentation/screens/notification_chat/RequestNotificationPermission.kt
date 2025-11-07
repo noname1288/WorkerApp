@@ -1,4 +1,4 @@
-package com.example.workerapp.presentation.screens.notification
+package com.example.workerapp.presentation.screens.notification_chat
 
 import android.os.Build
 import android.widget.Toast

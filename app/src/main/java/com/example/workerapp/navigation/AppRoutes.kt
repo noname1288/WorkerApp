@@ -6,6 +6,7 @@ object AppScreen{
     const val HEALTHCARE_SCREEN = "healthcare_detail"
     const val MAINTENANCE_SCREEN = "maintenance_detail"
     const val NOTIFICATION_SCREEN = "notification_detail"
+    const val CHAT_SCREEN = "chat_detail"
 }
 
 object DestinationArgs{
@@ -13,6 +14,10 @@ object DestinationArgs{
     const val JOB_ID = "jobId"
     const val ONLY_WATCH = "onlyWatch"
     const val NOTIFICATION_ID = "notificationId"
+    const val CHAT_ID = "chatId"
+    const val PARTNER_NAME = "partnerName"
+    const val PARTNER_AVATAR = "partnerAvt"
+
 }
 
 object AppRoutes {
@@ -34,7 +39,7 @@ object AppRoutes {
     const val CLEANING_DETAIL = "${AppScreen.CLEANING_SCREEN}/%s/%b"
     const val HEALTHCARE_DETAIL = "${AppScreen.HEALTHCARE_SCREEN}/%s/%b"
     const val MAINTENANCE_DETAIL = "${AppScreen.MAINTENANCE_SCREEN}/%s/%b"
-    const val NOTIFICATION_DETAIL = "${AppScreen.NOTIFICATION_SCREEN}/%s"
+    const val CHAT_DETAIL = "${AppScreen.CHAT_SCREEN}/%s/%s/%s"
 
     const val LIST_APPLICATIONS = "list_applications"
 

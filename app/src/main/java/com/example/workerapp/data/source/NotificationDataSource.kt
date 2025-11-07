@@ -8,6 +8,10 @@ interface NotificationDataSource {
     /* *
     * Local
     * */
+    interface Local{
+        suspend fun saveNotifications(notifications: List<NotificationItem>)
+    }
+
 
     /* *
      * Remote

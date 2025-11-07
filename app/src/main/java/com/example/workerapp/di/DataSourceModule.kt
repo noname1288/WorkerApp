@@ -2,6 +2,7 @@ package com.example.workerapp.di
 
 import com.example.workerapp.data.source.JobDataSource
 import com.example.workerapp.data.source.JobServiceDataSource
+import com.example.workerapp.data.source.MessageDataSource
 import com.example.workerapp.data.source.NotificationDataSource
 import com.example.workerapp.data.source.TokenDataSource
 import com.example.workerapp.data.source.UserDataSource
@@ -10,6 +11,7 @@ import com.example.workerapp.data.source.local.TokenLocalImpl
 import com.example.workerapp.data.source.local.UserLocalImpl
 import com.example.workerapp.data.source.remote.JobRemoteImpl
 import com.example.workerapp.data.source.remote.JobServiceRemoteImpl
+import com.example.workerapp.data.source.remote.MessageRemoteImpl
 import com.example.workerapp.data.source.remote.NotificationRemoteImpl
 import com.example.workerapp.data.source.remote.UserRemoteImpl
 import dagger.Binds
@@ -68,5 +70,11 @@ abstract class DataSourceModule{
     abstract fun bindNotificationRemote(
         impl: NotificationRemoteImpl
     ) : NotificationDataSource.Remote
+
+    @Binds
+    @Singleton
+    abstract fun bindMessageRemote(
+        impl: MessageRemoteImpl
+    ) : MessageDataSource.Remote
 
 }

@@ -1,4 +1,4 @@
-package com.example.workerapp.presentation.screens.notification
+package com.example.workerapp.presentation.screens.notification_chat.notification
 
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -12,9 +12,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,6 +37,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.workerapp.R
 import com.example.workerapp.data.source.model.NotificationItem
+import com.example.workerapp.presentation.screens.notification_chat.NotificationUiState
+import com.example.workerapp.presentation.screens.notification_chat.RootViewModel
 import com.example.workerapp.utils.components.CircleLoadingIndicator
 
 
@@ -40,12 +46,12 @@ import com.example.workerapp.utils.components.CircleLoadingIndicator
 @Composable
 fun NotificationView(
     modifier: Modifier = Modifier,
-    viewModel: NotificationViewModel,
+    viewModel: RootViewModel,
 ) {
     val context = LocalContext.current
 
-    val uiState by viewModel.uiState.collectAsState()
-    val listItems by viewModel.listItems.collectAsState()
+    val uiState by viewModel.notificationUiState.collectAsState()
+    val listItems by viewModel.listNoti.collectAsState()
 
     var showDialog by remember { mutableStateOf(false) }
     var temp by remember { mutableStateOf<NotificationItem?>(null) }
@@ -132,13 +138,14 @@ fun NotificationView(
 
 @Composable
 fun NotificationItemRow(item: NotificationItem = NotificationItem(), onClick: () -> Unit) {
-    val isReadColor = if (item.isRead) colorResource(R.color.bg_gray) else Color.White
+    val hasRead = item.isRead
 
     Row(
         Modifier
             .fillMaxWidth()
-            .background(isReadColor)
-            .clickable { onClick() }
+            .background(Color.White)
+            .clickable { onClick() },
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Column(
             Modifier
@@ -157,7 +164,9 @@ fun NotificationItemRow(item: NotificationItem = NotificationItem(), onClick: ()
 
             Text(
                 item.content,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontWeight = if (hasRead) FontWeight.Normal else FontWeight.Bold
+                ),
                 maxLines = 1
             )
 
@@ -165,8 +174,19 @@ fun NotificationItemRow(item: NotificationItem = NotificationItem(), onClick: ()
 
             Text(
                 item.createdAt,
-                style = MaterialTheme.typography.bodyMedium.copy(color = colorResource(R.color.subtext))
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = colorResource(R.color.subtext),
+                    fontWeight = if (hasRead) FontWeight.Normal else FontWeight.Bold
+                )
             )
         }
+
+        if (!hasRead)
+            Box {
+                Icon(
+                    Icons.Default.Circle, null, tint = colorResource(R.color.light_orange_icon),
+                    modifier = Modifier.size(8.dp).padding(end = 8.dp)
+                )
+            }
     }
 }

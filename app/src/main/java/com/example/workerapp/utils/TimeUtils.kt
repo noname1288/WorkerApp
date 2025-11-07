@@ -1,6 +1,7 @@
 package com.example.workerapp.utils
 
 import com.example.workerapp.utils.components.MonthWithDays
+import java.text.SimpleDateFormat
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
@@ -8,6 +9,9 @@ import java.time.LocalTime
 import java.time.YearMonth
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 object TimeUtils {
@@ -40,6 +44,44 @@ object TimeUtils {
             hours >= 1 -> "Còn $hours giờ"
             minutes >= 1 -> "Còn $minutes phút"
             else -> "Ngay bây giờ"
+        }
+    }
+
+    fun formatMessageTime(timestamp: Long): String {
+        val now = Calendar.getInstance()
+        val messageTime = Calendar.getInstance().apply {
+            timeInMillis = timestamp
+        }
+
+        val diffInMillis = now.timeInMillis - messageTime.timeInMillis
+        val diffInDays = diffInMillis / (1000 * 60 * 60 * 24)
+
+        val isSameDay = now.get(Calendar.YEAR) == messageTime.get(Calendar.YEAR) &&
+                now.get(Calendar.DAY_OF_YEAR) == messageTime.get(Calendar.DAY_OF_YEAR)
+
+        return when {
+            // 🔹 Nếu trong ngày → hiển thị giờ:phút (vd: 14:35)
+            isSameDay -> {
+                SimpleDateFormat("HH:mm", Locale.getDefault()).format(messageTime.time)
+            }
+
+            // 🔹 Nếu trong tuần (7 ngày gần nhất) → hiển thị Thứ (T2, T3,..., CN)
+            diffInDays in 1..6 -> {
+                when (messageTime.get(Calendar.DAY_OF_WEEK)) {
+                    Calendar.MONDAY -> "T2"
+                    Calendar.TUESDAY -> "T3"
+                    Calendar.WEDNESDAY -> "T4"
+                    Calendar.THURSDAY -> "T5"
+                    Calendar.FRIDAY -> "T6"
+                    Calendar.SATURDAY -> "T7"
+                    else -> "CN"
+                }
+            }
+
+            // 🔹 Nếu quá 1 tuần → hiển thị ngày/tháng (vd: 03/11)
+            else -> {
+                SimpleDateFormat("dd/MM", Locale.getDefault()).format(messageTime.time)
+            }
         }
     }
 

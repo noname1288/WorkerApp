@@ -30,8 +30,10 @@ import com.example.workerapp.presentation.screens.forgot_password.ForgotPassword
 import com.example.workerapp.presentation.screens.home.HomeScreen
 import com.example.workerapp.presentation.screens.income.IncomeScreen
 import com.example.workerapp.presentation.screens.map.MapScreen
-import com.example.workerapp.presentation.screens.notification.NotificationScreenRoot
-import com.example.workerapp.presentation.screens.notification.NotificationViewModel
+import com.example.workerapp.presentation.screens.notification_chat.RootViewModel
+import com.example.workerapp.presentation.screens.notification_chat.ScreenRoot
+import com.example.workerapp.presentation.screens.notification_chat.chat.ChatDetailScreen
+import com.example.workerapp.presentation.screens.notification_chat.chat.ChatDetailViewModel
 import com.example.workerapp.presentation.screens.policy.PolicyScreen
 import com.example.workerapp.presentation.screens.policy.PolicyViewModel
 import com.example.workerapp.presentation.screens.profile.ProfileScreen
@@ -47,6 +49,8 @@ import com.example.workerapp.ui.calendar.CalendarViewModel
 import com.example.workerapp.ui.detail.cleaning.CleaningViewModel
 import com.example.workerapp.ui.home.HomeViewModel
 import com.example.workerapp.utils.ServiceType
+import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
@@ -54,7 +58,7 @@ fun AppNavHost(
     navController: NavHostController,
     authViewModel: AuthViewModel,
     profileViewModel: ProfileViewModel,
-    notificationViewModel: NotificationViewModel,
+    rootViewModel: RootViewModel,
     startDestination: String,
     innerPadding: PaddingValues
 ) {
@@ -100,8 +104,9 @@ fun AppNavHost(
             IncomeScreen()
         }
         composable(AppRoutes.NOTIFICATION) {
-            NotificationScreenRoot(
-                notificationViewModel = notificationViewModel,
+
+            ScreenRoot(
+                rootViewModel = rootViewModel,
                 navController = navController
             )
         }
@@ -208,6 +213,35 @@ fun AppNavHost(
         composable(AppRoutes.POLICY_SCREEN) {
             val policyViewModel = hiltViewModel<PolicyViewModel>()
             PolicyScreen(viewModel = policyViewModel, navController = navController)
+        }
+
+        composable(
+            route = "${AppScreen.CHAT_SCREEN}/{${DestinationArgs.CHAT_ID}}/{${DestinationArgs.PARTNER_NAME}}/{${DestinationArgs.PARTNER_AVATAR}}",
+            arguments = listOf(
+                navArgument(DestinationArgs.CHAT_ID) { type = NavType.StringType },
+                navArgument(DestinationArgs.PARTNER_NAME) { type = NavType.StringType },
+                navArgument(DestinationArgs.PARTNER_AVATAR) { type = NavType.StringType }
+            )
+        ) {
+            val chatId = it.arguments?.getString(DestinationArgs.CHAT_ID) ?: ""
+            val partnerName = URLDecoder.decode(
+                it.arguments?.getString(DestinationArgs.PARTNER_NAME) ?: "",
+                StandardCharsets.UTF_8.toString()
+            )
+            val partnerAvatar = URLDecoder.decode(
+                it.arguments?.getString(DestinationArgs.PARTNER_AVATAR) ?: "",
+                StandardCharsets.UTF_8.toString()
+            )
+
+            val chatDetailViewModel = hiltViewModel<ChatDetailViewModel>()
+
+            ChatDetailScreen(
+                navController = navController,
+                roomId = chatId,
+                partnerName = partnerName,
+                partnerAvatar = partnerAvatar,
+                viewModel = chatDetailViewModel
+            )
         }
 
         composable(AppRoutes.MAP_SCREEN) {

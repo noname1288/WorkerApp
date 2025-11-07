@@ -1,5 +1,6 @@
 package com.example.workerapp.ui.base
 
+import android.content.Intent
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -33,6 +34,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.workerapp.R
@@ -40,14 +43,18 @@ import com.example.workerapp.navigation.AppNavHost
 import com.example.workerapp.navigation.AppRoutes
 import com.example.workerapp.navigation.NavItem
 import com.example.workerapp.presentation.screens.authen.AuthViewModel
-import com.example.workerapp.presentation.screens.notification.NotificationViewModel
+import com.example.workerapp.presentation.screens.notification_chat.RootViewModel
 import com.example.workerapp.presentation.screens.profile.ProfileViewModel
+import com.example.workerapp.service.NotificationService
+import com.example.workerapp.utils.ext.navigateWithArgs
 import com.example.workerapp.utils.ext.safeNavigate
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
-fun BaseScreen() {
+fun BaseScreen( navController: NavHostController) {
 
     val startDestination = AppRoutes.SPLASH
 
@@ -58,7 +65,6 @@ fun BaseScreen() {
         AppRoutes.PROFILE
     )
 
-    val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
@@ -71,12 +77,12 @@ fun BaseScreen() {
     * */
     val authViewModel = hiltViewModel<AuthViewModel>()
     val profileViewModel = hiltViewModel<ProfileViewModel>()
-    val notificationViewModel = hiltViewModel<NotificationViewModel>()
+    val rootViewModel = hiltViewModel<RootViewModel>()
 
     val systemUiController = rememberSystemUiController()
     val useDarkIcons = true // vì nền trắng nên dùng icon tối
 
-    val hasUnreadNotification by notificationViewModel.hasUnread.collectAsState()
+    val hasUnreadNotification by rootViewModel.hasUnread.collectAsState()
 
     SideEffect {
         systemUiController.setSystemBarsColor(
@@ -107,7 +113,7 @@ fun BaseScreen() {
             navController,
             authViewModel,
             profileViewModel,
-            notificationViewModel,
+            rootViewModel,
             startDestination,
             innerPadding
         )

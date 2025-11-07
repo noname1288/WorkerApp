@@ -3,6 +3,7 @@ package com.example.workerapp.di
 import com.example.workerapp.data.TokenRepository
 import com.example.workerapp.data.source.remote.adapter.JobModelAdapter
 import com.example.workerapp.data.source.remote.api.JobApi
+import com.example.workerapp.data.source.remote.api.MessageApi
 import com.example.workerapp.data.source.remote.api.NotificationApi
 import com.example.workerapp.data.source.remote.api.PolicyApi
 import com.example.workerapp.data.source.remote.api.ReviewApi
@@ -11,6 +12,8 @@ import com.example.workerapp.data.source.remote.api.UserApi
 import com.example.workerapp.data.source.remote.interceptor.AuthInterceptor
 import com.example.workerapp.data.source.remote.interceptor.TokenAuthenticator
 import com.example.workerapp.utils.Constant
+import com.example.workerapp.utils.annotation.HelpoApi
+import com.example.workerapp.utils.annotation.MessagingApi
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -48,9 +51,10 @@ object NetworkModule {
             .authenticator(tokenAuthenticator)
             .build()
 
+    @HelpoApi
     @Provides
     @Singleton
-    fun provideRetrofit(
+    fun provideHelpoRetrofit(
         moshi: Moshi,
         okHttpClient: OkHttpClient
     ): Retrofit =
@@ -67,31 +71,31 @@ object NetworkModule {
     * */
     @Provides
     @Singleton
-    fun provideJobApi(retrofit: Retrofit): JobApi =
+    fun provideJobApi(@HelpoApi retrofit: Retrofit): JobApi =
         retrofit.create(JobApi::class.java)
 
     @Provides
     @Singleton
-    fun provideUserApi(retrofit: Retrofit): UserApi =
+    fun provideUserApi(@HelpoApi retrofit: Retrofit): UserApi =
         retrofit.create(UserApi::class.java)
 
     @Provides
     @Singleton
-    fun provideServiceApi(retrofit: Retrofit): ServiceApi =
+    fun provideServiceApi(@HelpoApi retrofit: Retrofit): ServiceApi =
         retrofit.create(ServiceApi::class.java)
 
     @Provides
     @Singleton
-    fun provideNotificationApi(retrofit: Retrofit): NotificationApi =
+    fun provideNotificationApi(@HelpoApi retrofit: Retrofit): NotificationApi =
         retrofit.create(NotificationApi::class.java)
 
     @Provides
     @Singleton
-    fun provideReviewApi(retrofit: Retrofit): ReviewApi =
+    fun provideReviewApi(@HelpoApi retrofit: Retrofit): ReviewApi =
         retrofit.create(ReviewApi::class.java)
 
     @Provides
     @Singleton
-    fun providePolicyApi(retrofit: Retrofit): PolicyApi =
+    fun providePolicyApi(@HelpoApi retrofit: Retrofit): PolicyApi =
         retrofit.create(PolicyApi::class.java)
 }
