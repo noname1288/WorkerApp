@@ -2,7 +2,7 @@ package com.example.workerapp.data.source.remote
 
 import android.util.Log
 import com.example.workerapp.data.source.NotificationDataSource
-import com.example.workerapp.data.source.model.NotificationItem
+import com.example.workerapp.data.source.model.NotificationItemModel
 import com.example.workerapp.data.source.remote.api.NotificationApi
 import com.example.workerapp.data.source.remote.dto.NetworkResult
 import com.example.workerapp.data.source.remote.dto.response.ApiErrorResponse
@@ -15,7 +15,7 @@ class NotificationRemoteImpl @Inject constructor(
 ) : NotificationDataSource.Remote {
     private val errorAdapter = moshi.adapter(ApiErrorResponse::class.java)
 
-    override suspend fun getNotifications(): NetworkResult<List<NotificationItem>> {
+    override suspend fun getNotifications(): NetworkResult<List<NotificationItemModel>> {
         val response = notificationApi.getAllNotifications()
 
         return if (response.isSuccessful) {

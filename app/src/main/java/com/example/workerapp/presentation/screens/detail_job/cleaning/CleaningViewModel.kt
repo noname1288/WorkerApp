@@ -23,7 +23,7 @@ class CleaningViewModel @Inject constructor(
     private val cleaningRemoteImpl: JobRemoteImpl
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<CleaningUiState>(CleaningUiState.Idle)
+    private val _uiState = MutableStateFlow(CleaningUiState())
     val uiState: StateFlow<CleaningUiState> = _uiState
 
     private val _applyState = MutableStateFlow<Boolean?>(null)
@@ -31,30 +31,40 @@ class CleaningViewModel @Inject constructor(
 
     fun fetchJobDetail(uid: String) {
         if (uid.isEmpty()) {
-            _uiState.value = CleaningUiState.Error("Invalid job ID")
+            _uiState.value = _uiState.value.copy(error = "Invalid job ID")
             return
         }
+
         viewModelScope.launch {
-            _uiState.value = CleaningUiState.Loading
+            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
 
-            var services = emptyList<CleaningServiceModel>()
-            val servicesResult = jobServiceRepository.getCleaningServices()
-            servicesResult.onSuccess {
-                services = it
-                Log.d("CleaningViewModel", "Fetched services: $it")
-            }.onFailure {
-                Log.e("CleaningViewModel", "Failed to fetch services: ${it.message}")
-            }
+            try {
+                // Fetch cleaning services
+                val servicesResult = jobServiceRepository.getCleaningServices()
+                val services = servicesResult.getOrNull() ?: emptyList()
 
-            val resultJob = cleaningRemoteImpl.getCleaningDetail(uid)
-            when (resultJob) {
-                is NetworkResult.Success -> {
-                    _uiState.value = CleaningUiState.Success(resultJob.data, services)
+                // Fetch job detail
+                when (val resultJob = cleaningRemoteImpl.getCleaningDetail(uid)) {
+                    is NetworkResult.Success -> {
+                        _uiState.value = CleaningUiState(
+                            job = resultJob.data,
+                            services = services,
+                            isLoading = false
+                        )
+                    }
+
+                    is NetworkResult.Error -> {
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            error = resultJob.message
+                        )
+                    }
                 }
-
-                is NetworkResult.Error -> {
-                    _uiState.value = CleaningUiState.Error(resultJob.message)
-                }
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    error = e.localizedMessage ?: "Unexpected error"
+                )
             }
         }
     }
@@ -65,46 +75,40 @@ class CleaningViewModel @Inject constructor(
 
     fun applyToJob(uid: String) {
         if (uid.isEmpty()) {
-            _uiState.value = CleaningUiState.Error("Invalid job ID")
+            _uiState.value = _uiState.value.copy(error = "Invalid job ID")
             return
         }
+
         viewModelScope.launch {
-            _uiState.value = CleaningUiState.Loading
             try {
+                _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+
                 val request = ApplicationRequest(
                     workerID = UserSession.uid,
                     jobID = uid,
                     serviceType = ServiceType.CleaningType
                 )
 
-                Log.d("CleaningViewModel", "Applying with request: $request")
-
                 val result = cleaningRemoteImpl.applyForJob(request)
-                when (result) {
-                    is NetworkResult.Success -> {
-                        _applyState.value = true
-                    }
-
-
-                    is NetworkResult.Error -> {
-                        _applyState.value = false
-                        _uiState.value = CleaningUiState.Error(result.message)
-                    }
+                if (result is NetworkResult.Success) {
+                    _applyState.value = true
+                } else if (result is NetworkResult.Error) {
+                    _applyState.value = false
+                    _uiState.value = _uiState.value.copy(error = result.message)
                 }
             } catch (e: Exception) {
                 _applyState.value = false
-                _uiState.value = CleaningUiState.Error(e.message ?: "Unknown error")
+                _uiState.value = _uiState.value.copy(error = e.localizedMessage ?: "Unknown error")
+            } finally {
+                _uiState.value = _uiState.value.copy(isLoading = false)
             }
         }
     }
 }
 
-sealed class CleaningUiState {
-    object Loading : CleaningUiState()
-    object Idle : CleaningUiState()
-    data class Success(val job: CleaningJobModel1, val services: List<CleaningServiceModel>) :
-        CleaningUiState()
-
-    data class Error(val message: String) : CleaningUiState()
-}
-
+data class CleaningUiState(
+    val isLoading: Boolean = false,
+    val job: CleaningJobModel1? = null,
+    val services: List<CleaningServiceModel> = emptyList(),
+    val error: String? = null
+)

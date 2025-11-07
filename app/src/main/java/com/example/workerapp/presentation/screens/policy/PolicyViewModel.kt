@@ -7,6 +7,7 @@ import com.example.workerapp.data.source.remote.dto.NetworkResult
 import com.example.workerapp.data.source.remote.dto.response.PolicyResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -14,32 +15,34 @@ import javax.inject.Inject
 @HiltViewModel
 class PolicyViewModel @Inject constructor(
     private val systemRepository: SystemRepository
-): ViewModel(){
+) : ViewModel() {
+
     private val _policy = MutableStateFlow<PolicyResponse?>(null)
-    val policy = _policy.asStateFlow()
+    val policy: StateFlow<PolicyResponse?> = _policy
 
     private val _loading = MutableStateFlow(false)
-    val loading = _loading.asStateFlow()
+    val loading: StateFlow<Boolean> = _loading
+
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error
 
     init {
-        fetchPolicy()
+        fetchPolicies()
     }
 
-    fun fetchPolicy(){
+    fun fetchPolicies() {
         viewModelScope.launch {
             _loading.value = true
-
-            val result = systemRepository.getPolicies()
-            when(result){
-                is NetworkResult.Error -> {
-                    _loading.value = false
-                }
-                is NetworkResult.Success<PolicyResponse> -> {
+            when (val result = systemRepository.getPolicies()) {
+                is NetworkResult.Success -> {
                     _policy.value = result.data
-                    _loading.value = false
+                }
+                is NetworkResult.Error -> {
+                    _error.value = result.message
                 }
             }
+            _loading.value = false
         }
     }
-
 }
+

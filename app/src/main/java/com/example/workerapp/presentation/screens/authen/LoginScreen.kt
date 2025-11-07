@@ -195,30 +195,30 @@ fun LoginScreen(
             /*
             * Business Logic: Worker can't create new account by yourself
             * */
-            Text(
-                text = stringResource(R.string.register_action),
-                fontSize = 14.sp,
-                fontStyle = FontStyle.Italic,
-                color = colorResource(R.color.orange_primary),
-            )
+//            Text(
+//                text = stringResource(R.string.register_action),
+//                fontSize = 14.sp,
+//                fontStyle = FontStyle.Italic,
+//                color = colorResource(R.color.orange_primary),
+//            )
         }
 
         Spacer(Modifier.height(32.dp))
 
-        GoogleSignInButton {
-            val request = viewModel.request
-            activity.lifecycleScope.launch {
-                try {
-                    val result = credentialManager.getCredential(
-                        context = activity,
-                        request = request
-                    )
-                    viewModel.onGoogleSignInSuccess(result)
-                } catch (e: Exception) {
-                    viewModel.onGoogleSignInError(e)
-                }
-            }
-        }
+//        GoogleSignInButton {
+//            val request = viewModel.request
+//            activity.lifecycleScope.launch {
+//                try {
+//                    val result = credentialManager.getCredential(
+//                        context = activity,
+//                        request = request
+//                    )
+//                    viewModel.onGoogleSignInSuccess(result)
+//                } catch (e: Exception) {
+//                    viewModel.onGoogleSignInError(e)
+//                }
+//            }
+//        }
     }
 
     when (loginState) {

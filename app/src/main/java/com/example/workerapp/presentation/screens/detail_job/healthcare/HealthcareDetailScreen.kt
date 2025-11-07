@@ -25,12 +25,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -59,7 +61,6 @@ sealed class HealthcareJobSection {
 
     object ActionButtons : HealthcareJobSection()
 }
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HealthcareDetailScreen(
@@ -72,12 +73,17 @@ fun HealthcareDetailScreen(
     val context = LocalContext.current
     val tag = "HealthcareDetailScreen"
 
-    var sections = listOf<HealthcareJobSection>()
-
     val uiState by viewModel.uiState.collectAsState()
     val applyState by viewModel.applyState.collectAsState()
+
     var confirmed by rememberSaveable { mutableStateOf(false) }
     var jobAddress by rememberSaveable { mutableStateOf("") }
+
+    LaunchedEffect(uiState.error) {
+        uiState.error?.let {
+            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+        }
+    }
 
     LaunchedEffect(applyState) {
         when (applyState) {
@@ -85,143 +91,126 @@ fun HealthcareDetailScreen(
                 Toast.makeText(context, "Ứng tuyển thành công!", Toast.LENGTH_LONG).show()
                 navController.popBackIfCan()
             }
-
             false -> {
                 viewModel.updateApplyState(null)
                 confirmed = false
             }
-
-            else -> {
-                viewModel.fetchJobDetail(healthcareUid)
-            }
+            null -> viewModel.fetchJobDetail(healthcareUid)
         }
     }
 
-    when (uiState) {
-        is HealthcareUiState.Success -> {
-            val job = (uiState as HealthcareUiState.Success).data
-            val serviceData = (uiState as HealthcareUiState.Success).serviceData
-            jobAddress = job.location
+    val job = uiState.job
+    val serviceData = uiState.serviceData
+    val isLoading = uiState.isLoading
 
-            sections = listOf(
+    val sections = remember(job, serviceData) {
+        if (job != null) {
+            jobAddress = job.location
+            listOf(
                 HealthcareJobSection.UserInfo(job.user),
                 HealthcareJobSection.JobDetails(job),
-                HealthcareJobSection.WeeklySchedule(
-                    days = job.listDays,
-                    isWeekly = job.listDays.size != 1
-                ),
+                HealthcareJobSection.WeeklySchedule(job.listDays, job.listDays.size > 1),
                 HealthcareJobSection.JobWorkflow(serviceData),
                 HealthcareJobSection.ActionButtons
             )
-        }
-
-        is HealthcareUiState.Error -> {
-            Toast.makeText(context, (uiState as HealthcareUiState.Error).message, Toast.LENGTH_LONG)
-                .show()
-        }
-
-        is HealthcareUiState.Loading -> {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircleLoadingIndicator()
-            }
-        }
-
-        HealthcareUiState.Idle -> {}
+        } else emptyList()
     }
 
     Column(modifier.fillMaxSize()) {
         CenterAlignedTopAppBar(
             title = {
-                Text(
-                    stringResource(R.string.job_detail_title),
-                    fontWeight = FontWeight.Bold
-                )
+                Text(stringResource(R.string.job_detail_title), fontWeight = FontWeight.Bold)
             },
             windowInsets = WindowInsets(0, 0, 0, 0),
             navigationIcon = {
-                IconButton(onClick = {
-                    navController.popBackIfCan()
-                }) {
-                    Icon(
-                        Icons.Default.ArrowBackIosNew, contentDescription = "Back",
-                        modifier = Modifier.size(20.dp)
-                    )
+                IconButton(onClick = { navController.popBackIfCan() }) {
+                    Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back", modifier = Modifier.size(20.dp))
                 }
             },
             actions = {
-                IconButton(onClick = {openGoogleMap(context, jobAddress)}) {
-                    Icon(Icons.Default.Map,
-                        contentDescription = "Go to Map",
-                        modifier = Modifier.size(20.dp))
+                IconButton(onClick = { openGoogleMap(context, jobAddress) }) {
+                    Icon(Icons.Default.Map, contentDescription = "Go to Map", modifier = Modifier.size(20.dp))
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
         )
 
-        LazyColumn(
-            Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp)
-        ) {
-            item {
-                Spacer(Modifier.height(16.dp))
+        when {
+            isLoading -> {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircleLoadingIndicator()
+                }
             }
 
-            sections.forEach { section ->
-                when (section) {
-                    is HealthcareJobSection.UserInfo -> {
-                        item {
-                            ClientCard(user = section.user, onAddressClick = {openGoogleMap(context, section.user.location)})
-                            Spacer(Modifier.height(12.dp))
-                        }
-                    }
+            job == null -> {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("Không tìm thấy công việc", color = colorResource(R.color.subtext))
+                }
+            }
 
-                    is HealthcareJobSection.JobDetails -> {
-                        item {
-                            JobDetailCard(section.job)
-                            Spacer(Modifier.height(12.dp))
-                        }
-                    }
+            else -> {
+                LazyColumn(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    item { Spacer(Modifier.height(16.dp)) }
 
-                    is HealthcareJobSection.WeeklySchedule -> {
-                        item {
-                            WeeklySchedule(section.days)
-                            Spacer(Modifier.height(12.dp))
-                        }
-                    }
-
-                    is HealthcareJobSection.JobWorkflow -> {
-                        item {
-                            section.serviceData.forEach { item ->
-
-                                HealthcareServiceItem(item.first, item.second)
-
-                                Spacer(Modifier.height(12.dp))
+                    sections.forEach { section ->
+                        when (section) {
+                            is HealthcareJobSection.UserInfo -> {
+                                item {
+                                    ClientCard(
+                                        user = section.user,
+                                        onAddressClick = { openGoogleMap(context, section.user.location) }
+                                    )
+                                    Spacer(Modifier.height(12.dp))
+                                }
                             }
 
-                            Spacer(Modifier.height(12.dp))
-                        }
-                    }
+                            is HealthcareJobSection.JobDetails -> {
+                                item {
+                                    JobDetailCard(section.job)
+                                    Spacer(Modifier.height(12.dp))
+                                }
+                            }
 
-                    is HealthcareJobSection.ActionButtons -> {
-                        item {
-                            if (!isOnlyWatch) {
-                                SlideToConfirmButton(
-                                    isConfirmed = confirmed,
-                                    onValueChange = {
-                                        confirmed = it
+                            is HealthcareJobSection.WeeklySchedule -> {
+                                item {
+                                    WeeklySchedule(section.days)
+                                    Spacer(Modifier.height(12.dp))
+                                }
+                            }
 
-                                        Log.d(tag, "HealthcareDetailScreen: $confirmed")
-                                        viewModel.applyToJob(healthcareUid)
+                            is HealthcareJobSection.JobWorkflow -> {
+                                item {
+                                    section.serviceData.forEach { pair ->
+                                        HealthcareServiceItem(pair.first, pair.second)
+                                        Spacer(Modifier.height(12.dp))
                                     }
-                                )
+                                    Spacer(Modifier.height(12.dp))
+                                }
                             }
-                            Spacer(Modifier.height(24.dp))
+
+                            is HealthcareJobSection.ActionButtons -> {
+                                item {
+                                    if (!isOnlyWatch) {
+                                        SlideToConfirmButton(
+                                            isConfirmed = confirmed,
+                                            onValueChange = {
+                                                confirmed = it
+                                                Log.d(tag, "Confirmed: $confirmed")
+                                                viewModel.applyToJob(healthcareUid)
+                                            }
+                                        )
+                                    }
+                                    Spacer(Modifier.height(24.dp))
+                                }
+                            }
                         }
                     }
                 }
             }
         }
     }
-
 }

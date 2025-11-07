@@ -24,8 +24,8 @@ class MaintenanceViewModel @Inject constructor(
     private val jobServiceRepository: JobServiceRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<MaintenanceDetailUIState>(MaintenanceDetailUIState.Idle)
-    val uiState: MutableStateFlow<MaintenanceDetailUIState> = _uiState
+    private val _uiState = MutableStateFlow(MaintenanceUiState())
+    val uiState: StateFlow<MaintenanceUiState> = _uiState
 
     private val _applyState = MutableStateFlow<Boolean?>(null)
     val applyState: StateFlow<Boolean?> = _applyState
@@ -36,55 +36,61 @@ class MaintenanceViewModel @Inject constructor(
 
     fun fetchJobDetail(uid: String) {
         if (uid.isEmpty()) {
-            _uiState.value = MaintenanceDetailUIState.Error("Invalid job ID")
+            _uiState.value = _uiState.value.copy(error = "Invalid job ID")
             return
         }
 
         viewModelScope.launch {
-            _uiState.value = MaintenanceDetailUIState.Loading
-
+            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
             try {
                 val result = jobRemoteImpl.getMaintenanceDetail(uid)
-
                 when (result) {
-                    is NetworkResult.Error -> {
-                        _uiState.value = MaintenanceDetailUIState.Error(result.message)
-                    }
-
                     is NetworkResult.Success -> {
                         val jobData = result.data
-                        val serviceWrapper = jobData.services
+                        val serviceData = fetchMaintenanceService(jobData.services)
+                        _uiState.value = MaintenanceUiState(
+                            job = jobData,
+                            services = serviceData,
+                            isLoading = false
+                        )
+                    }
 
-                        val serviceData = fetchMaintenanceService(serviceWrapper)
-
-                        _uiState.value = MaintenanceDetailUIState.Success(jobData, serviceData)
+                    is NetworkResult.Error -> {
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            error = result.message
+                        )
                     }
                 }
             } catch (e: Exception) {
-                _uiState.value = MaintenanceDetailUIState.Error(e.message ?: "Unknown error")
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    error = e.localizedMessage ?: "Unexpected error"
+                )
             }
         }
     }
 
-    suspend fun fetchMaintenanceService(serviceDtoList: List<MaintenanceServiceDto>): List<Pair<MaintenanceServiceModel, List<PowerWrapper>>> {
+    private suspend fun fetchMaintenanceService(
+        serviceDtoList: List<MaintenanceServiceDto>
+    ): List<Pair<MaintenanceServiceModel, List<PowerWrapper>>> {
         val mapData = mutableListOf<Pair<MaintenanceServiceModel, List<PowerWrapper>>>()
 
         for (item in serviceDtoList) {
             val service = jobServiceRepository.getMaintenanceServiceByUid(item.uid)
             val powerList = mutableListOf<PowerWrapper>()
 
-            item.powers.map { index ->
+            for (index in item.powers) {
                 val powerModelResult = jobServiceRepository.getPowerModelByUid(index.uid)
-
-                val powerWrapper = powerModelResult.onSuccess {
+                powerModelResult.onSuccess {
                     powerList.add(
                         PowerWrapper(
-                            it.uid,
-                            it.name,
-                            it.price,
-                            it.priceAction,
-                            index.quantity,
-                            index.quantityAction
+                            uid = it.uid,
+                            name = it.name,
+                            price = it.price,
+                            priceAction = it.priceAction,
+                            quantity = index.quantity,
+                            quantityAction = index.quantityAction
                         )
                     )
                 }.onFailure {
@@ -95,17 +101,17 @@ class MaintenanceViewModel @Inject constructor(
             mapData.add(Pair(service.getOrThrow(), powerList))
         }
 
-        return mapData.toList()
+        return mapData
     }
 
     fun applyToJob(uid: String) {
         if (uid.isEmpty()) {
-            _uiState.value = MaintenanceDetailUIState.Error("Invalid job ID")
+            _uiState.value = _uiState.value.copy(error = "Invalid job ID")
             return
         }
-        viewModelScope.launch {
-            _uiState.value = MaintenanceDetailUIState.Loading
 
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
             try {
                 val request = ApplicationRequest(
                     workerID = UserSession.uid,
@@ -114,31 +120,26 @@ class MaintenanceViewModel @Inject constructor(
                 )
 
                 val result = jobRemoteImpl.applyForJob(request)
-                when (result) {
-                    is NetworkResult.Success -> {
-                        _applyState.value = true
-                    }
-
-                    is NetworkResult.Error -> {
-                        _applyState.value = false
-                        _uiState.value = MaintenanceDetailUIState.Error(result.message)
-                    }
+                if (result is NetworkResult.Success) {
+                    _applyState.value = true
+                } else if (result is NetworkResult.Error) {
+                    _applyState.value = false
+                    _uiState.value = _uiState.value.copy(error = result.message)
                 }
             } catch (e: Exception) {
                 _applyState.value = false
-                _uiState.value = MaintenanceDetailUIState.Error(e.message ?: "Unknown error")
+                _uiState.value = _uiState.value.copy(error = e.localizedMessage ?: "Unknown error")
+            } finally {
+                _uiState.value = _uiState.value.copy(isLoading = false)
             }
         }
     }
 }
 
-sealed class MaintenanceDetailUIState {
-    object Loading : MaintenanceDetailUIState()
-    object Idle : MaintenanceDetailUIState()
-    data class Success(
-        val maintenanceJob: MaintenanceJobResponse,
-        val serviceData: List<Pair<MaintenanceServiceModel, List<PowerWrapper>>>
-    ) : MaintenanceDetailUIState()
+data class MaintenanceUiState(
+    val isLoading: Boolean = false,
+    val job: MaintenanceJobResponse? = null,
+    val services: List<Pair<MaintenanceServiceModel, List<PowerWrapper>>> = emptyList(),
+    val error: String? = null
+)
 
-    data class Error(val message: String) : MaintenanceDetailUIState()
-}

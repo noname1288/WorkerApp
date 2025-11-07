@@ -43,7 +43,7 @@ class JobServiceRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             // Nếu có exception → fallback vào local
             val cached = local.getCleaningServices()
-            if (cached.isNotEmpty()) {
+            if (!cached.isNullOrEmpty()) {
                 Result.success(cached)
             } else {
                 Result.failure(e)

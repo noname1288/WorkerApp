@@ -2,6 +2,7 @@ package com.example.workerapp.presentation.screens.policy
 
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -16,10 +17,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -32,11 +35,18 @@ import com.example.workerapp.utils.ext.popBackIfCan
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PolicyScreen(modifier: Modifier = Modifier, viewModel: PolicyViewModel, navController: NavController) {
+    val context = LocalContext.current
 
     val content by viewModel.policy.collectAsState()
     val loading by viewModel.loading.collectAsState()
 
+    val error by viewModel.error.collectAsState()
 
+    LaunchedEffect(error) {
+        error?.let {
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+        }
+    }
 
     Column(Modifier.fillMaxSize()) {
         CenterAlignedTopAppBar(
@@ -86,7 +96,5 @@ fun PolicyScreen(modifier: Modifier = Modifier, viewModel: PolicyViewModel, navC
                 }
             )
         }
-
-
     }
 }

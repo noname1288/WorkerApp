@@ -123,6 +123,24 @@ fun ReviewScreen(
                         Spacer(Modifier.height(16.dp))
                     }
 
+                    item {
+                        if (cleaningReviews == null && healthcareReviews == null && maintenanceReviews == null) {
+                            Box(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    "Chưa có đánh giá nào",
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        color = colorResource(R.color.subtext)
+                                    )
+                                )
+                            }
+                        }
+                    }
+
                     cleaningReviews?.let {
                         item {
                             ReviewHeaderRow(wrapper = it, title = "Đánh giá dịch vụ dọn dẹp")
@@ -139,7 +157,7 @@ fun ReviewScreen(
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
-                                        "Chưa có đánh giá nào",
+                                        "Chưa có đánh giá về dịch vụ này",
                                         style = MaterialTheme.typography.bodyMedium.copy(
                                             color = colorResource(R.color.subtext)
                                         )
@@ -179,7 +197,7 @@ fun ReviewScreen(
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
-                                        "Chưa có đánh giá nào",
+                                        "Chưa có đánh giá về dịch vụ này",
                                         style = MaterialTheme.typography.bodyMedium.copy(
                                             color = colorResource(R.color.subtext)
                                         )
@@ -219,7 +237,7 @@ fun ReviewScreen(
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
-                                        "Chưa có đánh giá nào",
+                                        "Chưa có đánh giá về dịch vụ này",
                                         style = MaterialTheme.typography.bodyMedium.copy(
                                             color = colorResource(R.color.subtext)
                                         )

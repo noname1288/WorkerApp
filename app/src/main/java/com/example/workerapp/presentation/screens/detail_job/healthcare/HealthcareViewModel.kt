@@ -16,14 +16,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
 @HiltViewModel
 class HealthcareViewModel @Inject constructor(
     private val jobServiceRepository: JobServiceRepository,
     private val healthcareRemoteImpl: JobRemoteImpl
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow<HealthcareUiState>(HealthcareUiState.Idle)
-    val uiState: MutableStateFlow<HealthcareUiState> = _uiState
+
+    private val _uiState = MutableStateFlow(HealthcareUiState())
+    val uiState: StateFlow<HealthcareUiState> = _uiState
 
     private val _applyState = MutableStateFlow<Boolean?>(null)
     val applyState: StateFlow<Boolean?> = _applyState
@@ -34,55 +34,66 @@ class HealthcareViewModel @Inject constructor(
 
     fun fetchJobDetail(uid: String) {
         if (uid.isEmpty()) {
-            _uiState.value = HealthcareUiState.Error("Invalid job ID")
+            _uiState.value = _uiState.value.copy(error = "Invalid job ID")
             return
         }
+
         viewModelScope.launch {
-            _uiState.value = HealthcareUiState.Loading
+            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+
             try {
                 val result = healthcareRemoteImpl.getHealthcareDetail(uid)
-
                 when (result) {
                     is NetworkResult.Success -> {
                         val job = result.data
-                        val serviceWrapper = job.services
-
-                        val fetchedService = fetchHealthcareServices(serviceWrapper)
-
-                        _uiState.value = HealthcareUiState.Success(result.data, fetchedService)
+                        val serviceData = fetchHealthcareServices(job.services)
+                        _uiState.value = HealthcareUiState(
+                            isLoading = false,
+                            job = job,
+                            serviceData = serviceData
+                        )
                     }
 
                     is NetworkResult.Error -> {
-                        _uiState.value = HealthcareUiState.Error(result.message)
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            error = result.message
+                        )
                     }
                 }
             } catch (e: Exception) {
-                _uiState.value = HealthcareUiState.Error(e.message ?: "Unknown error")
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    error = e.localizedMessage ?: "Unexpected error"
+                )
             }
         }
     }
 
-    suspend fun fetchHealthcareServices(serviceWrappers: List<HealthServiceWrapper>): List<Pair<HealthcareServiceModel, Int>> {
+    private suspend fun fetchHealthcareServices(
+        serviceWrappers: List<HealthServiceWrapper>
+    ): List<Pair<HealthcareServiceModel, Int>> {
         val healthcareServices = mutableListOf<Pair<HealthcareServiceModel, Int>>()
-
         for (index in serviceWrappers) {
             val res = jobServiceRepository.getHealthcareServiceByUid(index.uid)
-            res.onSuccess {
-                healthcareServices.add(it to index.quantity)
+            res.onSuccess { service ->
+                healthcareServices.add(service to index.quantity)
             }.onFailure {
-                throw Exception("Can't fetch healthcare service from local Storage in HealthcareViewModel")
+                throw Exception("Cannot fetch healthcare service: ${it.localizedMessage}")
             }
         }
-
         return healthcareServices
     }
 
     fun applyToJob(uid: String) {
         if (uid.isEmpty()) {
-            _uiState.value = HealthcareUiState.Error("Invalid job ID")
+            _uiState.value = _uiState.value.copy(error = "Invalid job ID")
             return
         }
+
         viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+
             try {
                 val request = ApplicationRequest(
                     workerID = UserSession.uid,
@@ -91,30 +102,25 @@ class HealthcareViewModel @Inject constructor(
                 )
 
                 val result = healthcareRemoteImpl.applyForJob(request)
-                when (result) {
-                    is NetworkResult.Success -> {
-                        _applyState.value = true
-                    }
-
-                    is NetworkResult.Error -> {
-                        _applyState.value = false
-                        _uiState.value = HealthcareUiState.Error(result.message)
-                    }
+                if (result is NetworkResult.Success) {
+                    _applyState.value = true
+                } else if (result is NetworkResult.Error) {
+                    _applyState.value = false
+                    _uiState.value = _uiState.value.copy(error = result.message)
                 }
             } catch (e: Exception) {
                 _applyState.value = false
-                _uiState.value = HealthcareUiState.Error(e.message ?: "Unknown error")
+                _uiState.value = _uiState.value.copy(error = e.localizedMessage ?: "Unknown error")
+            } finally {
+                _uiState.value = _uiState.value.copy(isLoading = false)
             }
         }
     }
 }
 
-sealed class HealthcareUiState {
-    object Loading : HealthcareUiState()
-    object Idle : HealthcareUiState()
-    data class Success(
-        val data: HealthcareJobModel,
-        val serviceData: List<Pair<HealthcareServiceModel, Int>>
-    ) : HealthcareUiState()
-    data class Error(val message: String) : HealthcareUiState()
-}
+data class HealthcareUiState(
+    val isLoading: Boolean = false,
+    val job: HealthcareJobModel? = null,
+    val serviceData: List<Pair<HealthcareServiceModel, Int>> = emptyList(),
+    val error: String? = null
+)

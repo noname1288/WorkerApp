@@ -2,26 +2,45 @@ package com.example.workerapp.data.repository
 
 import com.example.workerapp.data.NotificationRepository
 import com.example.workerapp.data.source.NotificationDataSource
-import com.example.workerapp.data.source.model.NotificationItem
+import com.example.workerapp.data.source.model.NotificationItemModel
 import com.example.workerapp.data.source.remote.dto.NetworkResult
 import javax.inject.Inject
 
 class NotificationRepositoryImpl @Inject constructor(
+    private val local: NotificationDataSource.Local,
     private val remote: NotificationDataSource.Remote
 ) : NotificationRepository {
-    override suspend fun getNotifications(): Result<List<NotificationItem>> {
+    override suspend fun getNotifications(): Result<List<NotificationItemModel>> {
         return try {
-            when (val response = remote.getNotifications()) {
+            val response = remote.getNotifications()
+            when (response) {
                 is NetworkResult.Success -> {
-                    Result.success(response.data)
+                    val notifications = response.data
+
+                    //Save to local
+                    local.saveNotifications(notifications)
+
+                    //Read from local
+                    val cached = local.getNotifications()
+                    Result.success(cached)
                 }
 
                 is NetworkResult.Error -> {
-                    Result.failure(Exception(response.message))
+                    val cached = local.getNotifications()
+                    if (cached.isNotEmpty()) {
+                        Result.success(cached)
+                    } else {
+                        Result.failure(Exception(response.message))
+                    }
                 }
             }
         } catch (e: Exception) {
-            Result.failure(e)
+            val cached = local.getNotifications()
+            if (!cached.isNullOrEmpty()) {
+                Result.success(cached)
+            } else {
+                Result.failure(e)
+            }
         }
     }
 

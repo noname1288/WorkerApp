@@ -30,6 +30,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -70,12 +71,17 @@ fun MaintenanceDetailScreen(
     val context = LocalContext.current
     val tag = "MaintenanceDetailScreen"
 
-    var sections = emptyList<MaintenanceJobSection>()
-
     val uiState by viewModel.uiState.collectAsState()
     val applyState by viewModel.applyState.collectAsState()
+
     var confirmed by rememberSaveable { mutableStateOf(false) }
     var jobAddress by rememberSaveable { mutableStateOf("") }
+
+    LaunchedEffect(uiState.error) {
+        uiState.error?.let {
+            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+        }
+    }
 
     LaunchedEffect(applyState) {
         when (applyState) {
@@ -83,58 +89,32 @@ fun MaintenanceDetailScreen(
                 Toast.makeText(context, "Ứng tuyển thành công!", Toast.LENGTH_LONG).show()
                 navController.popBackIfCan()
             }
-
             false -> {
                 viewModel.updateApplyState(null)
                 confirmed = false
             }
-
-            else -> {
-                viewModel.fetchJobDetail(maintenanceUid)
-            }
+            null -> viewModel.fetchJobDetail(maintenanceUid)
         }
     }
 
-    when (uiState) {
-        is MaintenanceDetailUIState.Error -> {
-            Toast.makeText(
-                context,
-                (uiState as MaintenanceDetailUIState.Error).message,
-                Toast.LENGTH_LONG
-            )
-                .show()
-        }
+    val job = uiState.job
+    val services = uiState.services
+    val isLoading = uiState.isLoading
 
-        MaintenanceDetailUIState.Idle -> {}
-        MaintenanceDetailUIState.Loading -> {
-            Box(
-                Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircleLoadingIndicator()
-            }
-        }
-
-        is MaintenanceDetailUIState.Success -> {
-            val job = (uiState as MaintenanceDetailUIState.Success).maintenanceJob
-            val services = (uiState as MaintenanceDetailUIState.Success).serviceData
-
+    val sections = remember(job, services) {
+        if (job != null) {
             jobAddress = job.location
-
-            sections = listOf(
+            listOf(
                 MaintenanceJobSection.UserInfo(job.user),
                 MaintenanceJobSection.JobDetails(job),
-                MaintenanceJobSection.WeeklySchedule(
-                    job.listDays,
-                    job.listDays.size != 1
-                ),
+                MaintenanceJobSection.WeeklySchedule(job.listDays, job.listDays.size > 1),
                 MaintenanceJobSection.JobWorkflow(services),
                 MaintenanceJobSection.ActionButtons
             )
-        }
+        } else emptyList()
     }
 
-    Column(Modifier.fillMaxSize()) {
+    Column(modifier.fillMaxSize()) {
         CenterAlignedTopAppBar(
             title = {
                 Text(
@@ -144,84 +124,89 @@ fun MaintenanceDetailScreen(
             },
             windowInsets = WindowInsets(0, 0, 0, 0),
             navigationIcon = {
-                IconButton(onClick = {
-                    navController.popBackIfCan()
-                }) {
-                    Icon(
-                        Icons.Default.ArrowBackIosNew, contentDescription = "Back",
-                        modifier = Modifier.size(20.dp)
-                    )
+                IconButton(onClick = { navController.popBackIfCan() }) {
+                    Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back", modifier = Modifier.size(20.dp))
                 }
             },
             actions = {
                 IconButton(onClick = { openGoogleMap(context, jobAddress) }) {
-                    Icon(
-                        Icons.Default.Map,
-                        contentDescription = "Go to Map",
-                        modifier = Modifier.size(20.dp)
-                    )
+                    Icon(Icons.Default.Map, contentDescription = "Go to Map", modifier = Modifier.size(20.dp))
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
         )
 
-        LazyColumn(
-            Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            item {
-                Spacer(Modifier.height(16.dp))
+        when {
+            isLoading -> {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircleLoadingIndicator()
+                }
             }
 
-            sections.forEach { section ->
-                when (section) {
-                    is MaintenanceJobSection.UserInfo -> {
-                        item {
-                            ClientCard(
-                                user = section.user,
-                                onAddressClick = { openGoogleMap(context, section.user.location) })
-                            Spacer(Modifier.height(12.dp))
-                        }
-                    }
+            job == null -> {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("Không tìm thấy công việc", color = colorResource(R.color.subtext))
+                }
+            }
 
-                    is MaintenanceJobSection.JobDetails -> {
-                        item {
-                            JobDetailCard(section.job)
-                            Spacer(Modifier.height(12.dp))
-                        }
-                    }
+            else -> {
+                LazyColumn(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    item { Spacer(Modifier.height(16.dp)) }
 
-                    is MaintenanceJobSection.WeeklySchedule -> {
-                        item {
-                            WeeklySchedule(section.days)
-                            Spacer(Modifier.height(12.dp))
-                        }
-                    }
-
-                    is MaintenanceJobSection.JobWorkflow -> {
-                        item {
-                            section.serviceList.forEach { item ->
-                                MaintenanceServiceItemCard(item.first, item.second)
-                                Spacer(Modifier.height(12.dp))
+                    sections.forEach { section ->
+                        when (section) {
+                            is MaintenanceJobSection.UserInfo -> {
+                                item {
+                                    ClientCard(
+                                        user = section.user,
+                                        onAddressClick = { openGoogleMap(context, section.user.location) }
+                                    )
+                                    Spacer(Modifier.height(12.dp))
+                                }
                             }
-                        }
-                    }
 
-                    is MaintenanceJobSection.ActionButtons -> {
-                        item {
-                            if (!isOnlyWatch) {
-                                SlideToConfirmButton(
-                                    isConfirmed = confirmed,
-                                    onValueChange = {
-                                        confirmed = it
+                            is MaintenanceJobSection.JobDetails -> {
+                                item {
+                                    JobDetailCard(section.job)
+                                    Spacer(Modifier.height(12.dp))
+                                }
+                            }
 
-                                        Log.d(tag, "MaintenanceDetailScreen: $confirmed")
-                                        viewModel.applyToJob(maintenanceUid)
+                            is MaintenanceJobSection.WeeklySchedule -> {
+                                item {
+                                    WeeklySchedule(section.days)
+                                    Spacer(Modifier.height(12.dp))
+                                }
+                            }
+
+                            is MaintenanceJobSection.JobWorkflow -> {
+                                item {
+                                    section.serviceList.forEach { pair ->
+                                        MaintenanceServiceItemCard(pair.first, pair.second)
+                                        Spacer(Modifier.height(12.dp))
                                     }
-                                )
+                                }
                             }
-                            Spacer(Modifier.height(24.dp))
+
+                            is MaintenanceJobSection.ActionButtons -> {
+                                item {
+                                    if (!isOnlyWatch) {
+                                        SlideToConfirmButton(
+                                            isConfirmed = confirmed,
+                                            onValueChange = {
+                                                confirmed = it
+                                                Log.d(tag, "Confirmed: $confirmed")
+                                                viewModel.applyToJob(maintenanceUid)
+                                            }
+                                        )
+                                    }
+                                    Spacer(Modifier.height(24.dp))
+                                }
+                            }
                         }
                     }
                 }

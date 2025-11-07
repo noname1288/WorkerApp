@@ -91,6 +91,13 @@ fun BaseScreen( navController: NavHostController) {
         )
     }
 
+    /* *
+    * INIT Data from local/ remote
+    * */
+    LaunchedEffect(Unit) {
+        rootViewModel.fetchAllNotifications()
+    }
+
     Scaffold(
         bottomBar = {
             val isShowBottomBar = currentRoute != null && showBottomBar.contains(currentRoute)

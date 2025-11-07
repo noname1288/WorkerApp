@@ -15,23 +15,28 @@ class SystemRepositoryImpl @Inject constructor(
     val errorAdapter = moshi.adapter(ApiErrorResponse :: class.java)
 
     override suspend fun getPolicies(): NetworkResult<PolicyResponse> {
-        val response = policyApi.getPolicies()
+        return try {
+            val response = policyApi.getPolicies()
 
-        return if (response.isSuccessful){
-            val body = response.body()
+            if (response.isSuccessful) {
+                val body = response.body()
 
-            if (body!= null && body.success){
-                NetworkResult.Success(body.data)
-            }else {
-                NetworkResult.Error(body?.message ?: "Unknown error")
+                if (body != null && body.success && body.data != null) {
+                    NetworkResult.Success(body.data)
+                } else {
+                    NetworkResult.Error(body?.message ?: "Empty response body or data")
+                }
+            } else {
+                val errorMessage = response.errorBody()?.string()
+                    ?.let { json -> errorAdapter.fromJson(json)?.error }
+                    ?: response.message()
+                    ?: "Request failed with status code ${response.code()}"
+
+                NetworkResult.Error(errorMessage)
             }
-        }else {
-            val errorMessage = response.errorBody()?.string()
-                ?.let{json -> errorAdapter.fromJson(json)?.error}
-                ?: response.message()
-                ?: "Request failed with status code ${response.code()}"
-
-            NetworkResult.Error(errorMessage)
+        } catch (e: Exception) {
+            // ✅ catch tất cả các lỗi network hoặc parse
+            NetworkResult.Error(e.localizedMessage ?: "Unexpected error occurred")
         }
     }
 }

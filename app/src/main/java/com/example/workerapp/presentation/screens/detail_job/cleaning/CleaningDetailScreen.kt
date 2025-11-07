@@ -33,6 +33,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -50,9 +51,6 @@ import com.example.workerapp.R
 import com.example.workerapp.data.source.model.base.UserModel
 import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
 import com.example.workerapp.data.source.model.cleaning.CleaningServiceModel
-import com.example.workerapp.presentation.screens.detail_job.cleaning.CleaningJobSection.JobDetails
-import com.example.workerapp.presentation.screens.detail_job.cleaning.CleaningJobSection.UserInfo
-import com.example.workerapp.ui.detail.cleaning.CleaningUiState
 import com.example.workerapp.ui.detail.cleaning.CleaningViewModel
 import com.example.workerapp.ui.detail.components.ClientCard
 import com.example.workerapp.ui.detail.components.JobDetailCard
@@ -79,17 +77,23 @@ fun CleaningDetailScreen(
     modifier: Modifier = Modifier,
     cleaningUid: String,
     isOnlyWatch: Boolean = false,
-    viewModel: CleaningViewModel, navController: NavController
+    viewModel: CleaningViewModel,
+    navController: NavController
 ) {
     val tag = "CleaningDetailScreen"
     val context = LocalContext.current
 
-    var sections = emptyList<CleaningJobSection>()
-
     val uiState by viewModel.uiState.collectAsState()
     val applyState by viewModel.applyState.collectAsState()
+
     var confirmed by rememberSaveable { mutableStateOf(false) }
     var jobAddress by rememberSaveable { mutableStateOf("") }
+
+    LaunchedEffect(uiState.error) {
+        uiState.error?.let {
+            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+        }
+    }
 
     LaunchedEffect(applyState) {
         when (applyState) {
@@ -97,157 +101,134 @@ fun CleaningDetailScreen(
                 Toast.makeText(context, "Ứng tuyển thành công!", Toast.LENGTH_LONG).show()
                 navController.popBackIfCan()
             }
-
             false -> {
                 viewModel.updateApplyState(null)
                 confirmed = false
             }
-
-            else -> {
-                viewModel.fetchJobDetail(cleaningUid)
-            }
+            null -> viewModel.fetchJobDetail(cleaningUid)
         }
     }
 
-    when (uiState) {
-        is CleaningUiState.Success -> {
-            val jobDetail = (uiState as CleaningUiState.Success).job
-            val services = (uiState as CleaningUiState.Success).services
-            jobAddress = jobDetail.location
-            Log.d(tag, "CleaningDetailScreen: Fetched job detail: $jobDetail")
+    val jobDetail = uiState.job
+    val services = uiState.services
+    val isLoading = uiState.isLoading
 
-            sections = listOf(
-                UserInfo(jobDetail.user),
-                JobDetails(jobDetail),
-                CleaningJobSection.WeeklySchedule(
-                    jobDetail.listDays,
-                    jobDetail.listDays.size > 1
-                ),
+    // ✅ Chuẩn bị sections chỉ khi có dữ liệu job
+    val sections = remember(jobDetail, services) {
+        if (jobDetail != null) {
+            jobAddress = jobDetail.location
+            listOf(
+                CleaningJobSection.UserInfo(jobDetail.user),
+                CleaningJobSection.JobDetails(jobDetail),
+                CleaningJobSection.WeeklySchedule(jobDetail.listDays, jobDetail.listDays.size > 1),
                 CleaningJobSection.AdditionalJob(jobDetail.isCooking, jobDetail.isIroning),
                 CleaningJobSection.JobWorkflow(services),
                 CleaningJobSection.ActionButtons
             )
-        }
-
-        is CleaningUiState.Error -> {
-            Toast.makeText(
-                context,
-                (uiState as CleaningUiState.Error).message,
-                Toast.LENGTH_LONG
-            ).show()
-        }
-
-        CleaningUiState.Loading -> {
-            Box(
-                Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircleLoadingIndicator()
-            }
-        }
-
-        CleaningUiState.Idle -> {}
+        } else emptyList()
     }
 
     Column(modifier.fillMaxSize()) {
         CenterAlignedTopAppBar(
-            title = {
-                Text(
-                    stringResource(R.string.job_detail_title),
-                    fontWeight = FontWeight.Bold
-                )
-            },
+            title = { Text(stringResource(R.string.job_detail_title), fontWeight = FontWeight.Bold) },
             windowInsets = WindowInsets(0, 0, 0, 0),
             navigationIcon = {
-                IconButton(onClick = {
-                    navController.popBackIfCan()
-                }) {
-                    Icon(
-                        Icons.Default.ArrowBackIosNew,
-                        contentDescription = "Back",
-                        modifier = Modifier.size(20.dp)
-                    )
+                IconButton(onClick = { navController.popBackIfCan() }) {
+                    Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back", modifier = Modifier.size(20.dp))
                 }
             },
             actions = {
-                IconButton(onClick = {openGoogleMap(context, jobAddress)}) {
-                    Icon(Icons.Default.Map,
-                        contentDescription = "Go to Map",
-                        modifier = Modifier.size(20.dp))
+                IconButton(onClick = { openGoogleMap(context, jobAddress) }) {
+                    Icon(Icons.Default.Map, contentDescription = "Go to Map", modifier = Modifier.size(20.dp))
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
         )
 
-        LazyColumn(
-            Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp)
-        ) {
-            item {
-                Spacer(Modifier.height(16.dp))
+        when {
+            isLoading -> {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircleLoadingIndicator()
+                }
             }
 
-            sections.forEach { section ->
-                when (section) {
-                    is UserInfo -> {
-                        item {
-                            ClientCard(user = section.user, onAddressClick = {openGoogleMap(context, section.user.location)})
-                            Spacer(Modifier.height(12.dp))
-                        }
-                    }
+            jobDetail == null -> {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("Không tìm thấy công việc", color = colorResource(R.color.subtext))
+                }
+            }
 
-                    is JobDetails -> {
-                        item {
-                            JobDetailCard(job = section.job)
-                            Spacer(Modifier.height(12.dp))
-                        }
-                    }
+            else -> {
+                LazyColumn(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    item { Spacer(Modifier.height(16.dp)) }
 
-                    is CleaningJobSection.WeeklySchedule -> {
-                        item {
-                            WeeklySchedule(section.days, section.isWeekly)
-                            Spacer(Modifier.height(12.dp))
-                        }
-                    }
+                    sections.forEach { section ->
+                        when (section) {
+                            is CleaningJobSection.UserInfo -> {
+                                item {
+                                    ClientCard(
+                                        user = section.user,
+                                        onAddressClick = { openGoogleMap(context, section.user.location) }
+                                    )
+                                    Spacer(Modifier.height(12.dp))
+                                }
+                            }
 
-                    is CleaningJobSection.AdditionalJob -> {
-                        item {
-                            AdditionalJob(section.isCooking, section.isIroning)
-                            Spacer(Modifier.height(24.dp))
-                        }
-                    }
+                            is CleaningJobSection.JobDetails -> {
+                                item {
+                                    JobDetailCard(job = section.job)
+                                    Spacer(Modifier.height(12.dp))
+                                }
+                            }
 
-                    is CleaningJobSection.JobWorkflow -> {
-                        item {
-                            JobWorkflow(section.services)
-                            Spacer(Modifier.height(24.dp))
-                        }
-                    }
+                            is CleaningJobSection.WeeklySchedule -> {
+                                item {
+                                    WeeklySchedule(section.days, section.isWeekly)
+                                    Spacer(Modifier.height(12.dp))
+                                }
+                            }
 
-                    is CleaningJobSection.ActionButtons -> {
-                        item {
-                            if (!isOnlyWatch) {
-                                SlideToConfirmButton(
-                                    isConfirmed = confirmed,
-                                    onValueChange = {
-                                        confirmed = it
+                            is CleaningJobSection.AdditionalJob -> {
+                                item {
+                                    AdditionalJob(section.isCooking, section.isIroning)
+                                    Spacer(Modifier.height(24.dp))
+                                }
+                            }
 
-                                        Log.d(tag, "CleaningDetailScreen: Confirmed")
-                                        viewModel.applyToJob(cleaningUid)
+                            is CleaningJobSection.JobWorkflow -> {
+                                item {
+                                    JobWorkflow(section.services)
+                                    Spacer(Modifier.height(24.dp))
+                                }
+                            }
+
+                            is CleaningJobSection.ActionButtons -> {
+                                item {
+                                    if (!isOnlyWatch) {
+                                        SlideToConfirmButton(
+                                            isConfirmed = confirmed,
+                                            onValueChange = {
+                                                confirmed = it
+                                                Log.d(tag, "Confirmed")
+                                                viewModel.applyToJob(cleaningUid)
+                                            }
+                                        )
+                                        Spacer(Modifier.height(24.dp))
                                     }
-                                )
-                                Spacer(Modifier.height(24.dp))
+                                }
                             }
                         }
-
                     }
                 }
             }
         }
     }
-
 }
+
 
 @Composable
 fun AdditionalJob(isCooking: Boolean = true, isIroning: Boolean = true) {

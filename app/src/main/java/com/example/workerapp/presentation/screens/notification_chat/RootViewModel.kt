@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.workerapp.data.ChatRepository
 import com.example.workerapp.data.NotificationRepository
-import com.example.workerapp.data.source.model.NotificationItem
+import com.example.workerapp.data.source.model.NotificationItemModel
 import com.example.workerapp.data.source.model.RoomModel
 import com.example.workerapp.utils.cached.UserSession
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,8 +29,8 @@ class RootViewModel @Inject constructor(
     private val _roomChat = MutableStateFlow<List<RoomModel>>(emptyList())
     val roomChat = _roomChat.asStateFlow()
 
-    private val _listNoti = MutableStateFlow<List<NotificationItem>>(emptyList())
-    val listNoti: StateFlow<List<NotificationItem>> = _listNoti
+    private val _listNoti = MutableStateFlow<List<NotificationItemModel>>(emptyList())
+    val listNoti: StateFlow<List<NotificationItemModel>> = _listNoti
 
     val hasUnread = listNoti.map { list ->
         list.any { !it.isRead }
@@ -94,6 +94,6 @@ class RootViewModel @Inject constructor(
 sealed class NotificationUiState {
     object Idle : NotificationUiState()
     object Loading : NotificationUiState()
-    data class Success(val notifications: List<NotificationItem>) : NotificationUiState()
+    data class Success(val notifications: List<NotificationItemModel>) : NotificationUiState()
     data class Error(val message: String) : NotificationUiState()
 }

@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.StateFlow
 
 object UserSession {
     private var _isLoggedIn = MutableStateFlow(true)
-    val isLoggedIn : StateFlow<Boolean> = _isLoggedIn
 
     var uid: String? = null
     var displayName: String? = null

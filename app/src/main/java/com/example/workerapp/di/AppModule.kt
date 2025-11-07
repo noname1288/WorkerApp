@@ -37,6 +37,9 @@ object RoomModule {
 
     @Provides
     fun provideServiceDao(database: AppDatabase) = database.serviceDao()
+
+    @Provides
+    fun provideNotificationDao(database: AppDatabase) = database.notificationDao()
 }
 
 @Module

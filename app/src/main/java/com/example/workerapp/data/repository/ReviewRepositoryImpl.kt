@@ -16,23 +16,28 @@ class ReviewRepositoryImpl @Inject constructor(
     private val errorAdapter = moshi.adapter(ApiErrorResponse::class.java)
 
     override suspend fun getReviews(workerUid: String): NetworkResult<ReviewResponse> {
-        val response = reviewApi.getReviews(workerUid)
+        return try {
+            val response = reviewApi.getReviews(workerUid)
 
-        return if (response.isSuccessful){
-            val body = response.body()
+            if (response.isSuccessful) {
+                val body = response.body()
 
-            if (body!= null && body.success){
-                NetworkResult.Success(body.experiences)
-            }else{
-                NetworkResult.Error(body?.message ?: "Empty response body")
+                if (body != null && body.success && body.experiences != null) {
+                    NetworkResult.Success(body.experiences)
+                } else {
+                    NetworkResult.Error(body?.message ?: "Empty response body or data")
+                }
+            } else {
+                val errorMessage = response.errorBody()?.string()
+                    ?.let { json -> errorAdapter.fromJson(json)?.error }
+                    ?: response.message()
+                    ?: "Request failed with status code ${response.code()}"
+
+                NetworkResult.Error(errorMessage)
             }
-        }else {
-            val errorMessage = response.errorBody()?.string()
-                ?.let { json -> errorAdapter.fromJson(json)?.error }
-                ?: response.message()
-                ?: "Request failed with status code ${response.code()}"
-
-            NetworkResult.Error(errorMessage)
+        } catch (e: Exception) {
+            // catch tất cả exception từ network / parse / IO
+            NetworkResult.Error(e.localizedMessage ?: "Unexpected error occurred")
         }
     }
 }

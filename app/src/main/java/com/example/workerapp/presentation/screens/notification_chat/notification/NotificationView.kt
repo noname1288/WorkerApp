@@ -36,7 +36,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.workerapp.R
-import com.example.workerapp.data.source.model.NotificationItem
+import com.example.workerapp.data.source.model.NotificationItemModel
 import com.example.workerapp.presentation.screens.notification_chat.NotificationUiState
 import com.example.workerapp.presentation.screens.notification_chat.RootViewModel
 import com.example.workerapp.utils.components.CircleLoadingIndicator
@@ -54,7 +54,7 @@ fun NotificationView(
     val listItems by viewModel.listNoti.collectAsState()
 
     var showDialog by remember { mutableStateOf(false) }
-    var temp by remember { mutableStateOf<NotificationItem?>(null) }
+    var temp by remember { mutableStateOf<NotificationItemModel?>(null) }
 
     LaunchedEffect(Unit) {
         viewModel.fetchAllNotifications()
@@ -137,7 +137,7 @@ fun NotificationView(
 }
 
 @Composable
-fun NotificationItemRow(item: NotificationItem = NotificationItem(), onClick: () -> Unit) {
+fun NotificationItemRow(item: NotificationItemModel = NotificationItemModel(), onClick: () -> Unit) {
     val hasRead = item.isRead
 
     Row(
