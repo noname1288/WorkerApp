@@ -5,6 +5,7 @@ import com.example.workerapp.data.source.model.base.UserModel
 import com.example.workerapp.data.source.remote.dto.NetworkResult
 import com.example.workerapp.data.source.remote.dto.request.ChangePasswordRequest
 import com.example.workerapp.data.source.remote.dto.request.ForgotPasswordRequest
+import com.example.workerapp.data.source.remote.dto.request.ResetPasswordRequest
 import com.example.workerapp.data.source.remote.dto.request.UserLoginRequest
 import com.example.workerapp.data.source.remote.dto.request.UserLoginWithGGRequest
 import com.example.workerapp.data.source.remote.dto.request.UserRegisterRequest
@@ -41,7 +42,9 @@ interface UserDataSource {
 
         suspend fun changePassword(request: ChangePasswordRequest) : NetworkResult<Unit>
 
-        suspend fun sendEmail(request: ForgotPasswordRequest) : NetworkResult<Unit>
+        suspend fun sendEmail(request: ForgotPasswordRequest) : NetworkResult<String>
+
+        suspend fun resetPassword(request: ResetPasswordRequest ) : NetworkResult<Unit>
 
         suspend fun uploadImage(imagePart: MultipartBody.Part) : NetworkResult<String>
 

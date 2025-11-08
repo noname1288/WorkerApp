@@ -113,7 +113,6 @@ fun CleaningDetailScreen(
     val services = uiState.services
     val isLoading = uiState.isLoading
 
-    // ✅ Chuẩn bị sections chỉ khi có dữ liệu job
     val sections = remember(jobDetail, services) {
         if (jobDetail != null) {
             jobAddress = jobDetail.location

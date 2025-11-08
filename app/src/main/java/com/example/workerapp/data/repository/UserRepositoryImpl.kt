@@ -8,6 +8,7 @@ import com.example.workerapp.data.source.local.room.entity.UserLocalEntity
 import com.example.workerapp.data.source.remote.dto.NetworkResult
 import com.example.workerapp.data.source.remote.dto.request.ChangePasswordRequest
 import com.example.workerapp.data.source.remote.dto.request.ForgotPasswordRequest
+import com.example.workerapp.data.source.remote.dto.request.ResetPasswordRequest
 import com.example.workerapp.data.source.remote.dto.request.UserLoginRequest
 import com.example.workerapp.data.source.remote.dto.request.UserLoginWithGGRequest
 import com.example.workerapp.data.source.remote.dto.request.UserRegisterRequest
@@ -229,7 +230,7 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun sendEmail(request: ForgotPasswordRequest): Result<Unit> {
+    override suspend fun sendEmail(request: ForgotPasswordRequest): Result<String> {
         try {
             val response = remote.sendEmail(request)
 
@@ -238,13 +239,33 @@ class UserRepositoryImpl @Inject constructor(
                     Log.d(TAG, "sendEmail - Error: ${response.message}")
                     return Result.failure(Exception(response.message))
                 }
-                is NetworkResult.Success<Unit> -> {
+                is NetworkResult.Success -> {
                     Log.d(TAG, "sendEmail - Email sent successfully")
-                    return Result.success(Unit)
+                    return Result.success(response.data)
                 }
             }
         } catch (e: Exception){
             Log.e(TAG, "sendEmail - Exception: ${e.message}")
+            return Result.failure(e)
+        }
+    }
+
+    override suspend fun resetPassword(request: ResetPasswordRequest): Result<String> {
+        try {
+            val response = remote.resetPassword(request)
+
+            when(response){
+                is NetworkResult.Error -> {
+                    Log.d(TAG, "resetPassword - Error: ${response.message}")
+                    return Result.failure(Exception(response.message))
+                }
+                is NetworkResult.Success -> {
+                    Log.d(TAG, "resetPassword - Email sent successfully")
+                    return Result.success("Password reset successfully")
+                }
+            }
+        } catch (e: Exception){
+            Log.e(TAG, "resetPassword - Exception: ${e.message}")
             return Result.failure(e)
         }
     }

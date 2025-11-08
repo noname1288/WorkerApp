@@ -55,6 +55,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.workerapp.R
 import com.example.workerapp.navigation.AppRoutes
+import com.example.workerapp.presentation.screens.notification_chat.RootViewModel
 import com.example.workerapp.ui.home.HomeUiState
 import com.example.workerapp.ui.home.HomeViewModel
 import com.example.workerapp.utils.ServiceType
@@ -76,15 +77,20 @@ sealed class HomeSection {
 fun HomeScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
-    viewModel: HomeViewModel
+    viewModel: HomeViewModel,
+    notificationViewModel: RootViewModel
 ) {
     val context = LocalContext.current
 
     val uiState by viewModel.homeUiState.collectAsState()
     var shouldAskPermission by remember { mutableStateOf(true) }
 
+    /* *
+    * Fetch data from local storage or remote server when the screen is first composed
+    * */
     LaunchedEffect(Unit) {
         viewModel.fetchServices()
+        notificationViewModel.fetchAllNotifications()
     }
 
     LaunchedEffect(Unit) {

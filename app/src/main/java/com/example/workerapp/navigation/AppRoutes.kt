@@ -7,6 +7,7 @@ object AppScreen{
     const val MAINTENANCE_SCREEN = "maintenance_detail"
     const val NOTIFICATION_SCREEN = "notification_detail"
     const val CHAT_SCREEN = "chat_detail"
+    const val REQUIRE_CODE_SCREEN = "require_code_screen"
 }
 
 object DestinationArgs{
@@ -17,6 +18,8 @@ object DestinationArgs{
     const val CHAT_ID = "chatId"
     const val PARTNER_NAME = "partnerName"
     const val PARTNER_AVATAR = "partnerAvt"
+    const val CODE_FROM_EMAIL = "codeFromEmail"
+
 
 }
 
@@ -34,12 +37,16 @@ object AppRoutes {
     const val CHANGE_PASSWORD = "change_password"
     const val FORGOT_PASSWORD = "forgot_password"
 
+    const val REQUIRE_NEW_PASSWORD = "require_new_password"
+
+
 
     const val SERVICE_DETAIL = "${AppScreen.SERVICE_SCREEN}/%s"
     const val CLEANING_DETAIL = "${AppScreen.CLEANING_SCREEN}/%s/%b"
     const val HEALTHCARE_DETAIL = "${AppScreen.HEALTHCARE_SCREEN}/%s/%b"
     const val MAINTENANCE_DETAIL = "${AppScreen.MAINTENANCE_SCREEN}/%s/%b"
     const val CHAT_DETAIL = "${AppScreen.CHAT_SCREEN}/%s/%s/%s"
+    const val REQUIRE_CODE_FROM_EMAIL = "${AppScreen.REQUIRE_CODE_SCREEN}/%s"
 
     const val LIST_APPLICATIONS = "list_applications"
 

@@ -3,7 +3,6 @@ package com.example.workerapp.di
 import com.example.workerapp.data.TokenRepository
 import com.example.workerapp.data.source.remote.adapter.JobModelAdapter
 import com.example.workerapp.data.source.remote.api.JobApi
-import com.example.workerapp.data.source.remote.api.MessageApi
 import com.example.workerapp.data.source.remote.api.NotificationApi
 import com.example.workerapp.data.source.remote.api.PolicyApi
 import com.example.workerapp.data.source.remote.api.ReviewApi
@@ -13,7 +12,6 @@ import com.example.workerapp.data.source.remote.interceptor.AuthInterceptor
 import com.example.workerapp.data.source.remote.interceptor.TokenAuthenticator
 import com.example.workerapp.utils.Constant
 import com.example.workerapp.utils.annotation.HelpoApi
-import com.example.workerapp.utils.annotation.MessagingApi
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module

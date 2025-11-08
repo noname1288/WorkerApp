@@ -50,9 +50,33 @@ class ProfileDetailViewModel @Inject constructor(
     )
     val form : StateFlow<ProfileFormState> = _form
 
+    private var hasPrefilled = false
+
+    init {
+        viewModelScope.launch {
+            val u = userRepository.getUserProfile().firstOrNull()
+            if (!hasPrefilled && u != null && _form.value.isEmpty()) {
+                _form.update {
+                    it.copy(
+                        username = u.username.orEmpty(),
+                        gender   = u.gender.orEmpty(),
+                        dob      = u.dob.orEmpty(),
+                        tel      = u.tel.orEmpty(),
+                        location = u.location.orEmpty()
+                    )
+                }
+                hasPrefilled = true
+                persist()
+            }
+        }
+    }
+
     private fun persist(){
         savedStateHandle["profileFormState"] = _form.value
     }
+
+    private fun ProfileFormState.isEmpty(): Boolean =
+        username.isBlank() && gender.isBlank() && dob.isBlank() && tel.isBlank() && location.isBlank()
 
     fun onUsernameChange(v: String) { _form.update { it.copy(username = v) }.also { persist() } }
     fun onGenderChange(v: String)   { _form.update { it.copy(gender = v) }.also { persist() } }

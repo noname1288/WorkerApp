@@ -37,7 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.workerapp.R
-import com.example.workerapp.presentation.screens.profile.detail.MapResult
+import com.example.workerapp.data.source.model.MapResult
 import com.example.workerapp.utils.ext.popBackIfCan
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
@@ -76,10 +76,10 @@ fun MapScreen(
     // ---- MAP UI SETTINGS ----
     val mapProps = MapProperties(isMyLocationEnabled = hasLocationPermission)
     val uiSettings = MapUiSettings(myLocationButtonEnabled = true, zoomControlsEnabled = false)
+    var centerToHanoi by rememberSaveable { mutableStateOf(false) }
 
     var unAvailability = pickedAddress.isNullOrEmpty()
 
-    // ---- Khi được cấp quyền, hoặc khi user yêu cầu cập nhật vị trí, thì lấy current location & animate camera ----
     LaunchedEffect(hasLocationPermission, requestUpdatePosition) {
         if (hasLocationPermission) {
             if (requestUpdatePosition) {
@@ -123,6 +123,21 @@ fun MapScreen(
         }
     }
 
+    LaunchedEffect(centerToHanoi) {
+        if (centerToHanoi) {
+            val hanoi = LatLng(21.0278, 105.8342)
+            pickedLatLng = hanoi
+            pickedAddress = "Hà Nội, Việt Nam"
+            cameraPositionState.animate(
+                CameraUpdateFactory.newCameraPosition(
+                    CameraPosition(hanoi, 12f, 0f, 0f)
+                ),
+                durationMs = 800
+            )
+            centerToHanoi = false
+        }
+    }
+
     // ---- UI ----
     Column(Modifier.fillMaxSize()) {
 
@@ -135,7 +150,6 @@ fun MapScreen(
                 }
             },
             actions = {
-                // Nút My Location trên TopAppBar
                 IconButton(onClick = {
                     showPermissionDialog = true
                     requestUpdatePosition = true
@@ -146,12 +160,11 @@ fun MapScreen(
             colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
         )
 
-        // Hộp thoại xin quyền (hiển thị khi user nhấn nút Location)
         if (showPermissionDialog) {
             LocationPermissionHandler {
                 showPermissionDialog = false
                 hasLocationPermission = true
-                // requestUpdatePosition đã set = true khi bấm nút
+//                centerToHanoi = true
             }
         }
 
@@ -172,7 +185,6 @@ fun MapScreen(
                 pickedLatLng?.let { Marker(state = MarkerState(it), title = pickedAddress) }
             }
 
-            // Nút Confirm chọn vị trí
             Button(
                 onClick = {
                     val lat = pickedLatLng?.latitude

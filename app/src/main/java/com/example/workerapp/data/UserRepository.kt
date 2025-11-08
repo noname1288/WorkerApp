@@ -3,6 +3,7 @@ package com.example.workerapp.data
 import com.example.workerapp.data.source.local.room.entity.UserLocalEntity
 import com.example.workerapp.data.source.remote.dto.request.ChangePasswordRequest
 import com.example.workerapp.data.source.remote.dto.request.ForgotPasswordRequest
+import com.example.workerapp.data.source.remote.dto.request.ResetPasswordRequest
 import com.example.workerapp.data.source.remote.dto.request.UserLoginRequest
 import com.example.workerapp.data.source.remote.dto.request.UserLoginWithGGRequest
 import com.example.workerapp.data.source.remote.dto.request.UserRegisterRequest
@@ -22,7 +23,8 @@ interface UserRepository {
 
     suspend fun changePassword(request: ChangePasswordRequest) : Result<Unit>
 
-    suspend fun sendEmail(request: ForgotPasswordRequest) : Result<Unit>
+    suspend fun sendEmail(request: ForgotPasswordRequest) : Result<String>
+    suspend fun resetPassword(request: ResetPasswordRequest) : Result<String>
 
     fun getUserProfile(): Flow<UserLocalEntity?>
 

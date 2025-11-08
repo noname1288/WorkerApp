@@ -2,7 +2,6 @@ package com.example.workerapp.utils.cached
 
 import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
 object UserSession {
     private var _isLoggedIn = MutableStateFlow(true)

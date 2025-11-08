@@ -8,6 +8,7 @@ import com.example.workerapp.data.source.remote.dto.NetworkResult
 import com.example.workerapp.data.source.remote.dto.request.ChangePasswordRequest
 import com.example.workerapp.data.source.remote.dto.request.FcmTokenRequest
 import com.example.workerapp.data.source.remote.dto.request.ForgotPasswordRequest
+import com.example.workerapp.data.source.remote.dto.request.ResetPasswordRequest
 import com.example.workerapp.data.source.remote.dto.request.UserLoginRequest
 import com.example.workerapp.data.source.remote.dto.request.UserLoginWithGGRequest
 import com.example.workerapp.data.source.remote.dto.request.UserRegisterRequest
@@ -124,7 +125,7 @@ class UserRemoteImpl @Inject constructor(
         }
     }
 
-    override suspend fun sendEmail(request: ForgotPasswordRequest): NetworkResult<Unit> {
+    override suspend fun sendEmail(request: ForgotPasswordRequest): NetworkResult<String> {
         val response = userApi.sendEmail(request)
 
         if (response.isSuccessful) {
@@ -132,7 +133,7 @@ class UserRemoteImpl @Inject constructor(
 
             if (body != null && body.success) {
                 Log.d(TAG, "sendEmail: success")
-                return NetworkResult.Success(Unit)
+                return NetworkResult.Success(body.code)
             } else {
                 Log.e(TAG, "sendEmail error: ${body?.message}")
                 return NetworkResult.Error(body?.message ?: "Unknown error")
@@ -144,6 +145,30 @@ class UserRemoteImpl @Inject constructor(
                 ?: "Request failed with status code ${response.code()}"
 
             Log.e(TAG, "sendEmail Exception: $errorMessage")
+            return NetworkResult.Error(errorMessage)
+        }
+    }
+
+    override suspend fun resetPassword(request: ResetPasswordRequest): NetworkResult<Unit> {
+        val response = userApi.resetPassword(request)
+
+        if (response.isSuccessful) {
+            val body = response.body()
+
+            if (body != null && body.success) {
+                Log.d(TAG, "resetPassword: success")
+                return NetworkResult.Success(Unit)
+            } else {
+                Log.e(TAG, "resetPassword error: ${body?.message}")
+                return NetworkResult.Error(body?.message ?: "Unknown error")
+            }
+        } else {
+            val errorMessage = response.errorBody()?.string()
+                ?.let { json -> errorAdapter.fromJson(json)?.error }
+                ?: response.message()
+                ?: "Request failed with status code ${response.code()}"
+
+            Log.e(TAG, "resetPassword Exception: $errorMessage")
             return NetworkResult.Error(errorMessage)
         }
     }

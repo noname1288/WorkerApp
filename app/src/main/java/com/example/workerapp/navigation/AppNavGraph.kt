@@ -27,6 +27,8 @@ import com.example.workerapp.presentation.screens.detail_job.maintenance.Mainten
 import com.example.workerapp.presentation.screens.detail_job.maintenance.MaintenanceViewModel
 import com.example.workerapp.presentation.screens.forgot_password.ForgotPasswordScreen
 import com.example.workerapp.presentation.screens.forgot_password.ForgotPasswordViewModel
+import com.example.workerapp.presentation.screens.forgot_password.RequireCodeScreen
+import com.example.workerapp.presentation.screens.forgot_password.RequireNewPasswordScreen
 import com.example.workerapp.presentation.screens.home.HomeScreen
 import com.example.workerapp.presentation.screens.income.IncomeScreen
 import com.example.workerapp.presentation.screens.map.MapScreen
@@ -84,14 +86,15 @@ fun AppNavHost(
             ChangePasswordScreen(navController = navController, viewmodel = changePasswordViewModel)
         }
 
-        composable(AppRoutes.FORGOT_PASSWORD) {
-            val forgotPasswordViewModel = hiltViewModel<ForgotPasswordViewModel>()
-            ForgotPasswordScreen(navController = navController, viewModel = forgotPasswordViewModel)
-        }
+        forgotPasswordGraph(navController)
 
         composable(AppRoutes.HOME) {
             val homeViewModel = hiltViewModel<HomeViewModel>()
-            HomeScreen(navController = navController, viewModel = homeViewModel)
+            HomeScreen(
+                navController = navController,
+                viewModel = homeViewModel,
+                notificationViewModel = rootViewModel
+            )
         }
         composable(AppRoutes.CALENDAR) {
             val calendarViewModel = hiltViewModel<CalendarViewModel>()

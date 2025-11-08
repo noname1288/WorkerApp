@@ -10,7 +10,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.workerapp.data.source.local.AppCache

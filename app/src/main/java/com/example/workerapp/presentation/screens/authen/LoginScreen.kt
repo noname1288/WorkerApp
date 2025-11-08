@@ -60,13 +60,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.credentials.CredentialManager
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import com.example.workerapp.R
 import com.example.workerapp.navigation.AppRoutes
+import com.example.workerapp.navigation.GraphRoutes
 import com.example.workerapp.utils.components.CircleLoadingIndicator
 import com.example.workerapp.utils.ext.safeNavigate
-import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
@@ -145,7 +144,7 @@ fun LoginScreen(
             textAlign = TextAlign.End,
             modifier = Modifier
                 .clickable {
-                    navController.safeNavigate(AppRoutes.FORGOT_PASSWORD, popUpToRoute = AppRoutes.LOGIN)
+                    navController.navigate(GraphRoutes.FORGOT_PASSWORD_GRAPH)
                 }
                 .fillMaxWidth()
         )

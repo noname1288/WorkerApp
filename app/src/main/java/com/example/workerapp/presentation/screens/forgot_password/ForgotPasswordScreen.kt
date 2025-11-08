@@ -2,7 +2,6 @@ package com.example.workerapp.presentation.screens.forgot_password
 
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -21,6 +20,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,9 +39,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.workerapp.R
+import com.example.workerapp.navigation.AppRoutes
 import com.example.workerapp.presentation.screens.authen.CustomEditTextField
 import com.example.workerapp.utils.components.CircleLoadingIndicator
-import com.example.workerapp.utils.ext.popBackIfCan
+import com.example.workerapp.utils.ext.navigateWithArgs
 
 @Composable
 fun ForgotPasswordScreen(
@@ -50,8 +51,13 @@ fun ForgotPasswordScreen(
     viewModel: ForgotPasswordViewModel
 ) {
     val context = LocalContext.current
+
     val scrollState = rememberScrollState()
     val uiState by viewModel.uiState.collectAsState()
+    val isLoading = uiState.isLoading
+    val success = uiState.success
+    val codeFromEmail = uiState.codeFromEmail ?: ""
+
 
     var email by rememberSaveable { mutableStateOf("") }
     var isEmailValid by rememberSaveable { mutableStateOf(true) }
@@ -61,103 +67,88 @@ fun ForgotPasswordScreen(
 
     val canSubmit = emailRegex.matches(email)
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(scrollState)
-            .imePadding()
-            .background(Color.White)
-            .padding(32.dp),
-        horizontalAlignment = Alignment.Start
-    ) {
-        Text(
-            text = stringResource(R.string.forgot_password_title),
-            style = TextStyle(
-                fontSize = 25.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = colorResource(R.color.orange_primary)
-            )
-        )
-
-        Spacer(Modifier.height(32.dp))
-
-        Text(
-            text = stringResource(R.string.forgot_password_content),
-            style = MaterialTheme.typography.bodyLarge.copy(fontStyle = FontStyle.Italic),
-        )
-
-        Spacer(Modifier.height(32.dp))
-
-        CustomEditTextField(
-            leadingIcon = Icons.Default.Email,
-            title = "Email của bạn",
-            placeholderText = "Nhập email",
-            isPasswordTextField = false,
-            onTextChange = {
-                email = it
-                isEmailValid = it.isEmpty() || emailRegex.matches(it)
-            }
-        )
-
-        // ⚠️ Hiển thị lỗi khi email không hợp lệ
-        if (!isEmailValid && email.isNotEmpty()) {
-            Text(
-                text = "Email không hợp lệ. Vui lòng nhập đúng định dạng.",
-                color = Color.Red,
-                fontSize = 13.sp,
-                modifier = Modifier.padding(top = 4.dp)
-            )
-        }
-
-        Spacer(Modifier.height(64.dp))
-
-        Button(
-            onClick = { viewModel.sendForgotPasswordEmail(email) },
-            shape = RoundedCornerShape(8.dp),
-            contentPadding = PaddingValues(vertical = 20.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = if (canSubmit)
-                    colorResource(R.color.light_orange_icon)
-                else
-                    colorResource(R.color.light_gray)
-            ),
-            enabled = canSubmit, // ✅ chỉ bật khi email hợp lệ
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(stringResource(R.string.request_title), color = Color.White)
+    LaunchedEffect(uiState.error) {
+        uiState.error?.let {
+            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
         }
     }
 
-    // ✅ UI State
-    when (uiState) {
-        is ForgotPasswordUiState.Error -> {
-            Toast.makeText(
-                context,
-                (uiState as ForgotPasswordUiState.Error).error,
-                Toast.LENGTH_SHORT
-            ).show()
+    when {
+        isLoading -> {
+            CircleLoadingIndicator()
         }
 
-        ForgotPasswordUiState.Idle -> {}
-        ForgotPasswordUiState.Loading -> {
-            Box(
-                Modifier
+        success ->{
+            navController.navigateWithArgs(AppRoutes.REQUIRE_CODE_FROM_EMAIL, args = arrayOf(codeFromEmail))
+        }
+
+        else -> {
+            Column(
+                modifier = modifier
                     .fillMaxSize()
-                    .background(Color.LightGray.copy(0.5f)),
-                contentAlignment = Alignment.Center
+                    .verticalScroll(scrollState)
+                    .imePadding()
+                    .background(Color.White)
+                    .padding(32.dp),
+                horizontalAlignment = Alignment.Start
             ) {
-                CircleLoadingIndicator()
+                Text(
+                    text = stringResource(R.string.forgot_password_title),
+                    style = TextStyle(
+                        fontSize = 25.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = colorResource(R.color.orange_primary)
+                    )
+                )
+
+                Spacer(Modifier.height(32.dp))
+
+                Text(
+                    text = stringResource(R.string.forgot_password_content),
+                    style = MaterialTheme.typography.bodyLarge.copy(fontStyle = FontStyle.Italic),
+                )
+
+                Spacer(Modifier.height(32.dp))
+
+                CustomEditTextField(
+                    leadingIcon = Icons.Default.Email,
+                    title = "Email của bạn",
+                    placeholderText = "Nhập email",
+                    isPasswordTextField = false,
+                    onTextChange = {
+                        email = it
+                        isEmailValid = it.isEmpty() || emailRegex.matches(it)
+                    }
+                )
+
+                // ⚠️ Hiển thị lỗi khi email không hợp lệ
+                if (!isEmailValid && email.isNotEmpty()) {
+                    Text(
+                        text = "Email không hợp lệ. Vui lòng nhập đúng định dạng.",
+                        color = Color.Red,
+                        fontSize = 13.sp,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+
+                Spacer(Modifier.height(64.dp))
+
+                Button(
+                    onClick = { viewModel.sendForgotPasswordEmail(email) },
+                    shape = RoundedCornerShape(8.dp),
+                    contentPadding = PaddingValues(vertical = 20.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (canSubmit)
+                            colorResource(R.color.light_orange_icon)
+                        else
+                            colorResource(R.color.light_gray)
+                    ),
+                    enabled = canSubmit,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(stringResource(R.string.request_title), color = Color.White)
+                }
             }
-        }
-
-        is ForgotPasswordUiState.Success -> {
-            Toast.makeText(
-                context,
-                (uiState as ForgotPasswordUiState.Success).message,
-                Toast.LENGTH_SHORT
-            ).show()
-
-            navController.popBackIfCan()
         }
     }
 }

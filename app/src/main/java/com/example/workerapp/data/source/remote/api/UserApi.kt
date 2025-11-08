@@ -6,12 +6,14 @@ import com.example.workerapp.data.source.remote.dto.request.ChangePasswordReques
 import com.example.workerapp.data.source.remote.dto.request.FcmTokenRequest
 import com.example.workerapp.data.source.remote.dto.request.ForgotPasswordRequest
 import com.example.workerapp.data.source.remote.dto.request.RefreshTokenRequest
+import com.example.workerapp.data.source.remote.dto.request.ResetPasswordRequest
 import com.example.workerapp.data.source.remote.dto.request.UserLoginRequest
 import com.example.workerapp.data.source.remote.dto.request.UserLoginWithGGRequest
 import com.example.workerapp.data.source.remote.dto.request.UserRegisterRequest
 import com.example.workerapp.data.source.remote.dto.request.UserUpdateRequest
 import com.example.workerapp.data.source.remote.dto.response.ChangePasswordResponse
 import com.example.workerapp.data.source.remote.dto.response.ForgotPasswordResponse
+import com.example.workerapp.data.source.remote.dto.response.ResetPasswordResponse
 import com.example.workerapp.data.source.remote.dto.response.TokenWrapperResponse
 import com.example.workerapp.data.source.remote.dto.response.UploadingImageResponse
 import com.example.workerapp.data.source.remote.dto.response.UserUpdateResponse
@@ -44,6 +46,9 @@ interface UserApi {
 
     @POST("emails/send")
     suspend fun sendEmail(@Body request: ForgotPasswordRequest) : Response<ForgotPasswordResponse>
+
+    @PUT("users/forgot-password")
+    suspend fun resetPassword(@Body request: ResetPasswordRequest ) : Response<ResetPasswordResponse>
 
     @AuthRequired
     @POST("devices")

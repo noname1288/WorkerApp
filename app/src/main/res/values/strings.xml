@@ -50,5 +50,6 @@
     <string name="request_title">Gửi yêu cầu</string>
     <string name="map_title">Map</string>
     <string name="policy_title">Chính sách</string>
+    <string name="request_new_password_title">Yêu cầu mật khẩu mới</string>
 </resources>
 

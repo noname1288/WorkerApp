@@ -1,7 +1,6 @@
 package com.example.workerapp.presentation.screens.profile.detail
 
 import android.net.Uri
-import android.os.Parcelable
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -29,18 +28,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.outlined.DateRange
-import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -66,14 +61,15 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.workerapp.R
+import com.example.workerapp.data.source.model.MapResult
 import com.example.workerapp.navigation.AppRoutes
+import com.example.workerapp.presentation.screens.profile.components.GenderSelectionRow
+import com.example.workerapp.presentation.screens.profile.components.NewTextFieldRow
 import com.example.workerapp.utils.TimeUtils
 import com.example.workerapp.utils.components.CircleLoadingIndicator
 import com.example.workerapp.utils.components.DatePickerModal
 import com.example.workerapp.utils.ext.popBackIfCan
 import com.google.maps.android.compose.GoogleMap
-import kotlinx.parcelize.Parcelize
-import kotlinx.serialization.Serializable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -94,6 +90,7 @@ fun ProfileDetailScreen(
     var showDateDialog by remember { mutableStateOf(false) }
     var showConfirmDialog by remember { mutableStateOf(false) }
     var genderList = listOf("Nam", "Nữ", "Khác")
+    val selectedGender = form.gender
 
     val activeColor = Color.Black
     val borderColor = Color(0xFF7A7A7A)
@@ -114,21 +111,23 @@ fun ProfileDetailScreen(
         ?.getStateFlow<MapResult?>("map_result", null)
     val mapResult by resultFlow?.collectAsState() ?: remember { mutableStateOf(null) }
 
-    LaunchedEffect(user) {
-        user?.let {
-            viewModel.onUsernameChange(it.username)
-            viewModel.onGenderChange(it.gender)
-            viewModel.onDobChange(it.dob)
-            viewModel.onTelChange(it.tel)
-            viewModel.onLocationChange(it.location)
-        }
-    }
-
     LaunchedEffect(mapResult) {
         mapResult?.let { res ->
             viewModel.onLocationPicked(res.address, res.lat, res.lng)
 
             navController.currentBackStackEntry?.savedStateHandle?.set("map_result", null)
+        }
+    }
+
+    LaunchedEffect((uiState as? ProfileDetailUiState.Error)?.message) {
+        (uiState as? ProfileDetailUiState.Error)?.message?.let {
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    LaunchedEffect((uiState as? ProfileDetailUiState.Success)?.message) {
+        (uiState as? ProfileDetailUiState.Success)?.message?.let {
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -173,7 +172,7 @@ fun ProfileDetailScreen(
                 ) {
                     Box {
                         AsyncImage(
-                            model = imageUri ?: user?.avatar,
+                            model = imageUri ?: form.imagePath ?: user?.avatar,
                             error = painterResource(R.drawable.ic_launcher_background),
                             contentDescription = null,
                             modifier = Modifier
@@ -203,83 +202,45 @@ fun ProfileDetailScreen(
 
             item {
 
-                OutlinedTextField(
+                NewTextFieldRow(
                     value = form.username,
                     onValueChange = viewModel::onUsernameChange,
-                    label = { Text("Tên đầy đủ") },
-                    placeholder = { Text("Nguyễn Văn A...") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    shape = RoundedCornerShape(8.dp)
+                    title = "Tên đầy đủ",
+                    placeholderText = "Nguyễn Văn A...",
                 )
 
                 Spacer(Modifier.height(16.dp))
 
-                OutlinedTextField(
+                GenderSelectionRow(
+                    title = "Giới tính",
+                    genderList = genderList,
+                    selectedGender = selectedGender,
+                    onGenderSelected = { gender ->
+                        viewModel.onGenderChange(gender)
+                    }
+                )
+
+                Spacer(Modifier.height(16.dp))
+
+                NewTextFieldRow(
                     value = form.tel,
                     onValueChange = viewModel::onTelChange,
-                    label = { Text("Số điện thoại liên hệ") },
-                    placeholder = { Text("09xxxxxx...") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    shape = RoundedCornerShape(8.dp)
+                    title = "Số điện thoại liên hệ",
+                    placeholderText = "09xxxxxx...",
                 )
 
                 Spacer(Modifier.height(16.dp))
 
-                ExposedDropdownMenuBox(
-                    expanded = dropDownListexpanded,
-                    onExpandedChange = { dropDownListexpanded = !dropDownListexpanded },
-                ) {
-                    OutlinedTextField(
-                        value = form.gender,
-                        onValueChange = { },
-                        label = { Text("Giới tính") },
-                        placeholder = { Text("Nữ...") },
-                        trailingIcon = {
-                            Icon(
-                                Icons.Outlined.KeyboardArrowDown,
-                                contentDescription = null
-                            )
-                        },
-                        singleLine = true,
-                        readOnly = true,
-                        shape = RoundedCornerShape(8.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .menuAnchor(),
-                    )
-
-                    ExposedDropdownMenu(
-                        expanded = dropDownListexpanded,
-                        onDismissRequest = {
-                            dropDownListexpanded = false
-                        }
-                    ) {
-                        genderList.forEachIndexed { index, genderItem ->
-                            DropdownMenuItem(
-                                text = { Text(text = genderItem) },
-                                onClick = {
-                                    viewModel.onGenderChange(genderItem)
-                                    dropDownListexpanded = false
-                                }
-                            )
-                        }
-                    }
-                }
-
-                Spacer(Modifier.height(16.dp))
-
-                OutlinedTextField(
+                NewTextFieldRow(
                     value = form.dob,
                     onValueChange = {},
+                    title = "Ngày sinh",
+                    placeholderText = "01/01/2000...",
                     readOnly = true,
-                    label = { Text("Ngày sinh") },
-                    placeholder = { Text("01/01/2000...") },
-                    trailingIcon = { Icon(Icons.Outlined.DateRange, null) },
-                    singleLine = true,
                     enabled = false,
-                    shape = RoundedCornerShape(8.dp),
+                    trailingIcon = {
+                        Icon(Icons.Outlined.DateRange, null)
+                    },
                     colors = OutlinedTextFieldDefaults.colors(
                         disabledTextColor = activeColor,
                         disabledBorderColor = borderColor,
@@ -292,24 +253,23 @@ fun ProfileDetailScreen(
                         unfocusedBorderColor = borderColor,
                         unfocusedTextColor = activeColor
                     ),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            showDateDialog = true
-                        }
+                    modifier = Modifier.clickable {
+                        showDateDialog = true
+                    }
                 )
 
                 Spacer(Modifier.height(16.dp))
 
-                OutlinedTextField(
+                NewTextFieldRow(
                     value = form.location,
                     onValueChange = {},
-                    label = { Text("Nơi ở") },
-                    placeholder = { Text("282 Triều Khúc...") },
-                    trailingIcon = { Icon(Icons.Outlined.LocationOn, contentDescription = null) },
-                    singleLine = true,
-                    shape = RoundedCornerShape(8.dp),
+                    title = "Nơi ở",
+                    placeholderText = "282 Triều Khúc...",
+                    readOnly = true,
                     enabled = false,
+                    trailingIcon = {
+                        Icon(Icons.Outlined.LocationOn, null)
+                    },
                     colors = OutlinedTextFieldDefaults.colors(
                         disabledTextColor = activeColor,
                         disabledBorderColor = borderColor,
@@ -322,11 +282,9 @@ fun ProfileDetailScreen(
                         unfocusedBorderColor = borderColor,
                         unfocusedTextColor = activeColor
                     ),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            navController.navigate(AppRoutes.MAP_SCREEN)
-                        }
+                    modifier = Modifier.clickable {
+                        navController.navigate(AppRoutes.MAP_SCREEN)
+                    }
                 )
 
                 Spacer(Modifier.height(32.dp))
@@ -336,7 +294,6 @@ fun ProfileDetailScreen(
                 Button(
                     onClick = {
                         showConfirmDialog = true
-                        viewModel.updateProfile()
                     },
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(
@@ -368,7 +325,7 @@ fun ProfileDetailScreen(
                 confirmButton = {
                     Button(onClick = {
                         showConfirmDialog = false
-
+                        viewModel.updateProfile()
                     }) {
                         Text("Xác nhận")
                     }
@@ -391,13 +348,7 @@ fun ProfileDetailScreen(
     }
 
     when (uiState) {
-        is ProfileDetailUiState.Error -> {
-            Toast.makeText(
-                context,
-                (uiState as ProfileDetailUiState.Error).message,
-                Toast.LENGTH_SHORT
-            ).show()
-        }
+        is ProfileDetailUiState.Error -> {}
 
         ProfileDetailUiState.Idle -> {}
         ProfileDetailUiState.Loading -> {
@@ -411,20 +362,6 @@ fun ProfileDetailScreen(
             }
         }
 
-        is ProfileDetailUiState.Success -> {
-            Toast.makeText(
-                context,
-                (uiState as ProfileDetailUiState.Success).message,
-                Toast.LENGTH_SHORT
-            ).show()
-        }
+        is ProfileDetailUiState.Success -> {}
     }
 }
-
-@Serializable
-@Parcelize
-data class MapResult(
-    val address: String,
-    val lat: Double,
-    val lng: Double
-) : Parcelable
