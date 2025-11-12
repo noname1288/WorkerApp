@@ -12,60 +12,17 @@
 
 ---
 
-## 👥 Vai trò: **Người cung cấp dịch vụ (Worker)**
+## 👥**Người cung cấp dịch vụ (Worker)** được cung cấp các chức năng
 
-### 1. 🔑 Đăng ký tài khoản
-
-* Người cung cấp dịch vụ cần **đăng ký tài khoản** với **Quản trị viên**.
-* Sau khi hoàn tất **xác minh và phê duyệt**, tài khoản mới được kích hoạt.
-* Khi đã trở thành **nhân viên chính thức**, người dùng có thể truy cập và sử dụng toàn bộ chức năng trong vai trò của mình.
-
-### 2. 🔐 Đăng nhập
-
-* Nhân viên nhập **Email** và **Mật khẩu** (được cấp hoặc đăng ký trước đó).
-* Hệ thống xác thực và chuyển hướng đến **màn hình Trang chủ**.
-
-### 3. 📋 Xem danh sách công việc
-
-* Truy cập tab **Trang chủ** → hệ thống hiển thị danh sách các công việc đang tuyển theo **loại hình dịch vụ** và **khu vực**.
-* Chọn một công việc để xem chi tiết: **mô tả, địa điểm, mức giá, thời gian, loại dịch vụ.**
-
-### 4. 📨 Ứng tuyển công việc
-
-* Nhấn **“Ứng tuyển”** tại trang chi tiết công việc.
-* Hệ thống gửi yêu cầu đến **Khách hàng**, hiển thị thông báo *“Ứng tuyển thành công”*.
-* Công việc được thêm vào danh sách **“Đang chờ duyệt”**.
-
-### 5. ❌ Huỷ ứng tuyển
-
-* Trước khi Khách hàng chấp thuận, nhân viên có thể huỷ ứng tuyển trong mục **“Ứng tuyển của tôi”**.
-* Hệ thống cập nhật trạng thái và thông báo đến Khách hàng.
-
-### 6. ✅ Nhận việc
-
-* Khi Khách hàng **chấp thuận ứng tuyển**, hệ thống gửi thông báo *“Bạn đã được nhận”*.
-* Nhân viên xác nhận **“Nhận việc”** → công việc chuyển sang trạng thái **“Đang thực hiện”**.
-
-### 7. 🔧 Cập nhật tiến độ công việc
-
-* Trong chi tiết công việc → chọn **“Bắt đầu làm việc”**.
-* Sau khi hoàn tất → chọn **“Hoàn thành công việc”**.
-* Hệ thống gửi thông báo đến Khách hàng để xác nhận hoàn tất.
-
-### 8. ⭐ Xem đánh giá
-
-* Sau khi Khách hàng đánh giá, nhân viên nhận thông báo và xem chi tiết trong mục **“Đánh giá”**.
-* Hệ thống hiển thị **điểm trung bình và nhận xét** trên hồ sơ cá nhân.
-
-### 9. 📅 Quản lý lịch làm việc
-
-* Chọn tab **“Lịch làm việc”** để xem các công việc đã được duyệt theo **ngày/giờ**.
-* Có thể **lọc theo trạng thái hoặc loại dịch vụ** để dễ dàng quản lý.
-
-### 10.💬 Chat Realtime với khách hàng
-
-* Chọn tab **“Tin nhắn”** để danh sách khách hàng từng trao đổi trong quá khứ.
-* Chọn chi tiết một người và nhắn tin cho người đó.
+* Đăng ký tài khoản: Đăng ký qua Admin hệ thống
+* Đăng nhập bằng Email | Password
+* Xem danh sách công việc
+* Ứng tuyển công việc và chờ duyệt
+* Có thể huỷ ứng tuyển
+* Nhận việc - Khi được chấp nhận, công việc sẽ được hiển thị trong "Lịch làm việc"
+* Xem đánh giá từ khách hàng 
+* Quản lý lịch làm việc: Lọc các công việc theo ngày cụ thể
+* Chat Realtime với khách hàng
 
 ---
 
@@ -75,14 +32,14 @@
 
 * **UI (Compose)** – giao diện hiện đại, dễ mở rộng.
 * **ViewModel** – quản lý trạng thái, luồng dữ liệu bất đồng bộ.
-* **Repository** – xử lý truy xuất dữ liệu từ **Firebase** và **API**.
+* **Repository** – xử lý truy xuất dữ liệu từ **Firebase**, **API (Remote)** hoặc **(Local)** khi không có mạng.
 
 ### 📘 Biểu đồ hệ thống
 
 * **Biểu đồ lớp (Class Diagram)**: mô tả chi tiết mối quan hệ giữa các thực thể như *User, Job, Order, Review, Notification…*
-  
+![Class Diagram](docs/diagram.png)
 * **Biểu đồ Use Case**: thể hiện các chức năng chính của hệ thống đối với từng vai trò *(Client, Worker, Admin)*.
-
+![Use Case Diagram](docs/use_case.png)
 ---
 
 ## ⚙️ Công nghệ sử dụng
@@ -102,21 +59,23 @@
 
 ## 📱 Tính năng chính (Worker App)
 
-* 🔍 **Tìm kiếm & lọc công việc** theo loại dịch vụ, địa điểm, thời gian.
-* 📩 **Ứng tuyển – Huỷ ứng tuyển – Nhận việc – Cập nhật tiến độ.**
+* 🔍 **Tìm kiếm công việc** theo loại dịch vụ.
+* 📩 **Ứng tuyển – Huỷ ứng tuyển – Nhận việc.**
 * 🔔 **Thông báo realtime (FCM)** khi có cập nhật đơn việc hoặc đánh giá.
 * 📊 **Xem điểm đánh giá và phản hồi khách hàng.**
 * 🗓️ **Quản lý lịch làm việc theo ngày/tuần.**
-* 🧭 **Tích hợp bản đồ định vị và chỉ đường.**
+* 🧭 **Tích hợp bản đồ định vị.**
 
 ---
 
 ## 🧠 Hướng phát triển tương lai
 
 * Tích hợp **đề xuất việc làm thông minh** dựa trên kinh nghiệm và vị trí.
-* Hỗ trợ **đa ngôn ngữ (Việt/Anh/Nhật)**.
+* Hỗ trợ đa ngôn ngữ (Việt/Anh).
 * Thay đổi UI Mode (Light Mode/ Dark Mode)
 
 ---
-
-Bạn có muốn mình giúp viết thêm **README (English version)** hoặc **chèn preview ảnh UML và Use Case** (markdown image links) để commit trực tiếp lên GitHub không?
+## Demo
+| Feature | Preview |
+|----------|----------|
+| 🕹️ App Flow | [[App Flow]](https://drive.google.com/drive/folders/1MSOnLEOGi1m5Wr_ivLKaBJUWsTaZX7X-?usp=sharing) |
