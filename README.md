@@ -37,9 +37,9 @@
 ### 📘 Biểu đồ hệ thống
 
 * **Biểu đồ lớp (Class Diagram)**: mô tả chi tiết mối quan hệ giữa các thực thể như *User, Job, Order, Review, Notification…*
-![Class Diagram](docs/diagram.png)
+![Class Diagram](docs/diagram.jpg)
 * **Biểu đồ Use Case**: thể hiện các chức năng chính của hệ thống đối với từng vai trò *(Client, Worker, Admin)*.
-![Use Case Diagram](docs/use_case.png)
+![Use Case Diagram](docs/use_case.jpg)
 ---
 
 ## ⚙️ Công nghệ sử dụng
