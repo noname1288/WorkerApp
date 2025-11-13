@@ -49,7 +49,7 @@
 | Ngôn ngữ        | **Kotlin**                                       |
 | UI Framework    | **Jetpack Compose**                              |
 | Kiến trúc       | **MVVM + Repository Pattern**                    |
-| CSDL & Realtime | **Firebase Firestore, Realtime Database (RTDB)** |
+| CSDL & Realtime | **Firebase Firestore, Realtime Database (RTDB), Room** |
 | Thông báo       | **Firebase Cloud Messaging (FCM)**               |
 | Bản đồ          | **Google Map API**                               |
 | Điều hướng      | **Navigation Component (Compose Navigation)**    |
