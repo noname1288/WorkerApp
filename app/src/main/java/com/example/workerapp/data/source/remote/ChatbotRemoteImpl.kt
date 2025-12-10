@@ -1,33 +1,34 @@
-package com.example.workerapp.data.repository
+package com.example.workerapp.data.source.remote
 
-import com.example.workerapp.data.ReviewRepository
-import com.example.workerapp.data.source.remote.api.ReviewApi
+import com.example.workerapp.data.source.ChatbotDataSource
+import com.example.workerapp.data.source.remote.api.ChatbotApi
 import com.example.workerapp.data.source.remote.dto.NetworkResult
+import com.example.workerapp.data.source.remote.dto.request.ChatbotRequest
 import com.example.workerapp.data.source.remote.dto.response.ApiErrorResponse
-import com.example.workerapp.data.source.remote.dto.response.ReviewResponse
+import com.example.workerapp.data.source.remote.dto.response.ChatbotResponse
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
 
-class ReviewRepositoryImpl @Inject constructor(
-    private val reviewApi: ReviewApi,
+class ChatbotRemoteImpl @Inject constructor(
+    private val chatbotApi: ChatbotApi,
     moshi: Moshi
-) : ReviewRepository {
+) : ChatbotDataSource.Remote {
 
     private val errorAdapter = moshi.adapter(ApiErrorResponse::class.java)
 
-    override suspend fun getReviews(workerUid: String): NetworkResult<ReviewResponse> {
+    override suspend fun sendMsg(request: ChatbotRequest): NetworkResult<ChatbotResponse> {
         return try {
-            val response = reviewApi.getReviews(workerUid)
+            val response = chatbotApi.sendMessage(request)
 
-            if (response.isSuccessful) {
+            if (response.isSuccessful){
                 val body = response.body()
 
-                if (body != null && body.success && body.experiences != null) {
-                    NetworkResult.Success(body.experiences)
-                } else {
-                    NetworkResult.Error(body?.message ?: "Empty response body or data")
+                if (body != null){
+                    NetworkResult.Success(body)
+                }else {
+                    NetworkResult.Error("Empty response body")
                 }
-            } else {
+            }else {
                 val errorMessage = response.errorBody()?.string()
                     ?.let { json -> errorAdapter.fromJson(json)?.error }
                     ?: response.message()
