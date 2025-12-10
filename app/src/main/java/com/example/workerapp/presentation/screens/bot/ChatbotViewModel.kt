@@ -1,5 +1,6 @@
 package com.example.workerapp.presentation.screens.bot
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.room.util.query
@@ -50,9 +51,21 @@ class ChatbotViewModel @Inject constructor(
     }
 
     fun updateCurrentLocation(name: String, lat: Double, lon: Double){
-        addressName.value = name
         addressLat.value = lat
         addressLon.value = lon
+        Log.d("ChatbotViewModel", "lat: ${addressLat.value} | lon: ${addressLon.value}")
+
+        viewModelScope.launch {
+            val result = chatbotRepository.getGeoCoding(lat, lon)
+
+            result.onSuccess { data ->
+                addressName.value = data.display_name
+                Log.d("ChatbotViewModel", "name: ${addressName.value}")
+            }.onFailure{
+                addressName.value = ""
+            }
+
+        }
     }
 
     fun sendMessage(query: String){

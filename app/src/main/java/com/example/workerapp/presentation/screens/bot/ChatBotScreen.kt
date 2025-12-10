@@ -88,7 +88,7 @@ fun ChatBotScreen(
             } catch (e: SecurityException) {
                 Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
             } catch (e: Exception) {
-
+                Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
             }
 
         }
