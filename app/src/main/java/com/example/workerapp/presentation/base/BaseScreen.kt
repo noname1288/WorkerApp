@@ -1,17 +1,21 @@
 package com.example.workerapp.ui.base
 
 import android.os.Build
+import android.os.Build.VERSION.SDK_INT
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -26,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -35,6 +40,10 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import coil.ImageLoader
+import coil.compose.AsyncImage
+import coil.decode.GifDecoder
+import coil.decode.ImageDecoderDecoder
 import com.example.workerapp.R
 import com.example.workerapp.navigation.AppNavHost
 import com.example.workerapp.navigation.AppRoutes
@@ -47,7 +56,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
-fun BaseScreen( navController: NavHostController) {
+fun BaseScreen(navController: NavHostController) {
 
     val startDestination = AppRoutes.SPLASH
 
@@ -56,6 +65,11 @@ fun BaseScreen( navController: NavHostController) {
         AppRoutes.CALENDAR,
         AppRoutes.NOTIFICATION,
         AppRoutes.PROFILE
+    )
+
+    val showChatBot = listOf(
+        AppRoutes.HOME,
+        AppRoutes.CALENDAR
     )
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -99,6 +113,37 @@ fun BaseScreen( navController: NavHostController) {
                         )
                     }
                 )
+        },
+        floatingActionButton = {
+            val isShowChatBot = currentRoute != null && showChatBot.contains(currentRoute)
+            val gifEnabledLoader = ImageLoader.Builder(LocalContext.current)
+                .components {
+                    if ( SDK_INT >= 28 ) {
+                        add(ImageDecoderDecoder.Factory())
+                    } else {
+                        add(GifDecoder.Factory())
+                    }
+                }.build()
+
+            if (isShowChatBot) {
+                Box(
+                    Modifier.clickable {
+                        navController.safeNavigate(
+                            AppRoutes.CHATBOT_SCREEN,
+                            popUpToRoute = AppRoutes.HOME,
+                            restore = true
+                        )
+                    },
+                    contentAlignment = Alignment.Center
+                ) {
+                    AsyncImage(
+                        model = R.drawable.icons_chatbot_50,
+                        imageLoader = gifEnabledLoader,
+                        contentDescription = null,
+                        modifier = Modifier.size(56.dp)
+                    )
+                }
+            }
         },
         containerColor = colorResource(R.color.bg_gray)
     ) { innerPadding ->

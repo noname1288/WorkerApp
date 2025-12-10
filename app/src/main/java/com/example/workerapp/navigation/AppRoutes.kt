@@ -53,5 +53,6 @@ object AppRoutes {
     const val REVIEW_SCREEN = "review"
     const val POLICY_SCREEN = "policy"
     const val MAP_SCREEN = "map_screen"
+    const val CHATBOT_SCREEN = "chatbot_screen"
 
 }
