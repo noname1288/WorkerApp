@@ -1,5 +1,6 @@
 package com.example.workerapp.data.source.remote
 
+import android.util.Log
 import com.example.workerapp.data.source.ChatbotDataSource
 import com.example.workerapp.data.source.remote.api.ChatbotApi
 import com.example.workerapp.data.source.remote.dto.NetworkResult
@@ -31,6 +32,7 @@ class ChatbotRemoteImpl @Inject constructor(
                 val body = response.body()
 
                 if (body != null){
+                    Log.d(TAG, "Body: $body")
                     NetworkResult.Success(body)
                 }else {
                     NetworkResult.Error("Empty response body")
@@ -40,6 +42,7 @@ class ChatbotRemoteImpl @Inject constructor(
                     ?.let { json -> errorAdapter.fromJson(json)?.error }
                     ?: response.message()
                     ?: "Request failed with status code ${response.code()}"
+                Log.e(TAG, errorMessage)
 
                 NetworkResult.Error(errorMessage)
             }
@@ -84,6 +87,10 @@ class ChatbotRemoteImpl @Inject constructor(
                 NetworkResult.Error(e.localizedMessage ?: "Unexpected error occurred")
             }
         }
+    }
+
+    companion object{
+        private val TAG = "ChatbotRemoteImpl"
     }
 }
 

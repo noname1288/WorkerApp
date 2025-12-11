@@ -30,7 +30,8 @@ data class ChatbotJobResponse(
     val lon: Double,
     val price: Int,
     val serviceType: String,
-    val similarity_score: Double,
+    @Json(name = "similarity_score")
+    val similarityScore: Double,
     val startTime: String,
     val userID: String
 )

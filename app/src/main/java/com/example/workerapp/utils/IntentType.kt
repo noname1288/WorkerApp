@@ -1,7 +1,7 @@
 package com.example.workerapp.utils
 
 object IntentType {
-    val JobType = "job_search"
+    val JobType = "job"
     val GeneralType = "general"
     val PolicyType = "policy"
     val InfoType = "info"

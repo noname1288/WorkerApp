@@ -9,7 +9,7 @@ import retrofit2.http.POST
 
 interface ChatbotApi {
     @AuthRequired
-    @POST("/chatbot")
+    @POST("/api/chatbot")
     suspend fun sendMessage(
         @Body request: ChatbotRequest
     ): Response<ChatbotResponse>
