@@ -285,7 +285,7 @@ fun ReceiverRow(modifier: Modifier = Modifier, partnerAvatar: String, content: S
     ) {
         AsyncImage(
             model = partnerAvatar,
-            error = painterResource(R.drawable.ic_launcher_background),
+            error = painterResource(R.drawable.icon_bot),
             contentDescription = "Avatar",
             modifier = Modifier
                 .clip(CircleShape)

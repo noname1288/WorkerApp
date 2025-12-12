@@ -3,6 +3,7 @@ package com.example.workerapp.presentation.screens.bot
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -45,19 +46,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.workerapp.R
 import com.example.workerapp.data.source.remote.dto.response.ChatbotJobResponse
+import com.example.workerapp.navigation.AppRoutes
 import com.example.workerapp.presentation.screens.map.LocationPermissionHandler
 import com.example.workerapp.presentation.screens.notification_chat.chat.ReceiverRow
 import com.example.workerapp.presentation.screens.notification_chat.chat.SendMessageBar
 import com.example.workerapp.presentation.screens.notification_chat.chat.SenderRow
+import com.example.workerapp.utils.ServiceType
 import com.example.workerapp.utils.StringUtils
 import com.example.workerapp.utils.cached.UserSession
+import com.example.workerapp.utils.ext.navigateWithArgs
 import com.example.workerapp.utils.ext.popBackIfCan
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
@@ -156,8 +160,14 @@ fun ChatBotScreen(
                 when (message) {
                     is ChatbotResponseUiModel.JobResponse -> {
                         val partnerAvatar = painterResource(R.drawable.icon_bot).toString()
-                        JobResponseRow(partnerAvatar = partnerAvatar, content = StringUtils.extractIntroAndOutro(message.text), jobs = message.listJobs)
+                        JobResponseRow(
+                            navController = navController,
+                            partnerAvatar = partnerAvatar,
+                            content = StringUtils.extractIntroAndOutro(message.text),
+                            jobs = message.listJobs
+                        )
                     }
+
                     is ChatbotResponseUiModel.TextResponse -> {
                         if (message.userUid == UserSession.uid) {
                             SenderRow(
@@ -178,6 +188,7 @@ fun ChatBotScreen(
 @Composable
 fun JobResponseRow(
     modifier: Modifier = Modifier,
+    navController: NavController,
     partnerAvatar: String,
     content: String,
     jobs: List<ChatbotJobResponse>
@@ -193,7 +204,7 @@ fun JobResponseRow(
         // Avatar
         AsyncImage(
             model = partnerAvatar,
-            error = painterResource(R.drawable.ic_launcher_background),
+            error = painterResource(R.drawable.icon_bot),
             contentDescription = "Avatar",
             modifier = Modifier
                 .clip(CircleShape)
@@ -224,7 +235,12 @@ fun JobResponseRow(
 
             // Job list
             jobs.forEach { job ->
-                ChatbotJobCard(job = job)
+                ChatbotJobCard(job = job, onClicked = {
+                    navController.navigateWithArgs(
+                        route = AppRoutes.CLEANING_DETAIL,
+                        args = arrayOf(job.jobID, false)
+                    )
+                })
                 Spacer(Modifier.height(8.dp))
             }
         }
@@ -232,7 +248,7 @@ fun JobResponseRow(
 }
 
 @Composable
-fun ChatbotJobCard(job: ChatbotJobResponse) {
+fun ChatbotJobCard(job: ChatbotJobResponse, onClicked: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -241,11 +257,16 @@ fun ChatbotJobCard(job: ChatbotJobResponse) {
             .padding(12.dp)
     ) {
         Text(
-            text = job.serviceType,
+            text = ServiceType.translateToVietnamese(job.serviceType),
             style = MaterialTheme.typography.bodyMedium.copy(
                 fontSize = 15.sp,
-                fontWeight = FontWeight.Bold
-            )
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF1E88E5), // blue rõ
+                textDecoration = TextDecoration.Underline
+            ),
+            modifier = Modifier.clickable {
+                onClicked()
+            }
         )
 
         Text(
@@ -265,60 +286,4 @@ fun ChatbotJobCard(job: ChatbotJobResponse) {
             style = MaterialTheme.typography.bodySmall
         )
     }
-}
-
-@Preview
-@Composable
-fun PreviewJobResponseRow(modifier: Modifier = Modifier) {
-    val partnerAvatar = painterResource(R.drawable.icon_bot).toString()
-    val mockJobs = listOf(
-        ChatbotJobResponse(
-            context = "Giúp việc theo giờ, dọn dẹp phòng khách và bếp.",
-            createdAt = "2025-01-10T14:32:00Z",
-            jobID = "JOB_001",
-            lat = 10.762622,
-            listDays = listOf("Monday", "Wednesday", "Friday"),
-            location = "Quận 1, TP. Hồ Chí Minh",
-            lon = 106.660172,
-            price = 150000,
-            serviceType = "CLEANING",
-            similarityScore = 0.92,
-            startTime = "08:00",
-            userID = "USER_1001"
-        ),
-        ChatbotJobResponse(
-            context = "Trông trẻ 3 tuổi trong 4 giờ buổi chiều.",
-            createdAt = "2025-01-11T09:15:00Z",
-            jobID = "JOB_002",
-            lat = 21.028511,
-            listDays = listOf("Tuesday", "Thursday"),
-            location = "Cầu Giấy, Hà Nội",
-            lon = 105.804817,
-            price = 250000,
-            serviceType = "BABYSITTING",
-            similarityScore = 0.87,
-            startTime = "14:00",
-            userID = "USER_2002"
-        ),
-        ChatbotJobResponse(
-            context = "Chăm sóc người lớn tuổi, hỗ trợ ăn uống và đi lại.",
-            createdAt = "2025-01-12T18:50:00Z",
-            jobID = "JOB_003",
-            lat = 10.823099,
-            listDays = listOf("Saturday", "Sunday"),
-            location = "Bình Thạnh, TP. Hồ Chí Minh",
-            lon = 106.629664,
-            price = 300000,
-            serviceType = "ELDERCARE",
-            similarityScore = 0.94,
-            startTime = "09:30",
-            userID = "USER_3003"
-        )
-    )
-
-    JobResponseRow(
-        partnerAvatar = partnerAvatar,
-        content = "Dưới đây là phiên bản nâng cấp của JobResponseRow để hiển thị tin nhắn trả về + danh sách job gợi ý một cách đẹp – rõ ràng – UI kiểu chat.\n",
-        jobs = mockJobs
-    )
 }
