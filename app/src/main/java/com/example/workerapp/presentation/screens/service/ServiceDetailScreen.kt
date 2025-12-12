@@ -146,8 +146,15 @@ fun ServiceDetailScreen(
                                 }
 
                                 ServiceType.HealthcareType -> {
+                                    val jobWrapper = job as HealthcareJobModel
+
+                                    LaunchedEffect(jobWrapper.uid) {
+                                        viewModel.loadHealthcareJobImage(jobWrapper)
+                                    }
+
                                     HealthcareJobCard(
-                                        job as HealthcareJobModel,
+                                        job = jobWrapper,
+                                        jobImage = jobImageMap[jobWrapper.uid] ?: "",
                                         onClick = {
                                             navController.navigateWithArgs(
                                                 route = AppRoutes.HEALTHCARE_DETAIL,
