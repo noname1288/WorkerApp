@@ -62,6 +62,7 @@ fun ServiceDetailScreen(
     }
 
     val uiState by viewModel.uiState.collectAsState()
+    val jobImageMap by viewModel.jobImageMap.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.updateServiceType(serviceType)
@@ -156,8 +157,15 @@ fun ServiceDetailScreen(
                                 }
 
                                 ServiceType.MaintenanceType -> {
+                                    val jobWrapper = job as MaintenanceJobResponse
+
+                                    LaunchedEffect(jobWrapper.uid) {
+                                        viewModel.loadMaintenanceJobImage(jobWrapper)
+                                    }
+
                                     MaintenanceJobCard(
-                                        job as MaintenanceJobResponse,
+                                        jobWrapper,
+                                        jobImage = jobImageMap[jobWrapper.uid] ?: "",
                                         onClick = {
                                             navController.navigateWithArgs(
                                                 route = AppRoutes.MAINTENANCE_DETAIL,
