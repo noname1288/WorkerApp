@@ -243,7 +243,7 @@ fun SenderRow(modifier: Modifier = Modifier, currentUserAvatar: String, content:
             .fillMaxWidth()
             .padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.End,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.Top
     ) {
         Box(
             Modifier
@@ -281,11 +281,11 @@ fun ReceiverRow(modifier: Modifier = Modifier, partnerAvatar: String, content: S
             .fillMaxWidth()
             .padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.Start,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.Top
     ) {
         AsyncImage(
             model = partnerAvatar,
-            error = painterResource(R.drawable.ic_launcher_background),
+            error = painterResource(R.drawable.icon_bot),
             contentDescription = "Avatar",
             modifier = Modifier
                 .clip(CircleShape)

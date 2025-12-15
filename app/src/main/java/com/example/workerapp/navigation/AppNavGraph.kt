@@ -18,6 +18,7 @@ import com.example.workerapp.presentation.screens.authen.AuthViewModel
 import com.example.workerapp.presentation.screens.authen.LoginScreen
 import com.example.workerapp.presentation.screens.authen.RegisterScreen
 import com.example.workerapp.presentation.screens.bot.ChatBotScreen
+import com.example.workerapp.presentation.screens.bot.ChatbotViewModel
 import com.example.workerapp.presentation.screens.calendar.CalendarScreen
 import com.example.workerapp.presentation.screens.change_password.ChangePasswordScreen
 import com.example.workerapp.presentation.screens.change_password.ChangePasswordViewModel
@@ -253,7 +254,9 @@ fun AppNavHost(
         }
 
         composable (AppRoutes.CHATBOT_SCREEN) {
-            ChatBotScreen(navController = navController)
+            val viewModel = hiltViewModel<ChatbotViewModel>()
+
+            ChatBotScreen(navController = navController, viewModel = viewModel)
         }
     }
 }

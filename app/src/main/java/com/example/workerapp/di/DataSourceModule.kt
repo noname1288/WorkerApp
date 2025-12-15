@@ -1,5 +1,6 @@
 package com.example.workerapp.di
 
+import com.example.workerapp.data.source.ChatbotDataSource
 import com.example.workerapp.data.source.JobDataSource
 import com.example.workerapp.data.source.JobServiceDataSource
 import com.example.workerapp.data.source.MessageDataSource
@@ -10,6 +11,7 @@ import com.example.workerapp.data.source.local.JobServiceLocalImpl
 import com.example.workerapp.data.source.local.NotificationLocalImpl
 import com.example.workerapp.data.source.local.TokenLocalImpl
 import com.example.workerapp.data.source.local.UserLocalImpl
+import com.example.workerapp.data.source.remote.ChatbotRemoteImpl
 import com.example.workerapp.data.source.remote.JobRemoteImpl
 import com.example.workerapp.data.source.remote.JobServiceRemoteImpl
 import com.example.workerapp.data.source.remote.MessageRemoteImpl
@@ -83,5 +85,11 @@ abstract class DataSourceModule{
     abstract fun bindMessageRemote(
         impl: MessageRemoteImpl
     ) : MessageDataSource.Remote
+
+    @Binds
+    @Singleton
+    abstract fun bindChatbotRemote(
+        impl: ChatbotRemoteImpl
+    ): ChatbotDataSource.Remote
 
 }

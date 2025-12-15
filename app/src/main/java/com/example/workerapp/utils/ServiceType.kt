@@ -5,6 +5,9 @@ object ServiceType {
     val HealthcareType = "HEALTHCARE"
     val MaintenanceType = "MAINTENANCE"
 
+    val ServiceName_Dieu_hoa = "Điều hòa"
+    val ServiceName_May_giat = "Máy giặt"
+
     fun translateToVietnamese(type: String): String {
         return when (type) {
             CleaningType -> "Dịch vụ dọn dẹp"

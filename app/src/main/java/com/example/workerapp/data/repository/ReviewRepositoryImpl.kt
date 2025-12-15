@@ -36,7 +36,6 @@ class ReviewRepositoryImpl @Inject constructor(
                 NetworkResult.Error(errorMessage)
             }
         } catch (e: Exception) {
-            // catch tất cả exception từ network / parse / IO
             NetworkResult.Error(e.localizedMessage ?: "Unexpected error occurred")
         }
     }

@@ -29,6 +29,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.example.workerapp.R
 import com.example.workerapp.data.source.model.healthcare.HealthcareJobModel
 import com.example.workerapp.ui.home.components.MetaRow
@@ -38,8 +39,9 @@ import com.example.workerapp.utils.ext.toVND
 
 @Composable
 fun HealthcareJobCard(
-    job: HealthcareJobModel,
     modifier: Modifier = Modifier,
+    job: HealthcareJobModel,
+    jobImage: String,
     onClick: () -> Unit = {}
 ) {
     val iconJobInt = R.drawable.ic_healthcare_64
@@ -55,8 +57,9 @@ fun HealthcareJobCard(
         onClick = onClick
     ) {
         Column(Modifier.padding(16.dp)) {
-            Image(
-                painterResource(R.drawable.img_healthcare_service),
+            AsyncImage(
+                model = jobImage,
+                error = painterResource(R.drawable.img_healthcare_service),
                 contentDescription = "Healthcare Service Image",
                 modifier = Modifier
                     .fillMaxWidth()
@@ -112,4 +115,3 @@ fun HealthcareJobCard(
         }
     }
 }
-

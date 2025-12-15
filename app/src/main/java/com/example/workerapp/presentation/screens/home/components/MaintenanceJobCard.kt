@@ -1,6 +1,5 @@
 package com.example.workerapp.presentation.screens.home.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,13 +26,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.example.workerapp.R
-import com.example.workerapp.data.source.model.base.UserModel
 import com.example.workerapp.data.source.model.maintenance.MaintenanceJobResponse
-import com.example.workerapp.data.source.remote.dto.wrapper.MaintenanceServiceDto
-import com.example.workerapp.data.source.remote.dto.wrapper.PowerDto
 import com.example.workerapp.ui.home.components.MetaRow
 import com.example.workerapp.ui.theme.AppColors
 import com.example.workerapp.utils.components.CustomChip
@@ -42,6 +38,7 @@ import com.example.workerapp.utils.ext.toVND
 @Composable
 fun MaintenanceJobCard(
     job: MaintenanceJobResponse,
+    jobImage: String,
     onClick: () -> Unit = {}
 ) {
     Card(
@@ -51,8 +48,9 @@ fun MaintenanceJobCard(
         onClick = onClick
     ) {
         Column(Modifier.padding(16.dp)) {
-            Image(
-                painterResource(R.drawable.img_maintenance_service),
+            AsyncImage(
+                model = jobImage,
+                error = painterResource(R.drawable.img_maintain_service),
                 contentDescription = "Maintenance Service Image",
                 modifier = Modifier
                     .fillMaxWidth()
@@ -106,64 +104,4 @@ fun MaintenanceJobCard(
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewMaiJobCard(modifier: Modifier = Modifier) {
-
-    val instance = MaintenanceJobResponse(
-        uid = "OZH00M1FBDVuksGsWnDp", user = UserModel(
-            uid = "1V7M4UearWduxecpeigS9yXlxpv2",
-            username = "Phạm Thanh Sơn",
-            gender = "Nam",
-            dob = "23/04/2003",
-            avatar = "https://res.cloudinary.com/dvofgx21o/image/upload/v1758980280/jobs/qkgqspzzz0exomvcf8eo.png",
-            email = "sonpt2304@gmail.com",
-            tel = "0395770993",
-            location = "Ng. 285 Khuất Duy Tiến",
-            role = "user"
-        ),
-        serviceType = "MAINTENANCE",
-        price = 106000.0,
-        status = "Hiring",
-        listDays = listOf(
-            "21/10/2025",
-            "22/10/2025",
-            "23/10/2025",
-            "20/10/2025"
-        ),
-        createdAt = "08/10/2025",
-        startTime = "16:09",
-        location = "Ng. 285 Khuất Duy Tiến",
-        services = listOf(
-            MaintenanceServiceDto(
-                uid = "Pntsvw5ILpxwdO7e1Gyg",
-                powers = listOf(
-                    PowerDto( // Assuming the class is named PowerModel
-                        uid = "ho4Igxp5I6FOXwJ7nleM",
-                        quantity = 2,
-                        quantityAction = 1
-                    ),
-                    PowerDto(
-                        uid = "yaTNIssSIUbIF9Avc6rg",
-                        quantity = 3,
-                        quantityAction = 0
-                    )
-                )
-            ),
-            MaintenanceServiceDto(
-                uid = "O45WyERwfZsJxywdbDHR",
-                powers = listOf(
-                    PowerDto(
-                        uid = "5Dqdejv4R9FgL6Hic11f",
-                        quantity = 1,
-                        quantityAction = 0
-                    )
-                )
-            )
-        )
-    )
-
-    MaintenanceJobCard(job = instance)
 }

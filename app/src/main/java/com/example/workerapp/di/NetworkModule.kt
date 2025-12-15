@@ -2,6 +2,7 @@ package com.example.workerapp.di
 
 import com.example.workerapp.data.TokenRepository
 import com.example.workerapp.data.source.remote.adapter.JobModelAdapter
+import com.example.workerapp.data.source.remote.api.ChatbotApi
 import com.example.workerapp.data.source.remote.api.JobApi
 import com.example.workerapp.data.source.remote.api.NotificationApi
 import com.example.workerapp.data.source.remote.api.PolicyApi
@@ -96,4 +97,9 @@ object NetworkModule {
     @Singleton
     fun providePolicyApi(@HelpoApi retrofit: Retrofit): PolicyApi =
         retrofit.create(PolicyApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideChatbotApi(@HelpoApi retrofit: Retrofit): ChatbotApi =
+        retrofit.create(ChatbotApi::class.java)
 }

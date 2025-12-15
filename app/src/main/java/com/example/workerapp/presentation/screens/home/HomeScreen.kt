@@ -340,24 +340,24 @@ fun CustomAvatarRow(
 
         Spacer(Modifier.weight(1f))
 
-        Button(
-            onClick = { onClick() },
-            shape = RoundedCornerShape(16.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = colorResource(R.color.gray).copy(alpha = 0.5f)
-            )
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Rounded.PowerSettingsNew, null, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(4.dp))
-                Text(
-                    "Bật/Tắt",
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        fontWeight = FontWeight.Bold,
-                    )
-                )
-            }
-        }
+//        Button(
+//            onClick = { onClick() },
+//            shape = RoundedCornerShape(16.dp),
+//            colors = ButtonDefaults.buttonColors(
+//                containerColor = colorResource(R.color.gray).copy(alpha = 0.5f)
+//            )
+//        ) {
+//            Row(verticalAlignment = Alignment.CenterVertically) {
+//                Icon(Icons.Rounded.PowerSettingsNew, null, modifier = Modifier.size(20.dp))
+//                Spacer(Modifier.width(4.dp))
+//                Text(
+//                    "Bật/Tắt",
+//                    style = MaterialTheme.typography.bodyLarge.copy(
+//                        fontWeight = FontWeight.Bold,
+//                    )
+//                )
+//            }
+//        }
 
     }
 }
