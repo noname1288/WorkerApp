@@ -237,13 +237,13 @@ fun SettingButtons(
 
         HorizontalDivider()
 
-        CustomExtendedButton(
-            label = stringResource(R.string.job_history_title),
-            leadingIcon = Icons.Outlined.WorkHistory,
-            onClick = { onHistoryClick() }
-        )
-
-        HorizontalDivider()
+//        CustomExtendedButton(
+//            label = stringResource(R.string.job_history_title),
+//            leadingIcon = Icons.Outlined.WorkHistory,
+//            onClick = { onHistoryClick() }
+//        )
+//
+//        HorizontalDivider()
 
         CustomExtendedButton(
             label = stringResource(R.string.review_title_from_customer),
@@ -261,13 +261,13 @@ fun SettingButtons(
 
         HorizontalDivider()
 
-        CustomExtendedButton(
-            label = stringResource(R.string.support_title),
-            leadingIcon = Icons.Outlined.SupportAgent,
-            onClick = { onSupportClick() }
-        )
-
-        HorizontalDivider()
+//        CustomExtendedButton(
+//            label = stringResource(R.string.support_title),
+//            leadingIcon = Icons.Outlined.SupportAgent,
+//            onClick = { onSupportClick() }
+//        )
+//
+//        HorizontalDivider()
 
         CustomExtendedButton(
             label = stringResource(R.string.change_password_title),

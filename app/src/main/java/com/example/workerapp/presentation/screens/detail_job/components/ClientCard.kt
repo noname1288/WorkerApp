@@ -119,6 +119,7 @@ fun ClientCard(user: UserModel, onAddressClick: () -> Unit = {}) {
                 Spacer(Modifier.width(16.dp))
 
                 Button(onClick = {}, modifier = Modifier.weight(1f),
+                    enabled = false,
                     colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.bg3))) { Text("Liên hệ") }
 
             }
