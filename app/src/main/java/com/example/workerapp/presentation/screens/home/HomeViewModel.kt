@@ -2,6 +2,7 @@ package com.example.workerapp.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.workerapp.data.JobRepository
 import com.example.workerapp.data.JobServiceRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,7 +11,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val jobServiceRepository: JobServiceRepository
+    private val jobServiceRepository: JobServiceRepository,
+    private val jobRepository: JobRepository
 ) : ViewModel() {
 
     private val _homeUiState = MutableStateFlow<HomeUiState>(HomeUiState.Idle)
@@ -60,6 +62,12 @@ class HomeViewModel @Inject constructor(
             } catch (e: Exception) {
                 _homeUiState.value = HomeUiState.Error(e.message ?: "Unknown error")
             }
+        }
+    }
+
+    fun fetchApplications(){
+        viewModelScope.launch {
+            jobRepository.getApplications()
         }
     }
 }

@@ -3,7 +3,7 @@ package com.example.workerapp.presentation.screens.profile
 import androidx.lifecycle.ViewModel
 import com.example.workerapp.data.TokenRepository
 import com.example.workerapp.data.source.remote.JobRemoteImpl
-import com.example.workerapp.data.source.remote.dto.ApplicationDto
+import com.example.workerapp.data.source.remote.dto.response.ApplicationDto
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 

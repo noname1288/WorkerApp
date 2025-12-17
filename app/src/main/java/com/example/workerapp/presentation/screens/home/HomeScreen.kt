@@ -90,6 +90,7 @@ fun HomeScreen(
     * */
     LaunchedEffect(Unit) {
         viewModel.fetchServices()
+        viewModel.fetchApplications()
         notificationViewModel.fetchAllNotifications()
     }
 

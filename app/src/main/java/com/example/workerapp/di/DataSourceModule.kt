@@ -7,6 +7,7 @@ import com.example.workerapp.data.source.MessageDataSource
 import com.example.workerapp.data.source.NotificationDataSource
 import com.example.workerapp.data.source.TokenDataSource
 import com.example.workerapp.data.source.UserDataSource
+import com.example.workerapp.data.source.local.JobLocalImpl
 import com.example.workerapp.data.source.local.JobServiceLocalImpl
 import com.example.workerapp.data.source.local.NotificationLocalImpl
 import com.example.workerapp.data.source.local.TokenLocalImpl
@@ -52,6 +53,12 @@ abstract class DataSourceModule{
     abstract fun bindNotificationLocal(
         impl: NotificationLocalImpl
     ) : NotificationDataSource.Local
+
+    @Binds
+    @Singleton
+    abstract fun bindJobLocal(
+        impl: JobLocalImpl
+    ) : JobDataSource.Local
 
     /* *
     * Remote

@@ -7,10 +7,10 @@ import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
 import com.example.workerapp.data.source.model.healthcare.HealthcareJobModel
 import com.example.workerapp.data.source.model.maintenance.MaintenanceJobResponse
 import com.example.workerapp.data.source.remote.api.JobApi
-import com.example.workerapp.data.source.remote.dto.ApplicationDto
 import com.example.workerapp.data.source.remote.dto.NetworkResult
 import com.example.workerapp.data.source.remote.dto.request.ApplicationRequest
 import com.example.workerapp.data.source.remote.dto.response.ApiErrorResponse
+import com.example.workerapp.data.source.remote.dto.response.ApplicationDto
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
 

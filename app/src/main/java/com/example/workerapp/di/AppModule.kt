@@ -5,6 +5,8 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.workerapp.data.source.local.datastore.PrefKeys
 import com.example.workerapp.data.source.local.room.AppDatabase
 import com.example.workerapp.utils.Constant
@@ -22,6 +24,22 @@ val Context.dataStore by preferencesDataStore(name = PrefKeys.PREFS_NAME)
 @InstallIn(SingletonComponent::class)
 object RoomModule {
 
+    val MIGRATION_1_2 = object : Migration(1, 2) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL(
+                """
+            CREATE TABLE IF NOT EXISTS application_history (
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                applicationId TEXT NOT NULL,
+                jobId TEXT NOT NULL,
+                createdAt TEXT NOT NULL,
+                serviceType TEXT NOT NULL
+            )
+            """.trimIndent()
+            )
+        }
+    }
+
     @Provides
     @Singleton
     fun provideDataStore(@ApplicationContext context: Context): AppDatabase {
@@ -29,7 +47,9 @@ object RoomModule {
             context,
             AppDatabase::class.java,
             Constant.DATABASE_NAME
-        ).build()
+        )
+            .addMigrations(MIGRATION_1_2)
+            .build()
     }
 
     @Provides
@@ -40,6 +60,9 @@ object RoomModule {
 
     @Provides
     fun provideNotificationDao(database: AppDatabase) = database.notificationDao()
+
+    @Provides
+    fun provideJobDao(database: AppDatabase) = database.applicationDao()
 }
 
 @Module

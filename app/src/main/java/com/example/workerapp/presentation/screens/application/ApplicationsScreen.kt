@@ -40,7 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.workerapp.R
-import com.example.workerapp.data.source.remote.dto.ApplicationDto
+import com.example.workerapp.data.source.remote.dto.response.ApplicationDto
 import com.example.workerapp.presentation.screens.profile.ApplicationsUiState
 import com.example.workerapp.utils.ServiceType
 import com.example.workerapp.utils.components.CircleLoadingIndicator
@@ -111,10 +111,22 @@ fun ApplicationsScreen(
 
         Spacer(Modifier.height(16.dp))
 
-        LazyColumn() {
-            items(applicationList.size) { index ->
-                ApplicationItemCard(item = applicationList[index])
-                HorizontalDivider()
+        if (applicationList.size == 0) {
+            Box (Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center){
+                Text(
+                    text = "Bạn chưa ứng tuyển công việc nào.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier
+                        .padding(16.dp),
+                )
+            }
+        } else {
+            LazyColumn() {
+                items(applicationList.size) { index ->
+                    ApplicationItemCard(item = applicationList[index])
+                    HorizontalDivider()
+                }
             }
         }
     }

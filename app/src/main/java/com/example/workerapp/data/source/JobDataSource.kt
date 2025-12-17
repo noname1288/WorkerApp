@@ -1,17 +1,25 @@
 package com.example.workerapp.data.source
 
+import com.example.workerapp.data.source.local.room.entity.ApplicationModel
 import com.example.workerapp.data.source.model.base.JobModel1
 import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
 import com.example.workerapp.data.source.model.healthcare.HealthcareJobModel
 import com.example.workerapp.data.source.model.maintenance.MaintenanceJobResponse
-import com.example.workerapp.data.source.remote.dto.ApplicationDto
 import com.example.workerapp.data.source.remote.dto.NetworkResult
 import com.example.workerapp.data.source.remote.dto.request.ApplicationRequest
+import com.example.workerapp.data.source.remote.dto.response.ApplicationDto
 
 interface JobDataSource {
     /* *
     * Local
     * */
+    interface Local{
+        suspend fun getApplicationsFromLocal() : List<ApplicationModel>
+
+        suspend fun saveApplicationsToLocal(applications: List<ApplicationModel>)
+
+        suspend fun addNewApplicationToLocal(application: ApplicationModel)
+    }
 
 
     /* *

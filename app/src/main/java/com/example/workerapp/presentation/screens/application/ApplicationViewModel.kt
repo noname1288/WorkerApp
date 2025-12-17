@@ -3,8 +3,8 @@ package com.example.workerapp.presentation.screens.application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.workerapp.data.source.remote.JobRemoteImpl
-import com.example.workerapp.data.source.remote.dto.ApplicationDto
 import com.example.workerapp.data.source.remote.dto.NetworkResult
+import com.example.workerapp.data.source.remote.dto.response.ApplicationDto
 import com.example.workerapp.utils.cached.UserSession
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -50,7 +50,7 @@ fun SplashScreen(navController: NavController, viewModel: AuthViewModel) {
         viewModel.checkLoginStatus()
     }
 
-    // 🔥 Lắng nghe sự kiện hết hạn token
+    // Observe token expired event
     LaunchedEffect(Unit) {
         viewModel.tokenExpiredEvent.collect {
             // Hiển thị dialog
@@ -69,7 +69,6 @@ fun SplashScreen(navController: NavController, viewModel: AuthViewModel) {
         }
     }
 
-    // Lắng nghe kết quả kiểm tra login ở splash
     when (splashState) {
         is AuthenticationUIState.Success -> {
             navController.safeNavigate(
