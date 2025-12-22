@@ -14,6 +14,8 @@ class JobRepositoryImpl @Inject constructor(
     private val local: JobDataSource.Local,
     private val remote: JobDataSource.Remote
 ) : JobRepository {
+    private val TAG = "JobRepositoryImpl"
+
     override suspend fun getApplications(): Result<List<ApplicationModel>> {
         return try {
             //get applications from remote
@@ -28,6 +30,9 @@ class JobRepositoryImpl @Inject constructor(
                 }
 
                 is NetworkResult.Success -> {
+                    //clear old data
+                    local.clearData()
+
                     //save to local
                     val applicationDtoList = response.data as List<ApplicationDto>
                     val entities = applicationDtoList.map { it.toEntity() }
@@ -45,7 +50,7 @@ class JobRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun checkApplicationByJobUid(jobUid: String): Result<Boolean> {
+    override suspend fun checkApplicationByJobUid(jobUid: String): Result<String?> {
         return try {
             val result = local.checkApplicationByJobUid(jobUid)
 
@@ -75,7 +80,21 @@ class JobRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun insertApplicationToLocal(application: ApplicationModel) {
-        TODO("Not yet implemented")
+    override suspend fun insertApplicationToLocal(application: ApplicationDto): Result<Boolean> {
+        return try {
+            //map to Application Model
+            val applicationEntity = application.toEntity()
+
+            local.addNewApplicationToLocal(applicationEntity)
+            Log.d(TAG, "insert new application success: ${applicationEntity.applicationId}")
+            Result.success(true)
+        }catch (e: Exception){
+            Log.d(TAG, "insert new application failure: ${e.message}")
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun deleteCurrentApplication(applicationId: String): Result<Boolean> {
+
     }
 }

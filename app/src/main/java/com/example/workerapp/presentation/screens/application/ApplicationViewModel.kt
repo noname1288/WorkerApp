@@ -20,11 +20,6 @@ class ApplicationViewModel @Inject constructor(
         com.example.workerapp.presentation.screens.profile.ApplicationsUiState.Idle)
     val applicationsState: MutableStateFlow<com.example.workerapp.presentation.screens.profile.ApplicationsUiState> = _applicationsState
 
-//
-//    val file = File(imageUri.path!!) // ảnh bạn chọn
-//    val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
-//    val multipartBody = MultipartBody.Part
-
     fun fetchApplications() {
         val userUid = UserSession.uid
 

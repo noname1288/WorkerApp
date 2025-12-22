@@ -92,23 +92,64 @@ class CleaningViewModel @Inject constructor(
 
                 val result = cleaningRemoteImpl.applyForJob(request)
                 if (result is NetworkResult.Success) {
+                    insertApplicationToLocal()
                     _applyJobState.value = ApplyJobState.Success
                 } else if (result is NetworkResult.Error) {
-                    _applyJobState.value  = ApplyJobState.Error(result.message)
+                    _applyJobState.value = ApplyJobState.Error(result.message)
                 }
-            }catch (e : Exception){
-                _applyJobState.value  = ApplyJobState.Error(e.message?: "Unknown Error")
+            } catch (e: Exception) {
+                _applyJobState.value = ApplyJobState.Error(e.message ?: "Unknown Error")
             }
         }
     }
 
-    fun insertApplicationToLocal(){
-        viewModelScope.launch {
+    suspend fun insertApplicationToLocal() {
+        val currentUser = UserSession.uid
+        if (currentUser == null) {
+            _applyJobState.value = ApplyJobState.Error("Error to find current user")
+            return
+        }
 
+        val applicationResponse = cleaningRemoteImpl.getApplication(currentUser)
+
+        when (applicationResponse) {
+            is NetworkResult.Error -> {
+                _applyJobState.value =
+                    ApplyJobState.Error("cann't insert new application into local")
+            }
+
+            is NetworkResult.Success -> {
+                val applicationList = applicationResponse.data
+
+                val newApplicationDto = applicationList[0]
+                jobRepository.insertApplicationToLocal(newApplicationDto)
+            }
         }
     }
 
-    fun cancelApplication(jobUid: String){
+    suspend fun deleteCurrentApplication(cleaningUid: String){
+        val currentUser = UserSession.uid
+        if (currentUser == null) {
+            _cancelJobState.value = CancelJobState.Error("Error to find current user")
+            return
+        }
+
+        //get current application from local
+        val applicationIdResult = jobRepository.checkApplicationByJobUid(cleaningUid)
+
+        applicationIdResult.onSuccess {
+            val applicationId = it
+            if (applicationId == null){
+                return
+            } else {
+                jobRepository.
+            }
+        }
+
+
+    }
+
+    fun cancelApplication(jobUid: String) {
         viewModelScope.launch {
             _cancelJobState.value = CancelJobState.Loading
 
@@ -118,14 +159,14 @@ class CleaningViewModel @Inject constructor(
             )
 
             result.onSuccess {
-               _cancelJobState.value = CancelJobState.Success
+                _cancelJobState.value = CancelJobState.Success
             }.onFailure {
                 _cancelJobState.value = CancelJobState.Error(it.message ?: "Unknown Error")
             }
         }
     }
 
-    fun checkIfApplied(jobUid: String){
+    fun checkIfApplied(jobUid: String) {
         viewModelScope.launch {
             val result = jobRepository.checkApplicationByJobUid(jobUid)
 

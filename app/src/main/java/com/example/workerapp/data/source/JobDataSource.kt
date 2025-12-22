@@ -20,7 +20,9 @@ interface JobDataSource {
 
         suspend fun addNewApplicationToLocal(application: ApplicationModel)
 
-        suspend fun checkApplicationByJobUid(jobUid: String) : Boolean
+        suspend fun checkApplicationByJobUid(jobUid: String) : String?
+
+        suspend fun clearData()
     }
 
 

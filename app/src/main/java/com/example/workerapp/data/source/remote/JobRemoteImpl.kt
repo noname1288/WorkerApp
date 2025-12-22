@@ -12,6 +12,8 @@ import com.example.workerapp.data.source.remote.dto.request.ApplicationRequest
 import com.example.workerapp.data.source.remote.dto.response.ApiErrorResponse
 import com.example.workerapp.data.source.remote.dto.response.ApplicationDto
 import com.squareup.moshi.Moshi
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 class JobRemoteImpl @Inject constructor(
@@ -20,6 +22,9 @@ class JobRemoteImpl @Inject constructor(
 ) : JobDataSource.Remote {
 
     private val errorAdapter = moshi.adapter(ApiErrorResponse::class.java)
+
+    private val CREATED_AT_FORMATTER =
+        DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy")
 
     override suspend fun getCleaningJobs(): NetworkResult<List<CleaningJobModel1>> {
         try {
@@ -190,8 +195,12 @@ class JobRemoteImpl @Inject constructor(
         try {
             val response = jobApi.getApplicationsByWorkerId(workerId)
             if (response.success) {
+                val sortedOrders = response.orders.sortedByDescending {
+                    LocalDateTime.parse(it.createdAt, CREATED_AT_FORMATTER)
+                }
+
                 Log.d(TAG, "getApplication: ${response.orders}")
-                return NetworkResult.Success(response.orders)
+                return NetworkResult.Success(sortedOrders)
             } else {
                 Log.e(TAG, "getApplication Error: ${response.message}")
                 return NetworkResult.Error(response.message)

@@ -21,9 +21,16 @@ class JobLocalImpl @Inject constructor(
         applicationDao.insertApplication(application)
     }
 
-    override suspend fun checkApplicationByJobUid(jobUid: String): Boolean {
+    override suspend fun checkApplicationByJobUid(jobUid: String): String? {
         val entity = applicationDao.getApplicationByJobId(jobUid)
 
-        return entity != null
+        if (entity != null)
+            return entity.applicationId
+
+        return null
+    }
+
+    override suspend fun clearData() {
+        applicationDao.clearAll()
     }
 }
