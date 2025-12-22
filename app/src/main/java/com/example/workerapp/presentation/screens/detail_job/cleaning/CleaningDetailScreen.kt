@@ -1,7 +1,5 @@
 package com.example.workerapp.presentation.screens.detail_job.cleaning
 
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -18,7 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material.icons.filled.Map
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -51,13 +48,20 @@ import com.example.workerapp.R
 import com.example.workerapp.data.source.model.base.UserModel
 import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
 import com.example.workerapp.data.source.model.cleaning.CleaningServiceModel
+import com.example.workerapp.ui.detail.cleaning.ApplyJobState
+import com.example.workerapp.ui.detail.cleaning.CancelJobState
 import com.example.workerapp.ui.detail.cleaning.CleaningViewModel
 import com.example.workerapp.ui.detail.components.ClientCard
 import com.example.workerapp.ui.detail.components.JobDetailCard
 import com.example.workerapp.ui.detail.components.JobWorkflow
 import com.example.workerapp.ui.detail.components.WeeklySchedule
-import com.example.workerapp.utils.button.SlideToConfirmButton
+import com.example.workerapp.utils.components.ApplyJobButton
+import com.example.workerapp.utils.components.CancelJobButton
 import com.example.workerapp.utils.components.CircleLoadingIndicator
+import com.example.workerapp.utils.components.CommonAlertDialog
+import com.example.workerapp.utils.components.ErrorDialog
+import com.example.workerapp.utils.components.LoadingDialog
+import com.example.workerapp.utils.components.SuccessDialog
 import com.example.workerapp.utils.ext.openGoogleMap
 import com.example.workerapp.utils.ext.popBackIfCan
 
@@ -84,38 +88,19 @@ fun CleaningDetailScreen(
     val context = LocalContext.current
 
     val uiState by viewModel.uiState.collectAsState()
-    val applyState by viewModel.applyState.collectAsState()
+    val appJobState by viewModel.appJobState.collectAsState()
+    val appliedState by viewModel.appliedState.collectAsState()
+    val cancelState by viewModel.cancelJobState.collectAsState()
 
-    var confirmed by rememberSaveable { mutableStateOf(false) }
-    var jobAddress by rememberSaveable { mutableStateOf("") }
-
-    LaunchedEffect(uiState.error) {
-        uiState.error?.let {
-            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
-        }
-    }
-
-    LaunchedEffect(applyState) {
-        when (applyState) {
-            true -> {
-                Toast.makeText(context, "Ứng tuyển thành công!", Toast.LENGTH_LONG).show()
-                navController.popBackIfCan()
-            }
-            false -> {
-                viewModel.updateApplyState(null)
-                confirmed = false
-            }
-            null -> viewModel.fetchJobDetail(cleaningUid)
-        }
-    }
+    var showApplyDialog by rememberSaveable { mutableStateOf(false) }
+    var showAlertDialog by rememberSaveable { mutableStateOf(false) }
+    var showCancelDialog by rememberSaveable { mutableStateOf(false) }
 
     val jobDetail = uiState.job
     val services = uiState.services
-    val isLoading = uiState.isLoading
 
     val sections = remember(jobDetail, services) {
         if (jobDetail != null) {
-            jobAddress = jobDetail.location
             listOf(
                 CleaningJobSection.UserInfo(jobDetail.user),
                 CleaningJobSection.JobDetails(jobDetail),
@@ -127,31 +112,40 @@ fun CleaningDetailScreen(
         } else emptyList()
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.fetchJobDetail(cleaningUid)
+        viewModel.checkIfApplied(cleaningUid)
+    }
+
     Column(modifier.fillMaxSize()) {
         CenterAlignedTopAppBar(
-            title = { Text(stringResource(R.string.job_detail_title), fontWeight = FontWeight.Bold) },
+            title = {
+                Text(
+                    stringResource(R.string.job_detail_title),
+                    fontWeight = FontWeight.Bold
+                )
+            },
             windowInsets = WindowInsets(0, 0, 0, 0),
             navigationIcon = {
                 IconButton(onClick = { navController.popBackIfCan() }) {
-                    Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back", modifier = Modifier.size(20.dp))
-                }
-            },
-            actions = {
-                IconButton(onClick = { openGoogleMap(context, jobAddress) }) {
-                    Icon(Icons.Default.Map, contentDescription = "Go to Map", modifier = Modifier.size(20.dp))
+                    Icon(
+                        Icons.Default.ArrowBackIosNew,
+                        contentDescription = "Back",
+                        modifier = Modifier.size(20.dp)
+                    )
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
         )
 
         when {
-            isLoading -> {
+            uiState.isLoading -> {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircleLoadingIndicator()
                 }
             }
 
-            jobDetail == null -> {
+            uiState.job == null -> {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text("Không tìm thấy công việc", color = colorResource(R.color.subtext))
                 }
@@ -171,7 +165,12 @@ fun CleaningDetailScreen(
                                 item {
                                     ClientCard(
                                         user = section.user,
-                                        onAddressClick = { openGoogleMap(context, section.user.location) }
+                                        onAddressClick = {
+                                            openGoogleMap(
+                                                context,
+                                                section.user.location
+                                            )
+                                        }
                                     )
                                     Spacer(Modifier.height(12.dp))
                                 }
@@ -208,16 +207,86 @@ fun CleaningDetailScreen(
                             is CleaningJobSection.ActionButtons -> {
                                 item {
                                     if (!isOnlyWatch) {
-                                        SlideToConfirmButton(
-                                            isConfirmed = confirmed,
-                                            onValueChange = {
-                                                confirmed = it
-                                                Log.d(tag, "Confirmed")
-                                                viewModel.applyToJob(cleaningUid)
+                                        when (appliedState) {
+                                            true -> {
+                                                CancelJobButton(
+                                                    onCancel = {
+                                                        showAlertDialog = true
+                                                    }
+                                                )
                                             }
-                                        )
-                                        Spacer(Modifier.height(24.dp))
+
+                                            false -> {
+                                                ApplyJobButton(onConfirm = {
+                                                    showApplyDialog = true
+                                                    viewModel.applyToJob(cleaningUid)
+                                                })
+                                            }
+
+                                            null -> {}
+                                        }
                                     }
+                                    Spacer(Modifier.height(24.dp))
+                                }
+                            }
+                        }
+                    }
+
+                    item {
+                        if (showApplyDialog) {
+                            when (appJobState) {
+                                is ApplyJobState.Error -> {
+                                    val message = (appJobState as ApplyJobState.Error).message
+                                    ErrorDialog(
+                                        content = message,
+                                        onDismiss = {
+                                            showApplyDialog = false
+                                        }
+                                    )
+                                }
+
+                                ApplyJobState.Idle -> {}
+                                ApplyJobState.Loading -> LoadingDialog()
+                                ApplyJobState.Success -> {
+                                    SuccessDialog(
+                                        content = "Ứng tuyển thành công!",
+                                        onDismiss = { showApplyDialog = false })
+                                }
+                            }
+                        }
+
+                        if (showAlertDialog){
+                            CommonAlertDialog(
+                                content = "Bạn có chắc chắn muốn hủy ứng tuyển công việc này?",
+                                onDismiss = {
+                                    showAlertDialog = false
+                                },
+                                onConfirm = {
+                                    // Confirm cancel apply
+                                    showAlertDialog = false
+                                    viewModel.cancelApplication(cleaningUid)
+                                    showCancelDialog = true
+                                }
+                            )
+                        }
+
+                        if (showCancelDialog){
+                            when(cancelState){
+                                is CancelJobState.Error -> {
+                                    val message = (appJobState as ApplyJobState.Error).message
+                                    ErrorDialog(
+                                        content = message,
+                                        onDismiss = {
+                                            showCancelDialog = false
+                                        }
+                                    )
+                                }
+                                CancelJobState.Idle -> {}
+                                CancelJobState.Loading -> LoadingDialog()
+                                CancelJobState.Success -> {
+                                    SuccessDialog(
+                                        content = "Huỷ thành công!",
+                                        onDismiss = { showCancelDialog = false })
                                 }
                             }
                         }

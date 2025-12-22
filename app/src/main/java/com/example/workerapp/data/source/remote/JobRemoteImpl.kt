@@ -141,6 +141,32 @@ class JobRemoteImpl @Inject constructor(
         }
     }
 
+    override suspend fun cancelJob(
+        serviceType: String,
+        jobUid: String
+    ): NetworkResult<Boolean> {
+        val response = jobApi.cancelJob(serviceType, jobUid)
+
+        return if (response.isSuccessful){
+            val body = response.body()
+
+            if (body != null && body.success){
+                Log.d(TAG, "cancelJob: ${body.message}")
+                return NetworkResult.Success(true)
+            } else {
+                Log.e(TAG, "cancelJob Error: ${body?.message ?: "Empty response body"}")
+                return NetworkResult.Error(body?.message ?: "Empty response body")
+            }
+        } else {
+            val errorMessage = response.errorBody()?.string()
+                ?.let { json -> errorAdapter.fromJson(json)?.error }
+                ?: response.message()
+                ?: "Request failed with status code ${response.code()}"
+
+            NetworkResult.Error(errorMessage)
+        }
+    }
+
     override suspend fun getSchedules(
         workerId: String,
         date: String

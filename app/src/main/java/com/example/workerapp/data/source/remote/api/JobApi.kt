@@ -14,6 +14,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -47,6 +48,13 @@ interface JobApi {
     suspend fun applyForJob(
         @Body request: ApplicationRequest
     ): Response<ApplicationResponse>
+
+    @AuthRequired
+    @PUT("jobs/{serviceType}/{jobUid}/cancel")
+    suspend fun cancelJob(
+        @Path("serviceType") serviceType: String,
+        @Path("jobUid") jobUid: String
+    ) : Response<ApplicationResponse>
 
     @AuthRequired
     @GET("schedules")

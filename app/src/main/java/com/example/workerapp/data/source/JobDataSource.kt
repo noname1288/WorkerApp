@@ -19,6 +19,8 @@ interface JobDataSource {
         suspend fun saveApplicationsToLocal(applications: List<ApplicationModel>)
 
         suspend fun addNewApplicationToLocal(application: ApplicationModel)
+
+        suspend fun checkApplicationByJobUid(jobUid: String) : Boolean
     }
 
 
@@ -36,6 +38,7 @@ interface JobDataSource {
         suspend fun getMaintenanceDetail(jobUid: String) : NetworkResult<MaintenanceJobResponse>
 
         suspend fun applyForJob(request: ApplicationRequest): NetworkResult<Boolean>
+        suspend fun cancelJob(serviceType: String, jobUid: String) : NetworkResult<Boolean>
 
         suspend fun getSchedules(workerId: String, date: String): NetworkResult<List<JobModel1>>
 

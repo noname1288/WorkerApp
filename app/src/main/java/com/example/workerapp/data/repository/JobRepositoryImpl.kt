@@ -22,22 +22,60 @@ class JobRepositoryImpl @Inject constructor(
                 return Result.failure(Exception("User not found"))
 
             val response = remote.getApplication(currentUser)
-            when(response){
+            when (response) {
                 is NetworkResult.Error -> {
                     Result.failure(Exception(response.message))
                 }
+
                 is NetworkResult.Success -> {
                     //save to local
                     val applicationDtoList = response.data as List<ApplicationDto>
                     val entities = applicationDtoList.map { it.toEntity() }
 
                     local.saveApplicationsToLocal(entities)
-                    Log.d("JobRepositoryImpl", "getApplications: Saved $entities applications to local")
-                     Result.success(entities)
+                    Log.d(
+                        "JobRepositoryImpl",
+                        "getApplications: Saved $entities applications to local"
+                    )
+                    Result.success(entities)
                 }
             }
-        }catch (e : Exception){
-             Result.failure(e)
+        } catch (e: Exception) {
+            Result.failure(e)
         }
+    }
+
+    override suspend fun checkApplicationByJobUid(jobUid: String): Result<Boolean> {
+        return try {
+            val result = local.checkApplicationByJobUid(jobUid)
+
+            Result.success(result)
+        } catch (e: Exception) {
+            Result.failure(Exception(e.message))
+        }
+    }
+
+    override suspend fun cancelJob(
+        serviceType: String,
+        jobUid: String
+    ): Result<Boolean> {
+        return try {
+            val response = remote.cancelJob(serviceType, jobUid)
+            when (response) {
+                is NetworkResult.Error -> {
+                    Result.failure(Exception(response.message))
+                }
+
+                is NetworkResult.Success -> {
+                    Result.success(response.data)
+                }
+            }
+        } catch (e: Exception) {
+            Result.failure(Exception(e.message))
+        }
+    }
+
+    override suspend fun insertApplicationToLocal(application: ApplicationModel) {
+        TODO("Not yet implemented")
     }
 }
