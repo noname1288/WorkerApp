@@ -9,6 +9,7 @@ import com.example.workerapp.data.source.model.maintenance.MaintenanceJobRespons
 import com.example.workerapp.data.source.remote.api.JobApi
 import com.example.workerapp.data.source.remote.dto.NetworkResult
 import com.example.workerapp.data.source.remote.dto.request.ApplicationRequest
+import com.example.workerapp.data.source.remote.dto.request.CancelApplicationRequest
 import com.example.workerapp.data.source.remote.dto.response.ApiErrorResponse
 import com.example.workerapp.data.source.remote.dto.response.ApplicationDto
 import com.squareup.moshi.Moshi
@@ -146,18 +147,20 @@ class JobRemoteImpl @Inject constructor(
         }
     }
 
-    override suspend fun cancelJob(
-        serviceType: String,
-        jobUid: String
-    ): NetworkResult<Boolean> {
-        val response = jobApi.cancelJob(serviceType, jobUid)
+    override suspend fun cancelApplication(
+        request: CancelApplicationRequest
+    ): NetworkResult<String> {
+        val response = jobApi.cancelApplication(request)
 
         return if (response.isSuccessful){
             val body = response.body()
 
             if (body != null && body.success){
                 Log.d(TAG, "cancelJob: ${body.message}")
-                return NetworkResult.Success(true)
+                val applicationWrapper = body.updatedOrder
+                val applicationId = applicationWrapper.uid
+
+                return NetworkResult.Success(applicationId)
             } else {
                 Log.e(TAG, "cancelJob Error: ${body?.message ?: "Empty response body"}")
                 return NetworkResult.Error(body?.message ?: "Empty response body")

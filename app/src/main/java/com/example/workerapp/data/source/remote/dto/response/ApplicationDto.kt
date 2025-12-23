@@ -20,6 +20,7 @@ fun ApplicationDto.toEntity() : ApplicationModel{
         applicationId = uid,
         jobId = job.uid, // lấy từ JobModel1
         createdAt = createdAt,
-        serviceType = serviceType
+        serviceType = serviceType,
+        status = status
     )
 }

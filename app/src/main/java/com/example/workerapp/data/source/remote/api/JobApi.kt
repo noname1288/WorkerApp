@@ -8,7 +8,9 @@ import com.example.workerapp.data.source.remote.dto.BaseApplicationResponse
 import com.example.workerapp.data.source.remote.dto.BaseJobResponse
 import com.example.workerapp.data.source.remote.dto.BaseJobsResponse
 import com.example.workerapp.data.source.remote.dto.request.ApplicationRequest
+import com.example.workerapp.data.source.remote.dto.request.CancelApplicationRequest
 import com.example.workerapp.data.source.remote.dto.response.ApplicationResponse
+import com.example.workerapp.data.source.remote.dto.response.CancelApplicationResponse
 import com.example.workerapp.utils.annotation.AuthRequired
 import retrofit2.Response
 import retrofit2.http.Body
@@ -50,11 +52,10 @@ interface JobApi {
     ): Response<ApplicationResponse>
 
     @AuthRequired
-    @PUT("jobs/{serviceType}/{jobUid}/cancel")
-    suspend fun cancelJob(
-        @Path("serviceType") serviceType: String,
-        @Path("jobUid") jobUid: String
-    ) : Response<ApplicationResponse>
+    @PUT("orders/update")
+    suspend fun cancelApplication(
+        @Body request: CancelApplicationRequest
+    ) : Response<CancelApplicationResponse>
 
     @AuthRequired
     @GET("schedules")

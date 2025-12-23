@@ -7,6 +7,7 @@ import com.example.workerapp.data.source.model.healthcare.HealthcareJobModel
 import com.example.workerapp.data.source.model.maintenance.MaintenanceJobResponse
 import com.example.workerapp.data.source.remote.dto.NetworkResult
 import com.example.workerapp.data.source.remote.dto.request.ApplicationRequest
+import com.example.workerapp.data.source.remote.dto.request.CancelApplicationRequest
 import com.example.workerapp.data.source.remote.dto.response.ApplicationDto
 
 interface JobDataSource {
@@ -20,7 +21,9 @@ interface JobDataSource {
 
         suspend fun addNewApplicationToLocal(application: ApplicationModel)
 
-        suspend fun checkApplicationByJobUid(jobUid: String) : String?
+        suspend fun checkApplicationByJobUid(jobUid: String) : List<ApplicationModel>
+
+        suspend fun deleteByApplicationId(applicationId: String)
 
         suspend fun clearData()
     }
@@ -40,7 +43,7 @@ interface JobDataSource {
         suspend fun getMaintenanceDetail(jobUid: String) : NetworkResult<MaintenanceJobResponse>
 
         suspend fun applyForJob(request: ApplicationRequest): NetworkResult<Boolean>
-        suspend fun cancelJob(serviceType: String, jobUid: String) : NetworkResult<Boolean>
+        suspend fun cancelApplication(request: CancelApplicationRequest) : NetworkResult<String>
 
         suspend fun getSchedules(workerId: String, date: String): NetworkResult<List<JobModel1>>
 

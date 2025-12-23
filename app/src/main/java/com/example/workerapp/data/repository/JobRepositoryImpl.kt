@@ -5,6 +5,7 @@ import com.example.workerapp.data.JobRepository
 import com.example.workerapp.data.source.JobDataSource
 import com.example.workerapp.data.source.local.room.entity.ApplicationModel
 import com.example.workerapp.data.source.remote.dto.NetworkResult
+import com.example.workerapp.data.source.remote.dto.request.CancelApplicationRequest
 import com.example.workerapp.data.source.remote.dto.response.ApplicationDto
 import com.example.workerapp.data.source.remote.dto.response.toEntity
 import com.example.workerapp.utils.cached.UserSession
@@ -50,22 +51,28 @@ class JobRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun checkApplicationByJobUid(jobUid: String): Result<String?> {
-        return try {
-            val result = local.checkApplicationByJobUid(jobUid)
+    /**
+     * Get oldest application by jobUid
+     * if not contain, return null
+    * */
+    override suspend fun getApplicationByJobId(jobUid: String): Result<ApplicationModel?> {
+        try {
+            val list = local.getApplicationsFromLocal()
 
-            Result.success(result)
-        } catch (e: Exception) {
-            Result.failure(Exception(e.message))
+            if (list.isEmpty())
+                return Result.success(null)
+
+            return Result.success(list[0]) // return first element because the list sorted by 'createdAt'
+        }catch (e: Exception){
+            return Result.failure(e)
         }
     }
 
     override suspend fun cancelJob(
-        serviceType: String,
-        jobUid: String
-    ): Result<Boolean> {
+        request: CancelApplicationRequest
+    ): Result<String> {
         return try {
-            val response = remote.cancelJob(serviceType, jobUid)
+            val response = remote.cancelApplication(request)
             when (response) {
                 is NetworkResult.Error -> {
                     Result.failure(Exception(response.message))
@@ -95,6 +102,11 @@ class JobRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deleteCurrentApplication(applicationId: String): Result<Boolean> {
-
+        return try {
+            local.deleteByApplicationId(applicationId)
+            Result.success(true)
+        }catch (e: Exception){
+            Result.failure(e)
+        }
     }
 }

@@ -11,4 +11,5 @@ data class ApplicationModel(
     val jobId: String,
     val createdAt: String,
     val serviceType: String,
+    val status: String,
 )

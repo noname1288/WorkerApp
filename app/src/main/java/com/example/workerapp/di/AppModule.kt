@@ -40,6 +40,12 @@ object RoomModule {
         }
     }
 
+    val MIGRATION_2_3 = object : Migration(2, 3) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("ALTER TABLE application_history ADD COLUMN status TEXT NOT NULL DEFAULT ''")
+        }
+    }
+
     @Provides
     @Singleton
     fun provideDataStore(@ApplicationContext context: Context): AppDatabase {
@@ -49,6 +55,7 @@ object RoomModule {
             Constant.DATABASE_NAME
         )
             .addMigrations(MIGRATION_1_2)
+            .addMigrations(MIGRATION_2_3)
             .build()
     }
 

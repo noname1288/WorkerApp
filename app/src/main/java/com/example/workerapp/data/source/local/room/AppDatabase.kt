@@ -14,7 +14,7 @@ import com.example.workerapp.data.source.model.maintenance.PowerModel
 @Database(
     entities = [UserLocalEntity::class, CleaningServiceModel::class, HealthcareServiceModel::class,
         MaintenanceServiceModel::class, PowerModel::class, NotificationItemModel::class, ApplicationModel::class],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

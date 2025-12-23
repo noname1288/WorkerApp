@@ -9,6 +9,8 @@ import com.example.workerapp.data.source.model.cleaning.CleaningServiceModel
 import com.example.workerapp.data.source.remote.JobRemoteImpl
 import com.example.workerapp.data.source.remote.dto.NetworkResult
 import com.example.workerapp.data.source.remote.dto.request.ApplicationRequest
+import com.example.workerapp.data.source.remote.dto.request.CancelApplicationRequest
+import com.example.workerapp.utils.ApplicationStatusType
 import com.example.workerapp.utils.ServiceType
 import com.example.workerapp.utils.cached.UserSession
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -74,8 +76,8 @@ class CleaningViewModel @Inject constructor(
         }
     }
 
-    fun applyToJob(uid: String) {
-        if (uid.isEmpty()) {
+    fun applyToJob(jobUid: String) {
+        if (jobUid.isEmpty()) {
             _applyJobState.value = ApplyJobState.Error("Invalid User Uid")
             return
         }
@@ -86,13 +88,15 @@ class CleaningViewModel @Inject constructor(
 
                 val request = ApplicationRequest(
                     workerID = UserSession.uid,
-                    jobID = uid,
+                    jobID = jobUid,
                     serviceType = ServiceType.CleaningType
                 )
 
                 val result = cleaningRemoteImpl.applyForJob(request)
                 if (result is NetworkResult.Success) {
+                    //update local
                     insertApplicationToLocal()
+
                     _applyJobState.value = ApplyJobState.Success
                 } else if (result is NetworkResult.Error) {
                     _applyJobState.value = ApplyJobState.Error(result.message)
@@ -127,58 +131,74 @@ class CleaningViewModel @Inject constructor(
         }
     }
 
-    suspend fun deleteCurrentApplication(cleaningUid: String){
-        val currentUser = UserSession.uid
-        if (currentUser == null) {
-            _cancelJobState.value = CancelJobState.Error("Error to find current user")
-            return
-        }
-
-        //get current application from local
-        val applicationIdResult = jobRepository.checkApplicationByJobUid(cleaningUid)
-
-        applicationIdResult.onSuccess {
-            val applicationId = it
-            if (applicationId == null){
-                return
-            } else {
-                jobRepository.
-            }
-        }
-
-
-    }
-
     fun cancelApplication(jobUid: String) {
         viewModelScope.launch {
             _cancelJobState.value = CancelJobState.Loading
 
-            val result = jobRepository.cancelJob(
-                serviceType = ServiceType.CleaningType,
-                jobUid = jobUid,
+            val applicationUid = checkIfApplied(jobUid)
+
+            if (applicationUid == null) {
+                _cancelJobState.value = CancelJobState.Error("Bạn chưa ứng tuyển công việc này")
+                return@launch
+            }
+
+            val request = CancelApplicationRequest(
+                applicationUid,
+                ApplicationStatusType.CANCEL
             )
 
+            val result = jobRepository.cancelJob(request)
+
             result.onSuccess {
-                _cancelJobState.value = CancelJobState.Success
+
+                //update local
+                val result = deleteApplicationFromLocal(applicationUid)
+
+                if (result == true) {
+                    _cancelJobState.value = CancelJobState.Success
+                } else {
+                    _cancelJobState.value = CancelJobState.Error("Fail to update local")
+                }
             }.onFailure {
                 _cancelJobState.value = CancelJobState.Error(it.message ?: "Unknown Error")
             }
         }
     }
 
-    fun checkIfApplied(jobUid: String) {
-        viewModelScope.launch {
-            val result = jobRepository.checkApplicationByJobUid(jobUid)
+    suspend fun checkIfApplied(jobUid: String): String? {
+        val result = jobRepository.getApplicationByJobId(jobUid)
 
-            result.onSuccess {
-                _appliedState.value = it
-            }.onFailure {
-                _appliedState.value = null
+        result.onSuccess { application ->
+            if (application == null) {
+                _appliedState.value = false
+                return null
             }
+
+            val status = application.status
+            if (status == ApplicationStatusType.WAITING) {
+                _appliedState.value = false
+            } else {
+                _appliedState.value = true
+            }
+
+            return application.applicationId
+        }.onFailure {
+            _appliedState.value = null
+            return null
         }
+        return null
     }
 
+    suspend fun deleteApplicationFromLocal(applicationId: String): Boolean? {
+        val result = jobRepository.deleteCurrentApplication(applicationId)
 
+        result.onSuccess {
+            return true
+        }.onFailure {
+            return null
+        }
+        return null
+    }
 }
 
 data class CleaningUiState(

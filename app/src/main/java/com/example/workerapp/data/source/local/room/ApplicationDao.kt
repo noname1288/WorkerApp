@@ -26,18 +26,21 @@ interface ApplicationDao {
     @Query("DELETE FROM application_history")
     suspend fun clearAll()
 
+    @Query("DELETE FROM application_history WHERE applicationId = :applicationId")
+    suspend fun deleteByApplicationId(applicationId : String)
+
     /**
-     * Lấy application theo jobId
-     * Trả về null nếu không tồn tại
+     * Lấy danh sách application theo jobId
+     * Sắp xếp theo thời gian tạo mới nhất (giảm dần)
      */
     @Query("""
-        SELECT * FROM application_history
-        WHERE jobId = :jobId
-        LIMIT 1
-    """)
-    suspend fun getApplicationByJobId(
+    SELECT * FROM application_history
+    WHERE jobId = :jobId
+    ORDER BY createdAt DESC
+""")
+    suspend fun getApplicationsByJobId(
         jobId: String
-    ): ApplicationModel?
+    ): List<ApplicationModel>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertListApplications(
