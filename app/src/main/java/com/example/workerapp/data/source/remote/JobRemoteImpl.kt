@@ -12,6 +12,7 @@ import com.example.workerapp.data.source.remote.dto.request.ApplicationRequest
 import com.example.workerapp.data.source.remote.dto.request.CancelApplicationRequest
 import com.example.workerapp.data.source.remote.dto.response.ApiErrorResponse
 import com.example.workerapp.data.source.remote.dto.response.ApplicationDto
+import com.example.workerapp.data.source.remote.dto.response.CancelApplicationWrapper
 import com.squareup.moshi.Moshi
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -149,7 +150,7 @@ class JobRemoteImpl @Inject constructor(
 
     override suspend fun cancelApplication(
         request: CancelApplicationRequest
-    ): NetworkResult<String> {
+    ): NetworkResult<CancelApplicationWrapper> {
         val response = jobApi.cancelApplication(request)
 
         return if (response.isSuccessful){
@@ -158,9 +159,7 @@ class JobRemoteImpl @Inject constructor(
             if (body != null && body.success){
                 Log.d(TAG, "cancelJob: ${body.message}")
                 val applicationWrapper = body.updatedOrder
-                val applicationId = applicationWrapper.uid
-
-                return NetworkResult.Success(applicationId)
+                return NetworkResult.Success(applicationWrapper)
             } else {
                 Log.e(TAG, "cancelJob Error: ${body?.message ?: "Empty response body"}")
                 return NetworkResult.Error(body?.message ?: "Empty response body")

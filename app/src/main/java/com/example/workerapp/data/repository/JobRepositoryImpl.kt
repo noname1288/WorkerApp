@@ -7,6 +7,7 @@ import com.example.workerapp.data.source.local.room.entity.ApplicationModel
 import com.example.workerapp.data.source.remote.dto.NetworkResult
 import com.example.workerapp.data.source.remote.dto.request.CancelApplicationRequest
 import com.example.workerapp.data.source.remote.dto.response.ApplicationDto
+import com.example.workerapp.data.source.remote.dto.response.CancelApplicationWrapper
 import com.example.workerapp.data.source.remote.dto.response.toEntity
 import com.example.workerapp.utils.cached.UserSession
 import javax.inject.Inject
@@ -70,7 +71,7 @@ class JobRepositoryImpl @Inject constructor(
 
     override suspend fun cancelJob(
         request: CancelApplicationRequest
-    ): Result<String> {
+    ): Result<CancelApplicationWrapper> {
         return try {
             val response = remote.cancelApplication(request)
             when (response) {
@@ -97,6 +98,18 @@ class JobRepositoryImpl @Inject constructor(
             Result.success(true)
         }catch (e: Exception){
             Log.d(TAG, "insert new application failure: ${e.message}")
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun updateStatusByApplicationId(
+        applicationId: String,
+        newStatus: String
+    ): Result<Unit> {
+        return try {
+            local.updateStatusByApplicationId(applicationId, newStatus)
+            Result.success(Unit)
+        } catch (e: Exception) {
             Result.failure(e)
         }
     }

@@ -112,6 +112,7 @@ fun CleaningDetailScreen(
         } else emptyList()
     }
 
+    //init
     LaunchedEffect(Unit) {
         viewModel.fetchJobDetail(cleaningUid)
         viewModel.checkIfApplied(cleaningUid)
@@ -264,7 +265,7 @@ fun CleaningDetailScreen(
                                 onConfirm = {
                                     // Confirm cancel apply
                                     showAlertDialog = false
-                                    viewModel.cancelApplication(cleaningUid)
+                                    viewModel.cancelApplication()
                                     showCancelDialog = true
                                 }
                             )

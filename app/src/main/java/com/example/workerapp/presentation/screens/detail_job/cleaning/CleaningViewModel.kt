@@ -1,23 +1,29 @@
 package com.example.workerapp.ui.detail.cleaning
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.workerapp.data.JobRepository
 import com.example.workerapp.data.JobServiceRepository
+import com.example.workerapp.data.source.local.room.entity.ApplicationModel
 import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
 import com.example.workerapp.data.source.model.cleaning.CleaningServiceModel
 import com.example.workerapp.data.source.remote.JobRemoteImpl
 import com.example.workerapp.data.source.remote.dto.NetworkResult
 import com.example.workerapp.data.source.remote.dto.request.ApplicationRequest
 import com.example.workerapp.data.source.remote.dto.request.CancelApplicationRequest
+import com.example.workerapp.data.source.remote.dto.response.CancelApplicationWrapper
+import com.example.workerapp.presentation.screens.authen.LoginScreen
 import com.example.workerapp.utils.ApplicationStatusType
 import com.example.workerapp.utils.ServiceType
 import com.example.workerapp.utils.cached.UserSession
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -35,6 +41,7 @@ class CleaningViewModel @Inject constructor(
     val appliedState = _appliedState.asStateFlow()
     private val _cancelJobState = MutableStateFlow<CancelJobState>(CancelJobState.Idle)
     val cancelJobState = _cancelJobState.asStateFlow()
+    private val _applicationEntity = MutableStateFlow<ApplicationModel?>(null)
 
     fun fetchJobDetail(uid: String) {
         if (uid.isEmpty()) {
@@ -131,16 +138,14 @@ class CleaningViewModel @Inject constructor(
         }
     }
 
-    fun cancelApplication(jobUid: String) {
+    fun cancelApplication() {
         viewModelScope.launch {
             _cancelJobState.value = CancelJobState.Loading
 
-            val applicationUid = checkIfApplied(jobUid)
-
-            if (applicationUid == null) {
+            val applicationUid = if (_applicationEntity.value == null) {
                 _cancelJobState.value = CancelJobState.Error("Bạn chưa ứng tuyển công việc này")
                 return@launch
-            }
+            } else _applicationEntity.value!!.applicationId
 
             val request = CancelApplicationRequest(
                 applicationUid,
@@ -149,48 +154,60 @@ class CleaningViewModel @Inject constructor(
 
             val result = jobRepository.cancelJob(request)
 
-            result.onSuccess {
-
+            result.onSuccess { applicationWrapper ->
                 //update local
-                val result = deleteApplicationFromLocal(applicationUid)
+                val result = withContext(Dispatchers.IO) {
+                    updateStatusByApplicationId(applicationWrapper)
+                }
 
                 if (result == true) {
                     _cancelJobState.value = CancelJobState.Success
+                    _appliedState.value = false
                 } else {
+                    _appliedState.value = true
                     _cancelJobState.value = CancelJobState.Error("Fail to update local")
                 }
             }.onFailure {
                 _cancelJobState.value = CancelJobState.Error(it.message ?: "Unknown Error")
+                _appliedState.value = false
             }
         }
     }
 
-    suspend fun checkIfApplied(jobUid: String): String? {
-        val result = jobRepository.getApplicationByJobId(jobUid)
+    suspend fun checkIfApplied(jobUid: String) {
+        val result = withContext(Dispatchers.IO) {
+            jobRepository.getApplicationByJobId(jobUid)
+        }
+
+        Log.d("CleaningViewModel", "$result")
 
         result.onSuccess { application ->
             if (application == null) {
                 _appliedState.value = false
-                return null
+                _applicationEntity.value = null
+                return
             }
 
             val status = application.status
             if (status == ApplicationStatusType.WAITING) {
-                _appliedState.value = false
-            } else {
                 _appliedState.value = true
+                _applicationEntity.value = null
+            } else {
+                _appliedState.value = false
+                _applicationEntity.value = application
             }
 
-            return application.applicationId
         }.onFailure {
             _appliedState.value = null
-            return null
+            _applicationEntity.value = null
         }
-        return null
     }
 
-    suspend fun deleteApplicationFromLocal(applicationId: String): Boolean? {
-        val result = jobRepository.deleteCurrentApplication(applicationId)
+    suspend fun updateStatusByApplicationId(applicationWrapper: CancelApplicationWrapper): Boolean? {
+        val applicationId = applicationWrapper.uid
+        val newStatus = applicationWrapper.status
+
+        val result = jobRepository.updateStatusByApplicationId(applicationId, newStatus)
 
         result.onSuccess {
             return true

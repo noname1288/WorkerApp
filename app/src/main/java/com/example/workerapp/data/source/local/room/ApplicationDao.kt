@@ -5,39 +5,45 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.workerapp.data.source.local.room.entity.ApplicationModel
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ApplicationDao {
 
     /**
-     * Lấy toàn bộ application history
-     * Sắp xếp theo thời gian tạo mới nhất trước
+     * get data from table 'application_history'
+     * sorted by createdAt (DESC)
      */
-    @Query("""
+    @Query(
+        """
         SELECT * FROM application_history
         ORDER BY createdAt DESC
-    """)
+    """
+    )
     fun getApplications(): List<ApplicationModel>
 
     /**
-     * Xoá toàn bộ application history
+     * delete data from table 'application_history'
      */
     @Query("DELETE FROM application_history")
     suspend fun clearAll()
 
+    /**
+     * delete a data following applicationId
+     */
     @Query("DELETE FROM application_history WHERE applicationId = :applicationId")
-    suspend fun deleteByApplicationId(applicationId : String)
+    suspend fun deleteByApplicationId(applicationId: String)
 
     /**
-     * Lấy danh sách application theo jobId
-     * Sắp xếp theo thời gian tạo mới nhất (giảm dần)
+     * get list data following jobId
+     * return empty list [] if it have no data
      */
-    @Query("""
-    SELECT * FROM application_history
-    WHERE jobId = :jobId
-    ORDER BY createdAt DESC
-""")
+    @Query(
+        """
+        SELECT * FROM application_history
+        WHERE jobId = :jobId
+        ORDER BY createdAt DESC
+    """
+    )
     suspend fun getApplicationsByJobId(
         jobId: String
     ): List<ApplicationModel>
@@ -52,4 +58,13 @@ interface ApplicationDao {
         application: ApplicationModel
     ): Long
 
+    @Query("""
+        UPDATE application_history
+        SET status = :newStatus
+        WHERE applicationId = :applicationId
+    """)
+    suspend fun updateStatusByApplicationId(
+        applicationId: String,
+        newStatus: String
+    ): Int
 }

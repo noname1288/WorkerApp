@@ -27,6 +27,10 @@ class JobLocalImpl @Inject constructor(
         return entities
     }
 
+    override suspend fun updateStatusByApplicationId(applicationId: String, newStatus: String) {
+        applicationDao.updateStatusByApplicationId(applicationId, newStatus)
+    }
+
     override suspend fun deleteByApplicationId(applicationId: String) {
         applicationDao.deleteByApplicationId(applicationId)
     }
