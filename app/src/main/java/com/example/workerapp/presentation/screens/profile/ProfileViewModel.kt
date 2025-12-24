@@ -13,10 +13,3 @@ class ProfileViewModel @Inject constructor(
     private val jobRemoteImpl: JobRemoteImpl
 ) : ViewModel() {
 }
-
-sealed class ApplicationsUiState {
-    object Idle : ApplicationsUiState()
-    object Loading : ApplicationsUiState()
-    data class Success(val data: List<ApplicationDto>) : ApplicationsUiState()
-    data class Error(val message: String) : ApplicationsUiState()
-}

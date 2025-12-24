@@ -48,9 +48,6 @@ import com.example.workerapp.R
 import com.example.workerapp.data.source.model.base.UserModel
 import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
 import com.example.workerapp.data.source.model.cleaning.CleaningServiceModel
-import com.example.workerapp.ui.detail.cleaning.ApplyJobState
-import com.example.workerapp.ui.detail.cleaning.CancelJobState
-import com.example.workerapp.ui.detail.cleaning.CleaningViewModel
 import com.example.workerapp.ui.detail.components.ClientCard
 import com.example.workerapp.ui.detail.components.JobDetailCard
 import com.example.workerapp.ui.detail.components.JobWorkflow
@@ -274,7 +271,7 @@ fun CleaningDetailScreen(
                         if (showCancelDialog){
                             when(cancelState){
                                 is CancelJobState.Error -> {
-                                    val message = (appJobState as ApplyJobState.Error).message
+                                    val message = (cancelState as CancelJobState.Error).message
                                     ErrorDialog(
                                         content = message,
                                         onDismiss = {

@@ -27,10 +27,6 @@ import com.example.workerapp.presentation.screens.detail_job.healthcare.Healthca
 import com.example.workerapp.presentation.screens.detail_job.healthcare.HealthcareViewModel
 import com.example.workerapp.presentation.screens.detail_job.maintenance.MaintenanceDetailScreen
 import com.example.workerapp.presentation.screens.detail_job.maintenance.MaintenanceViewModel
-import com.example.workerapp.presentation.screens.forgot_password.ForgotPasswordScreen
-import com.example.workerapp.presentation.screens.forgot_password.ForgotPasswordViewModel
-import com.example.workerapp.presentation.screens.forgot_password.RequireCodeScreen
-import com.example.workerapp.presentation.screens.forgot_password.RequireNewPasswordScreen
 import com.example.workerapp.presentation.screens.home.HomeScreen
 import com.example.workerapp.presentation.screens.income.IncomeScreen
 import com.example.workerapp.presentation.screens.map.MapScreen
@@ -50,7 +46,7 @@ import com.example.workerapp.presentation.screens.service.ServiceDetailScreen
 import com.example.workerapp.presentation.screens.service.ServiceViewModel
 import com.example.workerapp.presentation.screens.splash.SplashScreen
 import com.example.workerapp.ui.calendar.CalendarViewModel
-import com.example.workerapp.ui.detail.cleaning.CleaningViewModel
+import com.example.workerapp.presentation.screens.detail_job.cleaning.CleaningViewModel
 import com.example.workerapp.ui.home.HomeViewModel
 import com.example.workerapp.utils.ServiceType
 import java.net.URLDecoder
@@ -207,7 +203,7 @@ fun AppNavHost(
 
         composable(AppRoutes.LIST_APPLICATIONS) {
             val applicationViewModel = hiltViewModel<ApplicationViewModel>()
-            ApplicationsScreen(viewModel = applicationViewModel, navcontroler = navController)
+            ApplicationsScreen(viewModel = applicationViewModel, navController = navController)
         }
 
         composable(AppRoutes.REVIEW_SCREEN) {

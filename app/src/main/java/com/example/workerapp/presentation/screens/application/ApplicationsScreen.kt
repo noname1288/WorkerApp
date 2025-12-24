@@ -41,7 +41,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.workerapp.R
 import com.example.workerapp.data.source.remote.dto.response.ApplicationDto
-import com.example.workerapp.presentation.screens.profile.ApplicationsUiState
 import com.example.workerapp.utils.ServiceType
 import com.example.workerapp.utils.components.CircleLoadingIndicator
 import com.example.workerapp.utils.components.CustomChip
@@ -52,7 +51,7 @@ import com.example.workerapp.utils.ext.popBackIfCan
 fun ApplicationsScreen(
     modifier: Modifier = Modifier,
     viewModel: ApplicationViewModel,
-    navcontroler: NavController
+    navController: NavController
 ) {
     val context = LocalContext.current
 
@@ -98,7 +97,7 @@ fun ApplicationsScreen(
             windowInsets = WindowInsets(0, 0, 0, 0),
             navigationIcon = {
                 IconButton(onClick = {
-                    navcontroler.popBackIfCan()
+                    navController.popBackIfCan()
                 }) {
                     Icon(
                         Icons.Default.ArrowBackIosNew, contentDescription = "Back",

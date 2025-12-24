@@ -9,7 +9,6 @@ import com.example.workerapp.data.source.remote.dto.NetworkResult
 import com.example.workerapp.data.source.remote.dto.request.ApplicationRequest
 import com.example.workerapp.data.source.remote.dto.request.CancelApplicationRequest
 import com.example.workerapp.data.source.remote.dto.response.ApplicationDto
-import com.example.workerapp.data.source.remote.dto.response.CancelApplicationResponse
 import com.example.workerapp.data.source.remote.dto.response.CancelApplicationWrapper
 
 interface JobDataSource {
@@ -23,7 +22,7 @@ interface JobDataSource {
 
         suspend fun addNewApplicationToLocal(application: ApplicationModel)
 
-        suspend fun checkApplicationByJobUid(jobUid: String) : List<ApplicationModel>
+        suspend fun getApplicationByJobUid(jobUid: String) : List<ApplicationModel>
 
         suspend fun updateStatusByApplicationId(applicationId: String, newStatus: String)
 
@@ -46,12 +45,12 @@ interface JobDataSource {
         suspend fun getMaintenanceJobs(): NetworkResult<List<MaintenanceJobResponse>>
         suspend fun getMaintenanceDetail(jobUid: String) : NetworkResult<MaintenanceJobResponse>
 
-        suspend fun applyForJob(request: ApplicationRequest): NetworkResult<Boolean>
+        suspend fun applyForJob(request: ApplicationRequest): Result<Unit>
         suspend fun cancelApplication(request: CancelApplicationRequest) : NetworkResult<CancelApplicationWrapper>
 
         suspend fun getSchedules(workerId: String, date: String): NetworkResult<List<JobModel1>>
 
-        suspend fun getApplication(workerId: String) : NetworkResult<List<ApplicationDto>>
+        suspend fun getApplication(workerId: String) : Result<List<ApplicationDto>>
     }
 }
 

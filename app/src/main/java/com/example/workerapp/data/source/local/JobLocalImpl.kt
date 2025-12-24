@@ -21,7 +21,7 @@ class JobLocalImpl @Inject constructor(
         applicationDao.insertApplication(application)
     }
 
-    override suspend fun checkApplicationByJobUid(jobUid: String): List<ApplicationModel> {
+    override suspend fun getApplicationByJobUid(jobUid: String): List<ApplicationModel> {
         val entities = applicationDao.getApplicationsByJobId(jobUid)
 
         return entities

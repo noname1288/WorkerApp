@@ -2,6 +2,7 @@ package com.example.workerapp.presentation.screens.application
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.workerapp.data.JobRepository
 import com.example.workerapp.data.source.remote.JobRemoteImpl
 import com.example.workerapp.data.source.remote.dto.NetworkResult
 import com.example.workerapp.data.source.remote.dto.response.ApplicationDto
@@ -13,44 +14,38 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ApplicationViewModel @Inject constructor(
-    private val jobRemoteImpl: JobRemoteImpl
+    private val jobRemoteImpl: JobRemoteImpl,
 ) : ViewModel() {
 
-    private val _applicationsState = MutableStateFlow<com.example.workerapp.presentation.screens.profile.ApplicationsUiState>(
-        com.example.workerapp.presentation.screens.profile.ApplicationsUiState.Idle)
-    val applicationsState: MutableStateFlow<com.example.workerapp.presentation.screens.profile.ApplicationsUiState> = _applicationsState
+    private val _applicationsState = MutableStateFlow<ApplicationsUiState>(
+        ApplicationsUiState.Idle
+    )
+    val applicationsState: MutableStateFlow<ApplicationsUiState> = _applicationsState
 
     fun fetchApplications() {
-        val userUid = UserSession.uid
-
-        if (userUid.isNullOrEmpty()) {
-            _applicationsState.value = com.example.workerapp.presentation.screens.profile.ApplicationsUiState.Error("User not logged in")
-            return
-        }
-
         viewModelScope.launch {
-            _applicationsState.value = com.example.workerapp.presentation.screens.profile.ApplicationsUiState.Loading
+            _applicationsState.value = ApplicationsUiState.Loading
 
-            try {
-                val result = jobRemoteImpl.getApplication(userUid)
+            var currentUser = ""
+            UserSession.requireUserId().onSuccess {
+                currentUser = it
+            }.onFailure { error ->
+                _applicationsState.value =
+                    ApplicationsUiState.Error(error.message ?: "Unknown Error")
+                return@launch
+            }
 
-                when (result) {
-                    is NetworkResult.Error -> {
-                        _applicationsState.value = com.example.workerapp.presentation.screens.profile.ApplicationsUiState.Error(result.message)
-                    }
+            if (currentUser.isEmpty())
+                return@launch
 
-                    is NetworkResult.Success -> {
-                        _applicationsState.value = com.example.workerapp.presentation.screens.profile.ApplicationsUiState.Success(result.data)
-                    }
-                }
-            } catch (e: Exception) {
-                _applicationsState.value = com.example.workerapp.presentation.screens.profile.ApplicationsUiState.Error(e.message ?: "Unknown error")
+            jobRemoteImpl.getApplication(currentUser).onSuccess { data ->
+                _applicationsState.value = ApplicationsUiState.Success(data)
+            }.onFailure { error ->
+                _applicationsState.value =
+                    ApplicationsUiState.Error(error.message ?: "Unknown Error")
             }
         }
-
-
     }
-
 }
 
 sealed class ApplicationsUiState {

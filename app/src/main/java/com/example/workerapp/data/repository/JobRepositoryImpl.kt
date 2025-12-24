@@ -2,9 +2,11 @@ package com.example.workerapp.data.repository
 
 import android.util.Log
 import com.example.workerapp.data.JobRepository
+import com.example.workerapp.data.error.AppError
 import com.example.workerapp.data.source.JobDataSource
 import com.example.workerapp.data.source.local.room.entity.ApplicationModel
 import com.example.workerapp.data.source.remote.dto.NetworkResult
+import com.example.workerapp.data.source.remote.dto.request.ApplicationRequest
 import com.example.workerapp.data.source.remote.dto.request.CancelApplicationRequest
 import com.example.workerapp.data.source.remote.dto.response.ApplicationDto
 import com.example.workerapp.data.source.remote.dto.response.CancelApplicationWrapper
@@ -19,56 +21,40 @@ class JobRepositoryImpl @Inject constructor(
     private val TAG = "JobRepositoryImpl"
 
     override suspend fun getApplications(): Result<List<ApplicationModel>> {
-        return try {
+        return runCatching {
+            //get current user
+            val currentUser = UserSession.requireUserId().getOrThrow()
+
             //get applications from remote
-            val currentUser = UserSession.uid
-            if (currentUser == null)
-                return Result.failure(Exception("User not found"))
+            val applicationDtoList = remote.getApplication(currentUser).getOrThrow()
+            val entities = applicationDtoList.map { it.toEntity() }
+            Log.d(TAG, "$entities")
 
-            val response = remote.getApplication(currentUser)
-            when (response) {
-                is NetworkResult.Error -> {
-                    Result.failure(Exception(response.message))
-                }
-
-                is NetworkResult.Success -> {
-                    //clear old data
-                    local.clearData()
-
-                    //save to local
-                    val applicationDtoList = response.data as List<ApplicationDto>
-                    val entities = applicationDtoList.map { it.toEntity() }
-
-                    local.saveApplicationsToLocal(entities)
-                    Log.d(
-                        "JobRepositoryImpl",
-                        "getApplications: Saved $entities applications to local"
-                    )
-                    Result.success(entities)
-                }
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
+            entities
         }
     }
 
     /**
      * Get oldest application by jobUid
      * if not contain, return null
-    * */
+     * */
     override suspend fun getApplicationByJobId(jobUid: String): Result<ApplicationModel?> {
         try {
-            val list = local.getApplicationsFromLocal()
+            val list = local.getApplicationByJobUid(jobUid)
 
             if (list.isEmpty())
                 return Result.success(null)
 
             return Result.success(list[0]) // return first element because the list sorted by 'createdAt'
-        }catch (e: Exception){
+        } catch (e: Exception) {
             return Result.failure(e)
         }
     }
 
+    /**
+     *
+     *
+     * */
     override suspend fun cancelJob(
         request: CancelApplicationRequest
     ): Result<CancelApplicationWrapper> {
@@ -88,6 +74,10 @@ class JobRepositoryImpl @Inject constructor(
         }
     }
 
+    /**
+     *
+     *
+     * */
     override suspend fun insertApplicationToLocal(application: ApplicationDto): Result<Boolean> {
         return try {
             //map to Application Model
@@ -96,12 +86,16 @@ class JobRepositoryImpl @Inject constructor(
             local.addNewApplicationToLocal(applicationEntity)
             Log.d(TAG, "insert new application success: ${applicationEntity.applicationId}")
             Result.success(true)
-        }catch (e: Exception){
+        } catch (e: Exception) {
             Log.d(TAG, "insert new application failure: ${e.message}")
             Result.failure(e)
         }
     }
 
+    /**
+     *
+     *
+     * */
     override suspend fun updateStatusByApplicationId(
         applicationId: String,
         newStatus: String
@@ -114,12 +108,38 @@ class JobRepositoryImpl @Inject constructor(
         }
     }
 
+    /**
+     *
+     *
+     * */
     override suspend fun deleteCurrentApplication(applicationId: String): Result<Boolean> {
         return try {
             local.deleteByApplicationId(applicationId)
             Result.success(true)
-        }catch (e: Exception){
+        } catch (e: Exception) {
             Result.failure(e)
         }
     }
+
+    /**
+     *
+     *
+     * */
+    override suspend fun applyJob(request: ApplicationRequest): Result<Unit> =
+        runCatching {
+            //1. apply job (generate a new application but BE not response the application for you)
+            remote.applyForJob(request).getOrThrow()
+
+            //2. get current user
+            val userId = UserSession.requireUserId().getOrThrow()
+
+            //3. fetch the lastest application
+            val lastestApplication =
+                remote.getApplication(userId).getOrThrow().firstOrNull() ?: throw AppError.Business(
+                    "lastest application is null"
+                )
+
+            //4. save to local
+            local.addNewApplicationToLocal(lastestApplication.toEntity() /*convert to ApplicationModel*/)
+        }
 }

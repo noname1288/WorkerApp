@@ -1,7 +1,5 @@
 package com.example.workerapp.presentation.screens.detail_job.maintenance
 
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -50,12 +48,19 @@ import com.example.workerapp.data.source.model.base.UserModel
 import com.example.workerapp.data.source.model.maintenance.MaintenanceJobResponse
 import com.example.workerapp.data.source.model.maintenance.MaintenanceServiceModel
 import com.example.workerapp.data.source.model.maintenance.PowerWrapper
+import com.example.workerapp.presentation.screens.detail_job.maintenance.ApplyJobState
+import com.example.workerapp.presentation.screens.detail_job.maintenance.CancelJobState
 import com.example.workerapp.ui.detail.components.ClientCard
 import com.example.workerapp.ui.detail.components.JobDetailCard
 import com.example.workerapp.ui.detail.components.WeeklySchedule
-import com.example.workerapp.utils.button.SlideToConfirmButton
+import com.example.workerapp.utils.components.ApplyJobButton
+import com.example.workerapp.utils.components.CancelJobButton
 import com.example.workerapp.utils.components.CircleLoadingIndicator
+import com.example.workerapp.utils.components.CommonAlertDialog
+import com.example.workerapp.utils.components.ErrorDialog
 import com.example.workerapp.utils.components.InformationItem
+import com.example.workerapp.utils.components.LoadingDialog
+import com.example.workerapp.utils.components.SuccessDialog
 import com.example.workerapp.utils.ext.openGoogleMap
 import com.example.workerapp.utils.ext.popBackIfCan
 
@@ -72,29 +77,19 @@ fun MaintenanceDetailScreen(
     val tag = "MaintenanceDetailScreen"
 
     val uiState by viewModel.uiState.collectAsState()
-    val applyState by viewModel.applyState.collectAsState()
+    val appJobState by viewModel.appJobState.collectAsState()
+    val appliedState by viewModel.appliedState.collectAsState()
+    val cancelState by viewModel.cancelJobState.collectAsState()
 
-    var confirmed by rememberSaveable { mutableStateOf(false) }
+    var showApplyDialog by rememberSaveable { mutableStateOf(false) }
+    var showAlertDialog by rememberSaveable { mutableStateOf(false) }
+    var showCancelDialog by rememberSaveable { mutableStateOf(false) }
     var jobAddress by rememberSaveable { mutableStateOf("") }
 
-    LaunchedEffect(uiState.error) {
-        uiState.error?.let {
-            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
-        }
-    }
-
-    LaunchedEffect(applyState) {
-        when (applyState) {
-            true -> {
-                Toast.makeText(context, "Ứng tuyển thành công!", Toast.LENGTH_LONG).show()
-                navController.popBackIfCan()
-            }
-            false -> {
-                viewModel.updateApplyState(null)
-                confirmed = false
-            }
-            null -> viewModel.fetchJobDetail(maintenanceUid)
-        }
+    //init
+    LaunchedEffect(Unit) {
+        viewModel.fetchJobDetail(maintenanceUid)
+        viewModel.checkIfApplied(maintenanceUid)
     }
 
     val job = uiState.job
@@ -195,16 +190,86 @@ fun MaintenanceDetailScreen(
                             is MaintenanceJobSection.ActionButtons -> {
                                 item {
                                     if (!isOnlyWatch) {
-                                        SlideToConfirmButton(
-                                            isConfirmed = confirmed,
-                                            onValueChange = {
-                                                confirmed = it
-                                                Log.d(tag, "Confirmed: $confirmed")
-                                                viewModel.applyToJob(maintenanceUid)
+                                        when (appliedState) {
+                                            true -> {
+                                                CancelJobButton(
+                                                    onCancel = {
+                                                        showAlertDialog = true
+                                                    }
+                                                )
                                             }
-                                        )
+
+                                            false -> {
+                                                ApplyJobButton(onConfirm = {
+                                                    showApplyDialog = true
+                                                    viewModel.applyToJob(maintenanceUid)
+                                                })
+                                            }
+
+                                            null -> {}
+                                        }
                                     }
                                     Spacer(Modifier.height(24.dp))
+                                }
+                            }
+                        }
+                    }
+
+                    item {
+                        if (showApplyDialog) {
+                            when (appJobState) {
+                                is ApplyJobState.Error -> {
+                                    val message = (appJobState as ApplyJobState.Error).message
+                                    ErrorDialog(
+                                        content = message,
+                                        onDismiss = {
+                                            showApplyDialog = false
+                                        }
+                                    )
+                                }
+
+                                ApplyJobState.Idle -> {}
+                                ApplyJobState.Loading -> LoadingDialog()
+                                ApplyJobState.Success -> {
+                                    SuccessDialog(
+                                        content = "Ứng tuyển thành công!",
+                                        onDismiss = { showApplyDialog = false })
+                                }
+                            }
+                        }
+
+                        if (showAlertDialog){
+                            CommonAlertDialog(
+                                content = "Bạn có chắc chắn muốn hủy ứng tuyển công việc này?",
+                                onDismiss = {
+                                    showAlertDialog = false
+                                },
+                                onConfirm = {
+                                    // Confirm cancel apply
+                                    showAlertDialog = false
+                                    viewModel.cancelApplication()
+                                    showCancelDialog = true
+                                }
+                            )
+                        }
+
+                        if (showCancelDialog){
+                            when(cancelState){
+                                is CancelJobState.Error -> {
+                                    val message = (cancelState as CancelJobState.Error).message
+                                    ErrorDialog(
+                                        content = message,
+                                        onDismiss = {
+                                            showCancelDialog = false
+                                        }
+                                    )
+                                }
+                                CancelJobState.Idle -> {}
+                                CancelJobState.Loading -> LoadingDialog()
+                                CancelJobState.Success -> {
+                                    SuccessDialog(
+                                        content = "Huỷ thành công!",
+                                        onDismiss = { showCancelDialog = false })
                                 }
                             }
                         }

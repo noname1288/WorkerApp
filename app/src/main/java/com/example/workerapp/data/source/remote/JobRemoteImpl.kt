@@ -1,6 +1,7 @@
 package com.example.workerapp.data.source.remote
 
 import android.util.Log
+import com.example.workerapp.data.error.AppError
 import com.example.workerapp.data.source.JobDataSource
 import com.example.workerapp.data.source.model.base.JobModel1
 import com.example.workerapp.data.source.model.cleaning.CleaningJobModel1
@@ -14,6 +15,7 @@ import com.example.workerapp.data.source.remote.dto.response.ApiErrorResponse
 import com.example.workerapp.data.source.remote.dto.response.ApplicationDto
 import com.example.workerapp.data.source.remote.dto.response.CancelApplicationWrapper
 import com.squareup.moshi.Moshi
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
@@ -25,15 +27,31 @@ class JobRemoteImpl @Inject constructor(
 
     private val errorAdapter = moshi.adapter(ApiErrorResponse::class.java)
 
-    private val CREATED_AT_FORMATTER =
+    private val APPLICATION_CREATED_AT_FORMATTER =
         DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy")
+
+    private val JOB_CREATED_AT_FORMATTER =
+        DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
     override suspend fun getCleaningJobs(): NetworkResult<List<CleaningJobModel1>> {
         try {
             val result = jobApi.getCleaningJobs()
             if (result.success) {
-                Log.d(TAG, "jobs: ${result.jobs}")
-                return NetworkResult.Success(result.jobs ?: emptyList())
+                val jobs = result.jobs ?: emptyList()
+                val sortedJobs = jobs.sortedByDescending { job ->
+                    try {
+                        if (job.createdAt.isNotEmpty()) {
+                            LocalDate.parse(job.createdAt, JOB_CREATED_AT_FORMATTER)
+                        } else {
+                            LocalDate.MIN
+                        }
+                    } catch (e: Exception) {
+                        Log.e(TAG, "getCleaningJobs: Failed to parse createdAt for job ${job.uid}: ${e.message}")
+                        LocalDate.MIN
+                    }
+                }
+                Log.d(TAG, "jobs: ${sortedJobs.size} jobs sorted by createdAt")
+                return NetworkResult.Success(sortedJobs)
             } else {
                 Log.e(TAG, "getCleaningJobs: ${result.message}")
                 return NetworkResult.Error(result.message)
@@ -64,8 +82,21 @@ class JobRemoteImpl @Inject constructor(
         try {
             val result = jobApi.getHealthcareJobs()
             if (result.success) {
-                Log.d(TAG, "jobs: ${result.jobs}")
-                return NetworkResult.Success(result.jobs ?: emptyList())
+                val jobs = result.jobs ?: emptyList()
+                val sortedJobs = jobs.sortedByDescending { job ->
+                    try {
+                        if (job.createdAt.isNotEmpty()) {
+                            LocalDate.parse(job.createdAt, JOB_CREATED_AT_FORMATTER)
+                        } else {
+                            LocalDate.MIN
+                        }
+                    } catch (e: Exception) {
+                        Log.e(TAG, "getHealthcareJobs: Failed to parse createdAt for job ${job.uid}: ${e.message}")
+                        LocalDate.MIN
+                    }
+                }
+                Log.d(TAG, "jobs: ${sortedJobs.size} jobs sorted by createdAt")
+                return NetworkResult.Success(sortedJobs)
             } else {
                 Log.e(TAG, "getHealthcareJobs: ${result.message}")
                 return NetworkResult.Error(result.message)
@@ -96,8 +127,22 @@ class JobRemoteImpl @Inject constructor(
         return try {
             val response = jobApi.getMaintenanceJobs()
             if (response.success) {
-                Log.d(TAG, "getMaintenanceJobs: ${response.jobs}")
-                NetworkResult.Success(response.jobs ?: emptyList())
+                val jobs = response.jobs ?: emptyList()
+                val sortedJobs = jobs.sortedByDescending { job ->
+                    try {
+                        if (job.createdAt.isNotEmpty()) {
+                            LocalDate.parse(job.createdAt, JOB_CREATED_AT_FORMATTER)
+                        } else {
+                            LocalDate.MIN
+                        }
+                    } catch (e: Exception) {
+                        Log.e(TAG, "getMaintenanceJobs: Failed to parse createdAt for job ${job.uid}: ${e.message}")
+                        LocalDate.MIN
+                    }
+                }
+                Log.d(TAG, "getMaintenanceJobs: ${sortedJobs.size} jobs sorted by createdAt")
+                Log.d(TAG, "getMaintenanceJobs: $sortedJobs ")
+                NetworkResult.Success(sortedJobs)
             } else {
                 Log.e(TAG, "getMaintenanceJobs Error: ${response.message}")
                 NetworkResult.Error(response.message)
@@ -125,26 +170,29 @@ class JobRemoteImpl @Inject constructor(
         }
     }
 
-    override suspend fun applyForJob(request: ApplicationRequest): NetworkResult<Boolean> {
-        val response = jobApi.applyForJob(request)
+    override suspend fun applyForJob(request: ApplicationRequest): Result<Unit> {
+        return runCatching {
+            val response = jobApi.applyForJob(request)
 
-        return if (response.isSuccessful) {
-            val body = response.body()
+            if (!response.isSuccessful){
+                val errorMessage = response.errorBody()?.string()
+                    ?.let { json -> errorAdapter.fromJson(json)?.error }
+                    ?: response.message()
+                    ?: "Request failed with status code ${response.code()}"
 
-            if (body != null && body.success) {
-                Log.d(TAG, "applyForJob: ${body.message}")
-                NetworkResult.Success(true)
-            } else {
-                Log.e(TAG, "applyForJob Error: ${body?.message ?: "Empty response body"}")
-                NetworkResult.Error(body?.message ?: "Empty response body")
+                throw AppError.Network(
+                    errorMessage = errorMessage,
+                    httpCode = response.code()
+                )
             }
-        } else {
-            val errorMessage = response.errorBody()?.string()
-                ?.let { json -> errorAdapter.fromJson(json)?.error }
-                ?: response.message()
-                ?: "Request failed with status code ${response.code()}"
 
-            NetworkResult.Error(errorMessage)
+            val body = response.body() ?: throw AppError.Network("Empty Body")
+
+            if (!body.success){
+                throw AppError.Business(body.message ?: "Apply failed")
+            }
+
+            Unit
         }
     }
 
@@ -159,7 +207,11 @@ class JobRemoteImpl @Inject constructor(
             if (body != null && body.success){
                 Log.d(TAG, "cancelJob: ${body.message}")
                 val applicationWrapper = body.updatedOrder
-                return NetworkResult.Success(applicationWrapper)
+                return if (applicationWrapper == null){
+                    NetworkResult.Error("Empty body.updatedOrder")
+                }else {
+                    NetworkResult.Success(applicationWrapper)
+                }
             } else {
                 Log.e(TAG, "cancelJob Error: ${body?.message ?: "Empty response body"}")
                 return NetworkResult.Error(body?.message ?: "Empty response body")
@@ -193,23 +245,35 @@ class JobRemoteImpl @Inject constructor(
         }
     }
 
-    override suspend fun getApplication(workerId: String): NetworkResult<List<ApplicationDto>> {
-        try {
-            val response = jobApi.getApplicationsByWorkerId(workerId)
-            if (response.success) {
-                val sortedOrders = response.orders.sortedByDescending {
-                    LocalDateTime.parse(it.createdAt, CREATED_AT_FORMATTER)
-                }
+    override suspend fun getApplication(workerId: String): Result<List<ApplicationDto>> {
+//        try {
+//            val response = jobApi.getApplicationsByWorkerId(workerId)
+//            if (response.success) {
+//                val sortedOrders = response.orders.sortedByDescending {
+//                    LocalDateTime.parse(it.createdAt, APPLICATION_CREATED_AT_FORMATTER)
+//                }
+//
+//                Log.d(TAG, "getApplication: ${response.orders}")
+//                return NetworkResult.Success(sortedOrders)
+//            } else {
+//                Log.e(TAG, "getApplication Error: ${response.message}")
+//                return NetworkResult.Error(response.message)
+//            }
+//        } catch (e: Exception) {
+//            Log.e(TAG, "getApplication Exception: ${e.message}")
+//            return NetworkResult.Error(e.message ?: "Unknown error")
+//        }
 
-                Log.d(TAG, "getApplication: ${response.orders}")
-                return NetworkResult.Success(sortedOrders)
-            } else {
-                Log.e(TAG, "getApplication Error: ${response.message}")
-                return NetworkResult.Error(response.message)
+        return runCatching {
+            val response = jobApi.getApplicationsByWorkerId(workerId)
+
+            if (!response.success)
+                throw AppError.Network(response.message ?: "Error to get all applications")
+
+            Log.d(TAG, "getApplication: ${response.orders}")
+            response.orders.sortedByDescending {
+                LocalDateTime.parse(it.createdAt, APPLICATION_CREATED_AT_FORMATTER)
             }
-        } catch (e: Exception) {
-            Log.e(TAG, "getApplication Exception: ${e.message}")
-            return NetworkResult.Error(e.message ?: "Unknown error")
         }
     }
 

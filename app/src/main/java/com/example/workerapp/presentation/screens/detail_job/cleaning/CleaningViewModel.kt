@@ -1,4 +1,4 @@
-package com.example.workerapp.ui.detail.cleaning
+package com.example.workerapp.presentation.screens.detail_job.cleaning
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -13,7 +13,6 @@ import com.example.workerapp.data.source.remote.dto.NetworkResult
 import com.example.workerapp.data.source.remote.dto.request.ApplicationRequest
 import com.example.workerapp.data.source.remote.dto.request.CancelApplicationRequest
 import com.example.workerapp.data.source.remote.dto.response.CancelApplicationWrapper
-import com.example.workerapp.presentation.screens.authen.LoginScreen
 import com.example.workerapp.utils.ApplicationStatusType
 import com.example.workerapp.utils.ServiceType
 import com.example.workerapp.utils.cached.UserSession
@@ -90,50 +89,20 @@ class CleaningViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            try {
-                _applyJobState.value = ApplyJobState.Loading
+            _applyJobState.value = ApplyJobState.Loading
 
-                val request = ApplicationRequest(
+            cleaningRemoteImpl.applyForJob(
+                ApplicationRequest(
                     workerID = UserSession.uid,
                     jobID = jobUid,
                     serviceType = ServiceType.CleaningType
                 )
-
-                val result = cleaningRemoteImpl.applyForJob(request)
-                if (result is NetworkResult.Success) {
-                    //update local
-                    insertApplicationToLocal()
-
-                    _applyJobState.value = ApplyJobState.Success
-                } else if (result is NetworkResult.Error) {
-                    _applyJobState.value = ApplyJobState.Error(result.message)
-                }
-            } catch (e: Exception) {
-                _applyJobState.value = ApplyJobState.Error(e.message ?: "Unknown Error")
-            }
-        }
-    }
-
-    suspend fun insertApplicationToLocal() {
-        val currentUser = UserSession.uid
-        if (currentUser == null) {
-            _applyJobState.value = ApplyJobState.Error("Error to find current user")
-            return
-        }
-
-        val applicationResponse = cleaningRemoteImpl.getApplication(currentUser)
-
-        when (applicationResponse) {
-            is NetworkResult.Error -> {
-                _applyJobState.value =
-                    ApplyJobState.Error("cann't insert new application into local")
-            }
-
-            is NetworkResult.Success -> {
-                val applicationList = applicationResponse.data
-
-                val newApplicationDto = applicationList[0]
-                jobRepository.insertApplicationToLocal(newApplicationDto)
+            ).onSuccess {
+                //update local
+                _applyJobState.value = ApplyJobState.Success
+                _appliedState.value = true
+            }.onFailure { error ->
+                _applyJobState.value = ApplyJobState.Error(error.message ?: "Unknown Error")
             }
         }
     }
@@ -142,10 +111,12 @@ class CleaningViewModel @Inject constructor(
         viewModelScope.launch {
             _cancelJobState.value = CancelJobState.Loading
 
-            val applicationUid = if (_applicationEntity.value == null) {
+            val applicationEntity = _applicationEntity.value
+
+            val applicationUid = if (applicationEntity == null) {
                 _cancelJobState.value = CancelJobState.Error("Bạn chưa ứng tuyển công việc này")
                 return@launch
-            } else _applicationEntity.value!!.applicationId
+            } else applicationEntity.applicationId
 
             val request = CancelApplicationRequest(
                 applicationUid,
@@ -191,10 +162,10 @@ class CleaningViewModel @Inject constructor(
             val status = application.status
             if (status == ApplicationStatusType.WAITING) {
                 _appliedState.value = true
-                _applicationEntity.value = null
+                _applicationEntity.value = application
             } else {
                 _appliedState.value = false
-                _applicationEntity.value = application
+                _applicationEntity.value = null
             }
 
         }.onFailure {
@@ -208,12 +179,10 @@ class CleaningViewModel @Inject constructor(
         val newStatus = applicationWrapper.status
 
         val result = jobRepository.updateStatusByApplicationId(applicationId, newStatus)
-
         result.onSuccess {
             return true
-        }.onFailure {
-            return null
         }
+
         return null
     }
 }
