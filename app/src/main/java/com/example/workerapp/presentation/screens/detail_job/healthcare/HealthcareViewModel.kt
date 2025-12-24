@@ -12,7 +12,6 @@ import com.example.workerapp.data.source.remote.JobRemoteImpl
 import com.example.workerapp.data.source.remote.dto.NetworkResult
 import com.example.workerapp.data.source.remote.dto.request.ApplicationRequest
 import com.example.workerapp.data.source.remote.dto.request.CancelApplicationRequest
-import com.example.workerapp.data.source.remote.dto.response.CancelApplicationWrapper
 import com.example.workerapp.data.source.remote.dto.wrapper.HealthServiceWrapper
 import com.example.workerapp.utils.ApplicationStatusType
 import com.example.workerapp.utils.ServiceType
@@ -34,11 +33,11 @@ class HealthcareViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(HealthcareUiState())
     val uiState: StateFlow<HealthcareUiState> = _uiState
-    private val _applyJobState = MutableStateFlow<ApplyJobState>(ApplyJobState.Idle)
+    private val _applyJobState = MutableStateFlow<ApplyHealthcareJobState>(ApplyHealthcareJobState.Idle)
     val appJobState = _applyJobState.asStateFlow()
     private val _appliedState = MutableStateFlow<Boolean?>(null)
     val appliedState = _appliedState.asStateFlow()
-    private val _cancelJobState = MutableStateFlow<CancelJobState>(CancelJobState.Idle)
+    private val _cancelJobState = MutableStateFlow<CancelHealthcareJobState>(CancelHealthcareJobState.Idle)
     val cancelJobState = _cancelJobState.asStateFlow()
     private val _applicationEntity = MutableStateFlow<ApplicationModel?>(null)
 
@@ -95,101 +94,52 @@ class HealthcareViewModel @Inject constructor(
         return healthcareServices
     }
 
-//    fun applyToJob(jobUid: String) {
-//        if (jobUid.isEmpty()) {
-//            _applyJobState.value = ApplyJobState.Error("Invalid job ID")
-//            return
-//        }
-//
-//        viewModelScope.launch {
-//            try {
-//                _applyJobState.value = ApplyJobState.Loading
-//
-//                val request = ApplicationRequest(
-//                    workerID = UserSession.uid,
-//                    jobID = jobUid,
-//                    serviceType = ServiceType.HealthcareType
-//                )
-//
-//                val result = healthcareRemoteImpl.applyForJob(request)
-//                if (result is NetworkResult.Success) {
-//                    //update local
-//                    insertApplicationToLocal(jobUid)
-//
-//                    _applyJobState.value = ApplyJobState.Success
-//                    _appliedState.value = true
-//                } else if (result is NetworkResult.Error) {
-//                    _applyJobState.value = ApplyJobState.Error(result.message)
-//                }
-//            } catch (e: Exception) {
-//                _applyJobState.value = ApplyJobState.Error(e.message ?: "Unknown Error")
-//            }
-//        }
-//    }
+    fun applyToJob(jobUid: String) {
+        if (jobUid.isEmpty()) {
+            _applyJobState.value = ApplyHealthcareJobState.Error("Invalid job ID")
+            return
+        }
 
-//    suspend fun insertApplicationToLocal(jobUid: String) {
-//        val currentUser = UserSession.uid
-//        if (currentUser == null) {
-//            _applyJobState.value = ApplyJobState.Error("Error to find current user")
-//            return
-//        }
-//
-//        val applicationResponse = healthcareRemoteImpl.getApplication(currentUser)
-//
-//        when (applicationResponse) {
-//            is NetworkResult.Error -> {
-//                _applyJobState.value =
-//                    ApplyJobState.Error("can't insert new application into local")
-//            }
-//
-//            is NetworkResult.Success -> {
-//                val applicationList = applicationResponse.data
-//
-//                if (applicationList.isNotEmpty()) {
-//                    val newApplicationDto = applicationList[0]
-//
-//                    if (newApplicationDto.job.uid == jobUid)
-//                        jobRepository.insertApplicationToLocal(newApplicationDto)
-//                    else
-//                        ApplyJobState.Error("new application (${newApplicationDto.job.uid}) doesn't match with current job($jobUid)")
-//                }
-//            }
-//        }
-//    }
+        viewModelScope.launch {
+            _applyJobState.value = ApplyHealthcareJobState.Loading
+
+            jobRepository.applyJob(
+                ApplicationRequest(
+                    workerID = UserSession.uid,
+                    jobID = jobUid,
+                    serviceType = ServiceType.HealthcareType
+                )
+            ).onSuccess {
+                //check event: data is updated (local)
+                checkIfApplied(jobUid)
+
+                _applyJobState.value = ApplyHealthcareJobState.Success
+            }.onFailure { error ->
+                _applyJobState.value = ApplyHealthcareJobState.Error(error.message ?: "Unknown Error")
+            }
+        }
+    }
 
     fun cancelApplication() {
         viewModelScope.launch {
-            _cancelJobState.value = CancelJobState.Loading
+            _cancelJobState.value = CancelHealthcareJobState.Loading
 
             val applicationEntity = _applicationEntity.value
 
             val applicationUid = if (applicationEntity == null) {
-                _cancelJobState.value = CancelJobState.Error("Bạn chưa ứng tuyển công việc này")
+                _cancelJobState.value = CancelHealthcareJobState.Error("Bạn chưa ứng tuyển công việc này")
                 return@launch
             } else applicationEntity.applicationId
 
-            val request = CancelApplicationRequest(
-                applicationUid,
-                ApplicationStatusType.CANCEL
-            )
-
-            val result = jobRepository.cancelJob(request)
-
-            result.onSuccess { applicationWrapper ->
-                //update local
-                val result = withContext(Dispatchers.IO) {
-                    updateStatusByApplicationId(applicationWrapper)
-                }
-
-                if (result == true) {
-                    _cancelJobState.value = CancelJobState.Success
-                    _appliedState.value = false
-                } else {
-                    _appliedState.value = true
-                    _cancelJobState.value = CancelJobState.Error("Fail to update local")
-                }
-            }.onFailure {
-                _cancelJobState.value = CancelJobState.Error(it.message ?: "Unknown Error")
+            jobRepository.cancelJob(
+                CancelApplicationRequest(
+                    applicationUid,
+                    ApplicationStatusType.CANCEL
+                )
+            ).onSuccess { applicationWrapper ->
+                _cancelJobState.value = CancelHealthcareJobState.Success
+            }.onFailure { error ->
+                _cancelJobState.value = CancelHealthcareJobState.Error(error.message ?: "Unknown Error")
                 _appliedState.value = false
             }
         }
@@ -224,16 +174,8 @@ class HealthcareViewModel @Inject constructor(
         }
     }
 
-    suspend fun updateStatusByApplicationId(applicationWrapper: CancelApplicationWrapper): Boolean? {
-        val applicationId = applicationWrapper.uid
-        val newStatus = applicationWrapper.status
-
-        val result = jobRepository.updateStatusByApplicationId(applicationId, newStatus)
-        result.onSuccess {
-            return true
-        }
-
-        return null
+    fun setNewAppliedState(state: Boolean) {
+        _appliedState.value = state
     }
 }
 
@@ -244,16 +186,16 @@ data class HealthcareUiState(
     val error: String? = null
 )
 
-sealed class ApplyJobState {
-    object Idle : ApplyJobState()
-    object Loading : ApplyJobState()
-    object Success : ApplyJobState()
-    data class Error(val message: String) : ApplyJobState()
+sealed class ApplyHealthcareJobState {
+    object Idle : ApplyHealthcareJobState()
+    object Loading : ApplyHealthcareJobState()
+    object Success : ApplyHealthcareJobState()
+    data class Error(val message: String) : ApplyHealthcareJobState()
 }
 
-sealed class CancelJobState {
-    object Idle : CancelJobState()
-    object Loading : CancelJobState()
-    object Success : CancelJobState()
-    data class Error(val message: String) : CancelJobState()
+sealed class CancelHealthcareJobState {
+    object Idle : CancelHealthcareJobState()
+    object Loading : CancelHealthcareJobState()
+    object Success : CancelHealthcareJobState()
+    data class Error(val message: String) : CancelHealthcareJobState()
 }

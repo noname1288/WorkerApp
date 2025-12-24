@@ -1,6 +1,5 @@
 package com.example.workerapp.presentation.screens.detail_job.cleaning
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.workerapp.data.JobRepository
@@ -12,7 +11,6 @@ import com.example.workerapp.data.source.remote.JobRemoteImpl
 import com.example.workerapp.data.source.remote.dto.NetworkResult
 import com.example.workerapp.data.source.remote.dto.request.ApplicationRequest
 import com.example.workerapp.data.source.remote.dto.request.CancelApplicationRequest
-import com.example.workerapp.data.source.remote.dto.response.CancelApplicationWrapper
 import com.example.workerapp.utils.ApplicationStatusType
 import com.example.workerapp.utils.ServiceType
 import com.example.workerapp.utils.cached.UserSession
@@ -34,11 +32,11 @@ class CleaningViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(CleaningUiState())
     val uiState: StateFlow<CleaningUiState> = _uiState
-    private val _applyJobState = MutableStateFlow<ApplyJobState>(ApplyJobState.Idle)
+    private val _applyJobState = MutableStateFlow<ApplyCleaningJobState>(ApplyCleaningJobState.Idle)
     val appJobState = _applyJobState.asStateFlow()
     private val _appliedState = MutableStateFlow<Boolean?>(null)
     val appliedState = _appliedState.asStateFlow()
-    private val _cancelJobState = MutableStateFlow<CancelJobState>(CancelJobState.Idle)
+    private val _cancelJobState = MutableStateFlow<CancelCleaningJobState>(CancelCleaningJobState.Idle)
     val cancelJobState = _cancelJobState.asStateFlow()
     private val _applicationEntity = MutableStateFlow<ApplicationModel?>(null)
 
@@ -84,106 +82,84 @@ class CleaningViewModel @Inject constructor(
 
     fun applyToJob(jobUid: String) {
         if (jobUid.isEmpty()) {
-            _applyJobState.value = ApplyJobState.Error("Invalid User Uid")
+            _applyJobState.value = ApplyCleaningJobState.Error("Invalid User Uid")
             return
         }
 
-        viewModelScope.launch {
-            _applyJobState.value = ApplyJobState.Loading
+        viewModelScope.launch { //todo : insert lastest application into local
+            _applyJobState.value = ApplyCleaningJobState.Loading
 
-            cleaningRemoteImpl.applyForJob(
+            jobRepository.applyJob(
                 ApplicationRequest(
                     workerID = UserSession.uid,
                     jobID = jobUid,
                     serviceType = ServiceType.CleaningType
                 )
             ).onSuccess {
-                //update local
-                _applyJobState.value = ApplyJobState.Success
-                _appliedState.value = true
+                //check event: data is updated (local)
+                checkIfApplied(jobUid)
+
+                _applyJobState.value = ApplyCleaningJobState.Success
             }.onFailure { error ->
-                _applyJobState.value = ApplyJobState.Error(error.message ?: "Unknown Error")
+                _applyJobState.value = ApplyCleaningJobState.Error(error.message ?: "Unknown Error")
             }
         }
     }
 
     fun cancelApplication() {
         viewModelScope.launch {
-            _cancelJobState.value = CancelJobState.Loading
+            _cancelJobState.value = CancelCleaningJobState.Loading
 
             val applicationEntity = _applicationEntity.value
 
             val applicationUid = if (applicationEntity == null) {
-                _cancelJobState.value = CancelJobState.Error("Bạn chưa ứng tuyển công việc này")
+                _cancelJobState.value = CancelCleaningJobState.Error("Bạn chưa ứng tuyển công việc này")
                 return@launch
             } else applicationEntity.applicationId
 
-            val request = CancelApplicationRequest(
-                applicationUid,
-                ApplicationStatusType.CANCEL
-            )
+           jobRepository.cancelJob(
+                CancelApplicationRequest(
+                    applicationUid,
+                    ApplicationStatusType.CANCEL
+                )
+            ).onSuccess { applicationWrapper ->
+                _cancelJobState.value = CancelCleaningJobState.Success
+            }.onFailure { error ->
+                _cancelJobState.value = CancelCleaningJobState.Error(error.message ?: "Unknown Error")
+            }
+        }
+    }
 
-            val result = jobRepository.cancelJob(request)
-
-            result.onSuccess { applicationWrapper ->
-                //update local
-                val result = withContext(Dispatchers.IO) {
-                    updateStatusByApplicationId(applicationWrapper)
+    fun checkIfApplied(jobUid: String) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                jobRepository.getApplicationByJobId(jobUid)
+            }.onSuccess { application ->
+                /* User has not applied this job*/
+                if (application == null) {
+                    _appliedState.value = false
+                    _applicationEntity.value = null
+                    return@launch
                 }
 
-                if (result == true) {
-                    _cancelJobState.value = CancelJobState.Success
-                    _appliedState.value = false
-                } else {
+                /* User has applied this job*/
+                val status = application.status
+                if (status == ApplicationStatusType.WAITING) {
                     _appliedState.value = true
-                    _cancelJobState.value = CancelJobState.Error("Fail to update local")
+                    _applicationEntity.value = application
+                } else {
+                    _appliedState.value = false
+                    _applicationEntity.value = null
                 }
             }.onFailure {
-                _cancelJobState.value = CancelJobState.Error(it.message ?: "Unknown Error")
-                _appliedState.value = false
+                _appliedState.value = null
+                _applicationEntity.value = null
             }
         }
     }
 
-    suspend fun checkIfApplied(jobUid: String) {
-        val result = withContext(Dispatchers.IO) {
-            jobRepository.getApplicationByJobId(jobUid)
-        }
-
-        Log.d("CleaningViewModel", "$result")
-
-        result.onSuccess { application ->
-            if (application == null) {
-                _appliedState.value = false
-                _applicationEntity.value = null
-                return
-            }
-
-            val status = application.status
-            if (status == ApplicationStatusType.WAITING) {
-                _appliedState.value = true
-                _applicationEntity.value = application
-            } else {
-                _appliedState.value = false
-                _applicationEntity.value = null
-            }
-
-        }.onFailure {
-            _appliedState.value = null
-            _applicationEntity.value = null
-        }
-    }
-
-    suspend fun updateStatusByApplicationId(applicationWrapper: CancelApplicationWrapper): Boolean? {
-        val applicationId = applicationWrapper.uid
-        val newStatus = applicationWrapper.status
-
-        val result = jobRepository.updateStatusByApplicationId(applicationId, newStatus)
-        result.onSuccess {
-            return true
-        }
-
-        return null
+    fun setNewAppliedState(state: Boolean){
+        _appliedState.value = state
     }
 }
 
@@ -194,18 +170,18 @@ data class CleaningUiState(
     val error: String? = null
 )
 
-sealed class ApplyJobState {
-    object Idle : ApplyJobState()
-    object Loading : ApplyJobState()
-    object Success : ApplyJobState()
-    data class Error(val message: String) : ApplyJobState()
+sealed class ApplyCleaningJobState {
+    object Idle : ApplyCleaningJobState()
+    object Loading : ApplyCleaningJobState()
+    object Success : ApplyCleaningJobState()
+    data class Error(val message: String) : ApplyCleaningJobState()
 }
 
-sealed class CancelJobState {
-    object Idle : CancelJobState()
-    object Loading : CancelJobState()
-    object Success : CancelJobState()
-    data class Error(val message: String) : CancelJobState()
+sealed class CancelCleaningJobState {
+    object Idle : CancelCleaningJobState()
+    object Loading : CancelCleaningJobState()
+    object Success : CancelCleaningJobState()
+    data class Error(val message: String) : CancelCleaningJobState()
 }
 
 

@@ -233,8 +233,8 @@ fun CleaningDetailScreen(
                     item {
                         if (showApplyDialog) {
                             when (appJobState) {
-                                is ApplyJobState.Error -> {
-                                    val message = (appJobState as ApplyJobState.Error).message
+                                is ApplyCleaningJobState.Error -> {
+                                    val message = (appJobState as ApplyCleaningJobState.Error).message
                                     ErrorDialog(
                                         content = message,
                                         onDismiss = {
@@ -243,17 +243,20 @@ fun CleaningDetailScreen(
                                     )
                                 }
 
-                                ApplyJobState.Idle -> {}
-                                ApplyJobState.Loading -> LoadingDialog()
-                                ApplyJobState.Success -> {
+                                ApplyCleaningJobState.Idle -> {}
+                                ApplyCleaningJobState.Loading -> LoadingDialog()
+                                ApplyCleaningJobState.Success -> {
                                     SuccessDialog(
                                         content = "Ứng tuyển thành công!",
-                                        onDismiss = { showApplyDialog = false })
+                                        onDismiss = {
+                                            showApplyDialog = false
+                                            viewModel.setNewAppliedState(true)
+                                        })
                                 }
                             }
                         }
 
-                        if (showAlertDialog){
+                        if (showAlertDialog) {
                             CommonAlertDialog(
                                 content = "Bạn có chắc chắn muốn hủy ứng tuyển công việc này?",
                                 onDismiss = {
@@ -268,10 +271,10 @@ fun CleaningDetailScreen(
                             )
                         }
 
-                        if (showCancelDialog){
-                            when(cancelState){
-                                is CancelJobState.Error -> {
-                                    val message = (cancelState as CancelJobState.Error).message
+                        if (showCancelDialog) {
+                            when (cancelState) {
+                                is CancelCleaningJobState.Error -> {
+                                    val message = (cancelState as CancelCleaningJobState.Error).message
                                     ErrorDialog(
                                         content = message,
                                         onDismiss = {
@@ -279,12 +282,17 @@ fun CleaningDetailScreen(
                                         }
                                     )
                                 }
-                                CancelJobState.Idle -> {}
-                                CancelJobState.Loading -> LoadingDialog()
-                                CancelJobState.Success -> {
+
+                                CancelCleaningJobState.Idle -> {}
+                                CancelCleaningJobState.Loading -> LoadingDialog()
+                                CancelCleaningJobState.Success -> {
                                     SuccessDialog(
                                         content = "Huỷ thành công!",
-                                        onDismiss = { showCancelDialog = false })
+                                        onDismiss = {
+                                            showCancelDialog = false
+                                            viewModel.setNewAppliedState(false)
+                                        }
+                                    )
                                 }
                             }
                         }

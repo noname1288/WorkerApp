@@ -34,13 +34,13 @@ class MaintenanceViewModel @Inject constructor(
     private val jobRepository: JobRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(FetchJobState())
-    val uiState: StateFlow<FetchJobState> = _uiState
-    private val _applyJobState = MutableStateFlow<ApplyJobState>(ApplyJobState.Idle)
+    private val _uiState = MutableStateFlow(FetchMaintenanceJobState())
+    val uiState: StateFlow<FetchMaintenanceJobState> = _uiState
+    private val _applyJobState = MutableStateFlow<ApplyMaintenanceJobState>(ApplyMaintenanceJobState.Idle)
     val appJobState = _applyJobState.asStateFlow()
     private val _appliedState = MutableStateFlow<Boolean?>(null)
     val appliedState = _appliedState.asStateFlow()
-    private val _cancelJobState = MutableStateFlow<CancelJobState>(CancelJobState.Idle)
+    private val _cancelJobState = MutableStateFlow<CancelMaintenanceJobState>(CancelMaintenanceJobState.Idle)
     val cancelJobState = _cancelJobState.asStateFlow()
     private val _applicationEntity = MutableStateFlow<ApplicationModel?>(null)
 
@@ -58,7 +58,7 @@ class MaintenanceViewModel @Inject constructor(
                     is NetworkResult.Success -> {
                         val jobData = result.data
                         val serviceData = fetchMaintenanceService(jobData.services)
-                        _uiState.value = FetchJobState(
+                        _uiState.value = FetchMaintenanceJobState(
                             job = jobData,
                             services = serviceData,
                             isLoading = false
@@ -115,19 +115,13 @@ class MaintenanceViewModel @Inject constructor(
     }
 
     fun applyToJob(jobUid: String) {
+        if (jobUid.isEmpty()) {
+            _applyJobState.value = ApplyMaintenanceJobState.Error("Invalid job ID")
+            return
+        }
+
         viewModelScope.launch {
-            if (jobUid.isEmpty()) {
-                _applyJobState.value = ApplyJobState.Error("Invalid job ID")
-                return@launch
-            }
-
-            val currentUserUid = UserSession.uid
-            if (currentUserUid == null){
-                _applyJobState.value = ApplyJobState.Error("Invalid current user")
-                return@launch
-            }
-
-            _applyJobState.value = ApplyJobState.Loading
+            _applyJobState.value = ApplyMaintenanceJobState.Loading
 
             jobRepository.applyJob(
                 ApplicationRequest(
@@ -136,72 +130,44 @@ class MaintenanceViewModel @Inject constructor(
                     serviceType = ServiceType.MaintenanceType
                 )
             ).onSuccess {
+                //check event: data is updated (local)
+                checkIfApplied(jobUid)
 
-                _applyJobState.value = ApplyJobState.Success
-                //change apply button state ('Ung tuyen' button <--> 'Huy ung tuyen' button)
-                _appliedState.value = true
+                _applyJobState.value = ApplyMaintenanceJobState.Success
             }.onFailure { error ->
-                _applyJobState.value = ApplyJobState.Error(error.message ?: "UnknowError")
+                _applyJobState.value = ApplyMaintenanceJobState.Error(error.message ?: "Unknown Error")
             }
         }
     }
 
-//    suspend fun insertApplicationToLocal(userUid: String) : Result<Boolean> {
-//        val applicationResponse = jobRemoteImpl.getApplication(userUid)
-//
-//        when (applicationResponse) {
-//            is NetworkResult.Error -> {
-//                Result.failure(Exception(""))
-//            }
-//
-//            is NetworkResult.Success -> {
-//                val applicationList = applicationResponse.data
-//
-//                if (applicationList.isNotEmpty()) {
-//                    val newApplicationDto = applicationList[0]
-//                    jobRepository.insertApplicationToLocal(newApplicationDto)
-//                }
-//            }
-//        }
-//    }
-
     fun cancelApplication() {
         viewModelScope.launch {
-            _cancelJobState.value = CancelJobState.Loading
+            _cancelJobState.value = CancelMaintenanceJobState.Loading
 
             val applicationEntity = _applicationEntity.value
 
             val applicationUid = if (applicationEntity == null) {
-                _cancelJobState.value = CancelJobState.Error("Bạn chưa ứng tuyển công việc này")
+                _cancelJobState.value = CancelMaintenanceJobState.Error("Bạn chưa ứng tuyển công việc này")
                 return@launch
             } else applicationEntity.applicationId
 
-            val request = CancelApplicationRequest(
-                applicationUid,
-                ApplicationStatusType.CANCEL
-            )
-
-            val result = jobRepository.cancelJob(request)
-
-            result.onSuccess { applicationWrapper ->
-                //update local
-                val result = withContext(Dispatchers.IO) {
-                    updateStatusByApplicationId(applicationWrapper)
-                }
-
-                if (result == true) {
-                    _cancelJobState.value = CancelJobState.Success
-                    _appliedState.value = false
-                } else {
-                    _appliedState.value = true
-                    _cancelJobState.value = CancelJobState.Error("Fail to update local")
-                }
-            }.onFailure {
-                _cancelJobState.value = CancelJobState.Error(it.message ?: "Unknown Error")
-                _appliedState.value = false
+            jobRepository.cancelJob(
+                CancelApplicationRequest(
+                    applicationUid,
+                    ApplicationStatusType.CANCEL
+                )
+            ).onSuccess { applicationWrapper ->
+                _cancelJobState.value = CancelMaintenanceJobState.Success
+            }.onFailure { error ->
+                _cancelJobState.value = CancelMaintenanceJobState.Error(error.message ?: "Unknown Error")
             }
         }
     }
+
+    fun setNewAppliedState(state: Boolean) {
+        _appliedState.value = state
+    }
+
 
     suspend fun checkIfApplied(jobUid: String) {
         val result = withContext(Dispatchers.IO) {
@@ -245,24 +211,24 @@ class MaintenanceViewModel @Inject constructor(
     }
 }
 
-data class FetchJobState(
+data class FetchMaintenanceJobState(
     val isLoading: Boolean = false,
     val job: MaintenanceJobResponse? = null,
     val services: List<Pair<MaintenanceServiceModel, List<PowerWrapper>>> = emptyList(),
     val error: String? = null
 )
 
-sealed class ApplyJobState {
-    object Idle : ApplyJobState()
-    object Loading : ApplyJobState()
-    object Success : ApplyJobState()
-    data class Error(val message: String) : ApplyJobState()
+sealed class ApplyMaintenanceJobState {
+    object Idle : ApplyMaintenanceJobState()
+    object Loading : ApplyMaintenanceJobState()
+    object Success : ApplyMaintenanceJobState()
+    data class Error(val message: String) : ApplyMaintenanceJobState()
 }
 
-sealed class CancelJobState {
-    object Idle : CancelJobState()
-    object Loading : CancelJobState()
-    object Success : CancelJobState()
-    data class Error(val message: String) : CancelJobState()
+sealed class CancelMaintenanceJobState {
+    object Idle : CancelMaintenanceJobState()
+    object Loading : CancelMaintenanceJobState()
+    object Success : CancelMaintenanceJobState()
+    data class Error(val message: String) : CancelMaintenanceJobState()
 }
 

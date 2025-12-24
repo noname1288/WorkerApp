@@ -40,8 +40,6 @@ import com.example.workerapp.data.source.model.base.UserModel
 import com.example.workerapp.data.source.model.healthcare.HealthcareJobModel
 import com.example.workerapp.data.source.model.healthcare.HealthcareServiceModel
 import com.example.workerapp.presentation.screens.detail_job.components.HealthcareServiceItem
-import com.example.workerapp.presentation.screens.detail_job.healthcare.ApplyJobState
-import com.example.workerapp.presentation.screens.detail_job.healthcare.CancelJobState
 import com.example.workerapp.ui.detail.components.ClientCard
 import com.example.workerapp.ui.detail.components.JobDetailCard
 import com.example.workerapp.ui.detail.components.WeeklySchedule
@@ -202,7 +200,7 @@ fun HealthcareDetailScreen(
                                             false -> {
                                                 ApplyJobButton(onConfirm = {
                                                     showApplyDialog = true
-//                                                    viewModel.applyToJob(healthcareUid)
+                                                    viewModel.applyToJob(healthcareUid)
                                                 })
                                             }
 
@@ -218,8 +216,8 @@ fun HealthcareDetailScreen(
                     item {
                         if (showApplyDialog) {
                             when (appJobState) {
-                                is ApplyJobState.Error -> {
-                                    val message = (appJobState as ApplyJobState.Error).message
+                                is ApplyHealthcareJobState.Error -> {
+                                    val message = (appJobState as ApplyHealthcareJobState.Error).message
                                     ErrorDialog(
                                         content = message,
                                         onDismiss = {
@@ -228,12 +226,15 @@ fun HealthcareDetailScreen(
                                     )
                                 }
 
-                                ApplyJobState.Idle -> {}
-                                ApplyJobState.Loading -> LoadingDialog()
-                                ApplyJobState.Success -> {
+                                ApplyHealthcareJobState.Idle -> {}
+                                ApplyHealthcareJobState.Loading -> LoadingDialog()
+                                ApplyHealthcareJobState.Success -> {
                                     SuccessDialog(
                                         content = "Ứng tuyển thành công!",
-                                        onDismiss = { showApplyDialog = false })
+                                        onDismiss = {
+                                            showApplyDialog = false
+                                            viewModel.setNewAppliedState(true)
+                                        })
                                 }
                             }
                         }
@@ -255,8 +256,8 @@ fun HealthcareDetailScreen(
 
                         if (showCancelDialog){
                             when(cancelState){
-                                is CancelJobState.Error -> {
-                                    val message = (cancelState as CancelJobState.Error).message
+                                is CancelHealthcareJobState.Error -> {
+                                    val message = (cancelState as CancelHealthcareJobState.Error).message
                                     ErrorDialog(
                                         content = message,
                                         onDismiss = {
@@ -264,12 +265,15 @@ fun HealthcareDetailScreen(
                                         }
                                     )
                                 }
-                                CancelJobState.Idle -> {}
-                                CancelJobState.Loading -> LoadingDialog()
-                                CancelJobState.Success -> {
+                                CancelHealthcareJobState.Idle -> {}
+                                CancelHealthcareJobState.Loading -> LoadingDialog()
+                                CancelHealthcareJobState.Success -> {
                                     SuccessDialog(
                                         content = "Huỷ thành công!",
-                                        onDismiss = { showCancelDialog = false })
+                                        onDismiss = {
+                                            showCancelDialog = false
+                                            viewModel.setNewAppliedState(false)
+                                        })
                                 }
                             }
                         }

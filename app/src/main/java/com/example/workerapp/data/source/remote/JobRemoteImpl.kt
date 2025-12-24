@@ -198,31 +198,29 @@ class JobRemoteImpl @Inject constructor(
 
     override suspend fun cancelApplication(
         request: CancelApplicationRequest
-    ): NetworkResult<CancelApplicationWrapper> {
-        val response = jobApi.cancelApplication(request)
+    ): Result<CancelApplicationWrapper?> {
+        return runCatching {
+            val response = jobApi.cancelApplication(request)
 
-        return if (response.isSuccessful){
-            val body = response.body()
-
-            if (body != null && body.success){
-                Log.d(TAG, "cancelJob: ${body.message}")
-                val applicationWrapper = body.updatedOrder
-                return if (applicationWrapper == null){
-                    NetworkResult.Error("Empty body.updatedOrder")
-                }else {
-                    NetworkResult.Success(applicationWrapper)
-                }
-            } else {
-                Log.e(TAG, "cancelJob Error: ${body?.message ?: "Empty response body"}")
-                return NetworkResult.Error(body?.message ?: "Empty response body")
-            }
-        } else {
-            val errorMessage = response.errorBody()?.string()
+            if (!response.isSuccessful){
+                val errorMessage = response.errorBody()?.string()
                 ?.let { json -> errorAdapter.fromJson(json)?.error }
                 ?: response.message()
                 ?: "Request failed with status code ${response.code()}"
 
-            NetworkResult.Error(errorMessage)
+                throw AppError.Network(
+                    errorMessage,
+                    response.code()
+                )
+            }
+
+            val body = response.body() ?: throw AppError.Network("Empty Body")
+
+            if (!body.success){
+                throw AppError.Business(body.message ?: "Cancel job failed")
+            }
+
+            body.updatedOrder
         }
     }
 

@@ -22,9 +22,9 @@ interface JobDataSource {
 
         suspend fun addNewApplicationToLocal(application: ApplicationModel)
 
-        suspend fun getApplicationByJobUid(jobUid: String) : List<ApplicationModel>
+        suspend fun getApplicationByJobUid(jobUid: String) : Result<List<ApplicationModel>>
 
-        suspend fun updateStatusByApplicationId(applicationId: String, newStatus: String)
+        suspend fun updateStatusByApplicationId(applicationId: String, newStatus: String) : Result<Unit>
 
         suspend fun deleteByApplicationId(applicationId: String)
 
@@ -46,7 +46,7 @@ interface JobDataSource {
         suspend fun getMaintenanceDetail(jobUid: String) : NetworkResult<MaintenanceJobResponse>
 
         suspend fun applyForJob(request: ApplicationRequest): Result<Unit>
-        suspend fun cancelApplication(request: CancelApplicationRequest) : NetworkResult<CancelApplicationWrapper>
+        suspend fun cancelApplication(request: CancelApplicationRequest) : Result<CancelApplicationWrapper?>
 
         suspend fun getSchedules(workerId: String, date: String): NetworkResult<List<JobModel1>>
 

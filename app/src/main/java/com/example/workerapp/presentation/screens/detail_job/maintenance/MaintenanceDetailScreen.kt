@@ -48,8 +48,6 @@ import com.example.workerapp.data.source.model.base.UserModel
 import com.example.workerapp.data.source.model.maintenance.MaintenanceJobResponse
 import com.example.workerapp.data.source.model.maintenance.MaintenanceServiceModel
 import com.example.workerapp.data.source.model.maintenance.PowerWrapper
-import com.example.workerapp.presentation.screens.detail_job.maintenance.ApplyJobState
-import com.example.workerapp.presentation.screens.detail_job.maintenance.CancelJobState
 import com.example.workerapp.ui.detail.components.ClientCard
 import com.example.workerapp.ui.detail.components.JobDetailCard
 import com.example.workerapp.ui.detail.components.WeeklySchedule
@@ -218,8 +216,8 @@ fun MaintenanceDetailScreen(
                     item {
                         if (showApplyDialog) {
                             when (appJobState) {
-                                is ApplyJobState.Error -> {
-                                    val message = (appJobState as ApplyJobState.Error).message
+                                is ApplyMaintenanceJobState.Error -> {
+                                    val message = (appJobState as ApplyMaintenanceJobState.Error).message
                                     ErrorDialog(
                                         content = message,
                                         onDismiss = {
@@ -228,12 +226,15 @@ fun MaintenanceDetailScreen(
                                     )
                                 }
 
-                                ApplyJobState.Idle -> {}
-                                ApplyJobState.Loading -> LoadingDialog()
-                                ApplyJobState.Success -> {
+                                ApplyMaintenanceJobState.Idle -> {}
+                                ApplyMaintenanceJobState.Loading -> LoadingDialog()
+                                ApplyMaintenanceJobState.Success -> {
                                     SuccessDialog(
                                         content = "Ứng tuyển thành công!",
-                                        onDismiss = { showApplyDialog = false })
+                                        onDismiss = {
+                                            showApplyDialog = false
+                                            viewModel.setNewAppliedState(true)
+                                        })
                                 }
                             }
                         }
@@ -255,8 +256,8 @@ fun MaintenanceDetailScreen(
 
                         if (showCancelDialog){
                             when(cancelState){
-                                is CancelJobState.Error -> {
-                                    val message = (cancelState as CancelJobState.Error).message
+                                is CancelMaintenanceJobState.Error -> {
+                                    val message = (cancelState as CancelMaintenanceJobState.Error).message
                                     ErrorDialog(
                                         content = message,
                                         onDismiss = {
@@ -264,12 +265,15 @@ fun MaintenanceDetailScreen(
                                         }
                                     )
                                 }
-                                CancelJobState.Idle -> {}
-                                CancelJobState.Loading -> LoadingDialog()
-                                CancelJobState.Success -> {
+                                CancelMaintenanceJobState.Idle -> {}
+                                CancelMaintenanceJobState.Loading -> LoadingDialog()
+                                CancelMaintenanceJobState.Success -> {
                                     SuccessDialog(
                                         content = "Huỷ thành công!",
-                                        onDismiss = { showCancelDialog = false })
+                                        onDismiss = {
+                                            showCancelDialog = false
+                                            viewModel.setNewAppliedState(false)
+                                        })
                                 }
                             }
                         }

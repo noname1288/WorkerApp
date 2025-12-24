@@ -1,5 +1,6 @@
 package com.example.workerapp.data.source.local
 
+import com.example.workerapp.data.error.AppError
 import com.example.workerapp.data.source.JobDataSource
 import com.example.workerapp.data.source.local.room.ApplicationDao
 import com.example.workerapp.data.source.local.room.entity.ApplicationModel
@@ -21,14 +22,28 @@ class JobLocalImpl @Inject constructor(
         applicationDao.insertApplication(application)
     }
 
-    override suspend fun getApplicationByJobUid(jobUid: String): List<ApplicationModel> {
-        val entities = applicationDao.getApplicationsByJobId(jobUid)
-
-        return entities
+    override suspend fun getApplicationByJobUid(jobUid: String): Result<List<ApplicationModel>> {
+        return runCatching {
+            applicationDao.getApplicationsByJobId(jobUid)
+        }.recoverCatching { throwable ->
+            throw AppError.Database(
+                errorMessage = "Fail to get applications from database status following $jobUid "
+            )
+        }
     }
 
-    override suspend fun updateStatusByApplicationId(applicationId: String, newStatus: String) {
-        applicationDao.updateStatusByApplicationId(applicationId, newStatus)
+    override suspend fun updateStatusByApplicationId(
+        applicationId: String,
+        newStatus: String
+    ): Result<Unit> {
+        return runCatching {
+            applicationDao.updateStatusByApplicationId(applicationId, newStatus)
+            Unit
+        }.recoverCatching { throwable ->
+            throw AppError.Database(
+                errorMessage = "Fail to update status: $newStatus for application $applicationId"
+            )
+        }
     }
 
     override suspend fun deleteByApplicationId(applicationId: String) {
