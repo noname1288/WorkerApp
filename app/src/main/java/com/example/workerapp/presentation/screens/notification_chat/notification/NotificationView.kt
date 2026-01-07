@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import com.example.workerapp.R
 import com.example.workerapp.data.source.model.NotificationItemModel
 import com.example.workerapp.presentation.screens.notification_chat.NotificationUiState
-import com.example.workerapp.presentation.screens.notification_chat.RootViewModel
+import com.example.workerapp.presentation.screens.notification_chat.NotificationChatViewModel
 import com.example.workerapp.utils.components.CircleLoadingIndicator
 
 
@@ -46,7 +46,7 @@ import com.example.workerapp.utils.components.CircleLoadingIndicator
 @Composable
 fun NotificationView(
     modifier: Modifier = Modifier,
-    viewModel: RootViewModel,
+    viewModel: NotificationChatViewModel,
 ) {
     val context = LocalContext.current
 

@@ -40,9 +40,9 @@ data class NotificationTabDestination(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScreenRoot(
+fun NotificationChatScreen(
     modifier: Modifier = Modifier,
-    rootViewModel: RootViewModel,
+    rootViewModel: NotificationChatViewModel,
     navController: NavController
 ) {
     val destinations = listOf(

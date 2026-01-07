@@ -34,7 +34,7 @@ import com.example.workerapp.R
 import com.example.workerapp.data.source.model.ChatUser
 import com.example.workerapp.data.source.model.RoomModel
 import com.example.workerapp.navigation.AppRoutes
-import com.example.workerapp.presentation.screens.notification_chat.RootViewModel
+import com.example.workerapp.presentation.screens.notification_chat.NotificationChatViewModel
 import com.example.workerapp.utils.TimeUtils
 import com.example.workerapp.utils.cached.UserSession
 import com.example.workerapp.utils.ext.navigateWithArgs
@@ -45,7 +45,7 @@ import java.nio.charset.StandardCharsets
 fun ChatView(
     modifier: Modifier = Modifier,
     navController: NavController,
-    viewModel: RootViewModel,
+    viewModel: NotificationChatViewModel,
 ) {
     val conversations by viewModel.roomChat.collectAsState()
 

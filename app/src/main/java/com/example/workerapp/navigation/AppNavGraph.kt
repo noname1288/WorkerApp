@@ -30,8 +30,8 @@ import com.example.workerapp.presentation.screens.detail_job.maintenance.Mainten
 import com.example.workerapp.presentation.screens.home.HomeScreen
 import com.example.workerapp.presentation.screens.income.IncomeScreen
 import com.example.workerapp.presentation.screens.map.MapScreen
-import com.example.workerapp.presentation.screens.notification_chat.RootViewModel
-import com.example.workerapp.presentation.screens.notification_chat.ScreenRoot
+import com.example.workerapp.presentation.screens.notification_chat.NotificationChatViewModel
+import com.example.workerapp.presentation.screens.notification_chat.NotificationChatScreen
 import com.example.workerapp.presentation.screens.notification_chat.chat.ChatDetailScreen
 import com.example.workerapp.presentation.screens.notification_chat.chat.ChatDetailViewModel
 import com.example.workerapp.presentation.screens.policy.PolicyScreen
@@ -58,7 +58,7 @@ fun AppNavHost(
     navController: NavHostController,
     authViewModel: AuthViewModel,
     profileViewModel: ProfileViewModel,
-    rootViewModel: RootViewModel,
+    rootViewModel: NotificationChatViewModel,
     startDestination: String,
     innerPadding: PaddingValues
 ) {
@@ -106,7 +106,7 @@ fun AppNavHost(
         }
         composable(AppRoutes.NOTIFICATION) {
 
-            ScreenRoot(
+            NotificationChatScreen(
                 rootViewModel = rootViewModel,
                 navController = navController
             )

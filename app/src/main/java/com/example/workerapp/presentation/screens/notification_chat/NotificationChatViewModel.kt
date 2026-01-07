@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class RootViewModel @Inject constructor(
+class NotificationChatViewModel @Inject constructor(
     private val notificationRepository: NotificationRepository,
     private val chatRepository: ChatRepository
 ) : ViewModel() {

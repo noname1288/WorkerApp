@@ -4,7 +4,6 @@ import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -49,7 +48,7 @@ import com.example.workerapp.navigation.AppNavHost
 import com.example.workerapp.navigation.AppRoutes
 import com.example.workerapp.navigation.NavItem
 import com.example.workerapp.presentation.screens.authen.AuthViewModel
-import com.example.workerapp.presentation.screens.notification_chat.RootViewModel
+import com.example.workerapp.presentation.screens.notification_chat.NotificationChatViewModel
 import com.example.workerapp.presentation.screens.profile.ProfileViewModel
 import com.example.workerapp.utils.ext.safeNavigate
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -84,7 +83,7 @@ fun BaseScreen(navController: NavHostController) {
     * */
     val authViewModel = hiltViewModel<AuthViewModel>()
     val profileViewModel = hiltViewModel<ProfileViewModel>()
-    val rootViewModel = hiltViewModel<RootViewModel>()
+    val rootViewModel = hiltViewModel<NotificationChatViewModel>()
 
     val systemUiController = rememberSystemUiController()
     val useDarkIcons = true // vì nền trắng nên dùng icon tối
