@@ -38,19 +38,17 @@ class NotificationService : FirebaseMessagingService() {
         val partnerName = metaData[PARTNER_NAME]
         val partnerAvatar = metaData[PARTNER_AVATAR]
 
-        val notificationItem = message.notification
-//        if (notificationItem != null) {
-//            showNotification(notificationItem.title ?: "My App", notificationItem.body ?: "My body")
-//        }
+        val title = metaData["senderName"] ?: "New Message"
+        val body = metaData["content"] ?: "You have received a new message."
 
-        if (type == "new_message" && notificationItem != null) {
+        if (type == "new_message") {
 
             if (MyApplication.isForeground){
                 //send broadcast to update chat UI
             }else {
                 showMessageNotification(
-                    notificationItem.title,
-                    notificationItem.body,
+                    title,
+                    body,
                     roomId = roomId,
                     partnerName = partnerName,
                     partnerAvatar = partnerAvatar
