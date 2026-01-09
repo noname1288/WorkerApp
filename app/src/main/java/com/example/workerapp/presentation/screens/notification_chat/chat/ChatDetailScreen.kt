@@ -176,7 +176,8 @@ fun ChatDetailScreen(
 }
 
 @Composable
-fun SendMessageBar(modifier: Modifier = Modifier, onSend: (String) -> Unit) {
+fun SendMessageBar(onSend: (String) -> Unit) {
+    val context = LocalContext.current
     var input by remember { mutableStateOf("") }
 
     Row(
@@ -191,7 +192,9 @@ fun SendMessageBar(modifier: Modifier = Modifier, onSend: (String) -> Unit) {
         horizontalArrangement = Arrangement.Start
     ) {
         IconButton(
-            onClick = {}
+            onClick = {
+                Toast.makeText(context, "Chức năng chưa được hỗ trợ", Toast.LENGTH_SHORT).show()
+            }
         ) {
             Icon(
                 painterResource(R.drawable.ic_photo_48), null,

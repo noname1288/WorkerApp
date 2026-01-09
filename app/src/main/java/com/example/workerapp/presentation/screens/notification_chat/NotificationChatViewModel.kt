@@ -79,9 +79,7 @@ class NotificationChatViewModel @Inject constructor(
             }
 
             chatRepository.getAllConversations(currentUserUid)
-                .collect{ _roomChat.value = it}.also {
-                    println("Fetched ${_roomChat.value.size} conversations for user $currentUserUid")
-                }
+                .collect{ _roomChat.value = it}
         }
     }
 
