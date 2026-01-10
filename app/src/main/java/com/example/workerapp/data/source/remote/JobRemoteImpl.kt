@@ -244,24 +244,6 @@ class JobRemoteImpl @Inject constructor(
     }
 
     override suspend fun getApplication(workerId: String): Result<List<ApplicationDto>> {
-//        try {
-//            val response = jobApi.getApplicationsByWorkerId(workerId)
-//            if (response.success) {
-//                val sortedOrders = response.orders.sortedByDescending {
-//                    LocalDateTime.parse(it.createdAt, APPLICATION_CREATED_AT_FORMATTER)
-//                }
-//
-//                Log.d(TAG, "getApplication: ${response.orders}")
-//                return NetworkResult.Success(sortedOrders)
-//            } else {
-//                Log.e(TAG, "getApplication Error: ${response.message}")
-//                return NetworkResult.Error(response.message)
-//            }
-//        } catch (e: Exception) {
-//            Log.e(TAG, "getApplication Exception: ${e.message}")
-//            return NetworkResult.Error(e.message ?: "Unknown error")
-//        }
-
         return runCatching {
             val response = jobApi.getApplicationsByWorkerId(workerId)
 

@@ -67,7 +67,7 @@ class HomeViewModel @Inject constructor(
 
     fun fetchApplications(){
         viewModelScope.launch {
-            jobRepository.getApplications()
+            jobRepository.syncApplicationsFromRemote()
         }
     }
 }

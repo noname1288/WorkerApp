@@ -18,6 +18,10 @@ class JobLocalImpl @Inject constructor(
         applicationDao.insertListApplications(applications)
     }
 
+    override suspend fun upsertApplicationToLocal(applications: List<ApplicationModel>) {
+        applicationDao.upsertApplications(applications)
+    }
+
     override suspend fun addNewApplicationToLocal(application: ApplicationModel) {
         applicationDao.insertApplication(application)
     }

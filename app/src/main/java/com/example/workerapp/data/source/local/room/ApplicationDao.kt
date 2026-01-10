@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Upsert
 import com.example.workerapp.data.source.local.room.entity.ApplicationModel
 
 @Dao
@@ -67,4 +68,11 @@ interface ApplicationDao {
         applicationId: String,
         newStatus: String
     ): Int
+
+    /**
+     * update changed item
+     * no need to clear storage and re-insert all items
+     * */
+    @Upsert
+    suspend fun upsertApplications(applications: List<ApplicationModel>)
 }

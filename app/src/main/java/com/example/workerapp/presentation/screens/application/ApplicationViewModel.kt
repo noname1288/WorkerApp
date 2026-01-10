@@ -4,17 +4,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.workerapp.data.JobRepository
 import com.example.workerapp.data.source.remote.JobRemoteImpl
-import com.example.workerapp.data.source.remote.dto.NetworkResult
 import com.example.workerapp.data.source.remote.dto.response.ApplicationDto
 import com.example.workerapp.utils.cached.UserSession
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class ApplicationViewModel @Inject constructor(
     private val jobRemoteImpl: JobRemoteImpl,
+    private val jobRepository: JobRepository
 ) : ViewModel() {
 
     private val _applicationsState = MutableStateFlow<ApplicationsUiState>(
@@ -40,9 +42,19 @@ class ApplicationViewModel @Inject constructor(
 
             jobRemoteImpl.getApplication(currentUser).onSuccess { data ->
                 _applicationsState.value = ApplicationsUiState.Success(data)
+
+                syncApplicationsFromRemote()
             }.onFailure { error ->
                 _applicationsState.value =
                     ApplicationsUiState.Error(error.message ?: "Unknown Error")
+            }
+        }
+    }
+
+    fun syncApplicationsFromRemote() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO){
+                jobRepository.syncApplicationsFromRemote()
             }
         }
     }

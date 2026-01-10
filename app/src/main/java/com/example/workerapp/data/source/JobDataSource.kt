@@ -20,6 +20,8 @@ interface JobDataSource {
 
         suspend fun saveApplicationsToLocal(applications: List<ApplicationModel>)
 
+        suspend fun upsertApplicationToLocal(applications: List<ApplicationModel>)
+
         suspend fun addNewApplicationToLocal(application: ApplicationModel)
 
         suspend fun getApplicationByJobUid(jobUid: String) : Result<List<ApplicationModel>>

@@ -6,7 +6,7 @@ import com.example.workerapp.data.source.remote.dto.request.CancelApplicationReq
 import com.example.workerapp.data.source.remote.dto.response.ApplicationDto
 
 interface JobRepository {
-    suspend fun getApplications(): Result<List<ApplicationModel>>
+    suspend fun syncApplicationsFromRemote(): Result<List<ApplicationModel>>
     suspend fun getApplicationByJobId(jobUid: String) : Result<ApplicationModel?>
     suspend fun cancelJob(request: CancelApplicationRequest) : Result<Unit>
     suspend fun insertApplicationToLocal(application: ApplicationDto) : Result<Boolean>

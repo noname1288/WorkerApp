@@ -14,7 +14,7 @@ data class ApplicationDto(
     val serviceType: String,
 )
 
-fun ApplicationDto.toEntity() : ApplicationModel{
+fun ApplicationDto.toApplicationModel() : ApplicationModel{
     return ApplicationModel(
         id = 0L, // Room auto-generate
         applicationId = uid,

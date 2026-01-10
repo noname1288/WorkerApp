@@ -8,7 +8,7 @@ import com.example.workerapp.data.source.local.room.entity.ApplicationModel
 import com.example.workerapp.data.source.remote.dto.request.ApplicationRequest
 import com.example.workerapp.data.source.remote.dto.request.CancelApplicationRequest
 import com.example.workerapp.data.source.remote.dto.response.ApplicationDto
-import com.example.workerapp.data.source.remote.dto.response.toEntity
+import com.example.workerapp.data.source.remote.dto.response.toApplicationModel
 import com.example.workerapp.utils.ApplicationStatusType
 import com.example.workerapp.utils.cached.UserSession
 import javax.inject.Inject
@@ -19,15 +19,18 @@ class JobRepositoryImpl @Inject constructor(
 ) : JobRepository {
     private val TAG = "JobRepositoryImpl"
 
-    override suspend fun getApplications(): Result<List<ApplicationModel>> {
+    override suspend fun syncApplicationsFromRemote(): Result<List<ApplicationModel>> {
         return runCatching {
             //get current user
             val currentUser = UserSession.requireUserId().getOrThrow()
 
             //get applications from remote
             val applicationDtoList = remote.getApplication(currentUser).getOrThrow()
-            val entities = applicationDtoList.map { it.toEntity() }
+            val entities = applicationDtoList.map { it.toApplicationModel() }
             Log.d(TAG, "$entities")
+
+            //upsert to local
+            local.upsertApplicationToLocal(entities)
 
             entities
         }
@@ -83,7 +86,7 @@ class JobRepositoryImpl @Inject constructor(
     override suspend fun insertApplicationToLocal(application: ApplicationDto): Result<Boolean> {
         return try {
             //map to Application Model
-            val applicationEntity = application.toEntity()
+            val applicationEntity = application.toApplicationModel()
 
             local.addNewApplicationToLocal(applicationEntity)
             Log.d(TAG, "insert new application success: ${applicationEntity.applicationId}")
@@ -142,6 +145,6 @@ class JobRepositoryImpl @Inject constructor(
                 )
 
             //4. save to local
-            local.addNewApplicationToLocal(lastestApplication.toEntity() /*convert to ApplicationModel*/)
+            local.addNewApplicationToLocal(lastestApplication.toApplicationModel() /*convert to ApplicationModel*/)
         }
 }
