@@ -150,6 +150,9 @@ fun CleaningDetailScreen(
             }
 
             else -> {
+                /**
+                 * Contents
+                 * */
                 LazyColumn(
                     Modifier
                         .fillMaxSize()
@@ -229,75 +232,75 @@ fun CleaningDetailScreen(
                             }
                         }
                     }
-
-                    item {
-                        if (showApplyDialog) {
-                            when (appJobState) {
-                                is ApplyCleaningJobState.Error -> {
-                                    val message = (appJobState as ApplyCleaningJobState.Error).message
-                                    ErrorDialog(
-                                        content = message,
-                                        onDismiss = {
-                                            showApplyDialog = false
-                                        }
-                                    )
-                                }
-
-                                ApplyCleaningJobState.Idle -> {}
-                                ApplyCleaningJobState.Loading -> LoadingDialog()
-                                ApplyCleaningJobState.Success -> {
-                                    SuccessDialog(
-                                        content = "Ứng tuyển thành công!",
-                                        onDismiss = {
-                                            showApplyDialog = false
-                                            viewModel.setNewAppliedState(true)
-                                        })
-                                }
-                            }
-                        }
-
-                        if (showAlertDialog) {
-                            CommonAlertDialog(
-                                content = "Bạn có chắc chắn muốn hủy ứng tuyển công việc này?",
-                                onDismiss = {
-                                    showAlertDialog = false
-                                },
-                                onConfirm = {
-                                    // Confirm cancel apply
-                                    showAlertDialog = false
-                                    viewModel.cancelApplication()
-                                    showCancelDialog = true
-                                }
-                            )
-                        }
-
-                        if (showCancelDialog) {
-                            when (cancelState) {
-                                is CancelCleaningJobState.Error -> {
-                                    val message = (cancelState as CancelCleaningJobState.Error).message
-                                    ErrorDialog(
-                                        content = message,
-                                        onDismiss = {
-                                            showCancelDialog = false
-                                        }
-                                    )
-                                }
-
-                                CancelCleaningJobState.Idle -> {}
-                                CancelCleaningJobState.Loading -> LoadingDialog()
-                                CancelCleaningJobState.Success -> {
-                                    SuccessDialog(
-                                        content = "Huỷ thành công!",
-                                        onDismiss = {
-                                            showCancelDialog = false
-                                            viewModel.setNewAppliedState(false)
-                                        }
-                                    )
-                                }
-                            }
-                        }
-                    }
                 }
+            }
+        }
+    }
+
+    if (showApplyDialog) {
+        when (appJobState) {
+            is ApplyCleaningJobState.Error -> {
+                val message = (appJobState as ApplyCleaningJobState.Error).message
+                ErrorDialog(
+                    content = message,
+                    onDismiss = {
+                        showApplyDialog = false
+                    }
+                )
+            }
+
+            ApplyCleaningJobState.Idle -> {}
+            ApplyCleaningJobState.Loading -> LoadingDialog()
+            ApplyCleaningJobState.Success -> {
+                SuccessDialog(
+                    content = "Ứng tuyển thành công!",
+                    onDismiss = {
+                        showApplyDialog = false
+                        viewModel.setNewAppliedState(true)
+                        viewModel.resetApplyState()
+                    })
+            }
+        }
+    }
+
+    if (showAlertDialog) {
+        CommonAlertDialog(
+            content = "Bạn có chắc chắn muốn hủy ứng tuyển công việc này?",
+            onDismiss = {
+                showAlertDialog = false
+            },
+            onConfirm = {
+                // Confirm cancel apply
+                showAlertDialog = false
+                viewModel.cancelApplication(cleaningUid)
+                showCancelDialog = true
+            }
+        )
+    }
+
+    if (showCancelDialog) {
+        when (cancelState) {
+            is CancelCleaningJobState.Error -> {
+                val message = (cancelState as CancelCleaningJobState.Error).message
+                ErrorDialog(
+                    content = message,
+                    onDismiss = {
+                        showCancelDialog = false
+                    }
+                )
+            }
+
+            CancelCleaningJobState.Idle -> {}
+            CancelCleaningJobState.Loading -> LoadingDialog()
+            CancelCleaningJobState.Success -> {
+                SuccessDialog(
+                    content = "Huỷ thành công!",
+                    onDismiss = {
+                        showCancelDialog = false
+                        viewModel.setNewAppliedState(false)
+                        viewModel.resetCancelState()
+                    }
+                )
             }
         }
     }

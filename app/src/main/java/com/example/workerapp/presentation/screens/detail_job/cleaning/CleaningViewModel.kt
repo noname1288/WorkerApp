@@ -1,5 +1,6 @@
 package com.example.workerapp.presentation.screens.detail_job.cleaning
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.workerapp.data.JobRepository
@@ -36,9 +37,11 @@ class CleaningViewModel @Inject constructor(
     val appJobState = _applyJobState.asStateFlow()
     private val _appliedState = MutableStateFlow<Boolean?>(null)
     val appliedState = _appliedState.asStateFlow()
-    private val _cancelJobState = MutableStateFlow<CancelCleaningJobState>(CancelCleaningJobState.Idle)
+    private val _cancelJobState =
+        MutableStateFlow<CancelCleaningJobState>(CancelCleaningJobState.Idle)
     val cancelJobState = _cancelJobState.asStateFlow()
     private val _applicationEntity = MutableStateFlow<ApplicationModel?>(null)
+    private val TAG = "CleaningViewModel"
 
     fun fetchJobDetail(uid: String) {
         if (uid.isEmpty()) {
@@ -81,24 +84,25 @@ class CleaningViewModel @Inject constructor(
     }
 
     fun applyToJob(jobUid: String) {
+        Log.d(TAG, "applyToJob: $jobUid")
         if (jobUid.isEmpty()) {
             _applyJobState.value = ApplyCleaningJobState.Error("Invalid User Uid")
             return
         }
 
-        viewModelScope.launch { //todo : insert lastest application into local
+        viewModelScope.launch {
             _applyJobState.value = ApplyCleaningJobState.Loading
 
-            jobRepository.applyJob(
-                ApplicationRequest(
-                    workerID = UserSession.uid,
-                    jobID = jobUid,
-                    serviceType = ServiceType.CleaningType
+            val applyResult = withContext(Dispatchers.IO){
+                jobRepository.applyJob(
+                    ApplicationRequest(
+                        workerID = UserSession.uid,
+                        jobID = jobUid,
+                        serviceType = ServiceType.CleaningType
+                    )
                 )
-            ).onSuccess {
-                //check event: data is updated (local)
-                checkIfApplied(jobUid)
-
+            }
+            applyResult.onSuccess {
                 _applyJobState.value = ApplyCleaningJobState.Success
             }.onFailure { error ->
                 _applyJobState.value = ApplyCleaningJobState.Error(error.message ?: "Unknown Error")
@@ -106,26 +110,62 @@ class CleaningViewModel @Inject constructor(
         }
     }
 
-    fun cancelApplication() {
+    fun cancelApplication(jobUid: String) {
         viewModelScope.launch {
             _cancelJobState.value = CancelCleaningJobState.Loading
+
+            //get lastest applicationID
+            val resultGetLastestApplicationById = withContext(Dispatchers.IO) {
+                jobRepository.getApplicationByJobId(jobUid)
+            }
+
+            resultGetLastestApplicationById.onSuccess { application ->
+                Log.d(TAG, "checkIfApplied: $application")
+                /* User has not applied this job*/
+                if (application == null) {
+                    _appliedState.value = false
+                    _applicationEntity.value = null
+                    return@launch
+                }
+
+                /* User has applied this job*/
+                val status = application.status
+                if (status == ApplicationStatusType.WAITING) {
+                    _appliedState.value = true
+                    _applicationEntity.value = application
+                } else {
+                    _appliedState.value = false
+                    _applicationEntity.value = null
+                }
+            }.onFailure {
+                _appliedState.value = null
+                _applicationEntity.value = null
+                return@launch
+            }
 
             val applicationEntity = _applicationEntity.value
 
             val applicationUid = if (applicationEntity == null) {
-                _cancelJobState.value = CancelCleaningJobState.Error("Bạn chưa ứng tuyển công việc này")
+                _cancelJobState.value =
+                    CancelCleaningJobState.Error("Bạn chưa ứng tuyển công việc này")
                 return@launch
             } else applicationEntity.applicationId
 
-           jobRepository.cancelJob(
-                CancelApplicationRequest(
-                    applicationUid,
-                    ApplicationStatusType.CANCEL
+            Log.d(TAG, "Cancel Order: applicationUid: $applicationUid")
+            val cancelResult = withContext(Dispatchers.IO){
+                jobRepository.cancelJob(
+                    CancelApplicationRequest(
+                        applicationUid,
+                        ApplicationStatusType.CANCEL
+                    )
                 )
-            ).onSuccess { applicationWrapper ->
+            }
+
+            cancelResult.onSuccess { applicationWrapper ->
                 _cancelJobState.value = CancelCleaningJobState.Success
             }.onFailure { error ->
-                _cancelJobState.value = CancelCleaningJobState.Error(error.message ?: "Unknown Error")
+                _cancelJobState.value =
+                    CancelCleaningJobState.Error(error.message ?: "Unknown Error")
             }
         }
     }
@@ -135,6 +175,7 @@ class CleaningViewModel @Inject constructor(
             withContext(Dispatchers.IO) {
                 jobRepository.getApplicationByJobId(jobUid)
             }.onSuccess { application ->
+                Log.d(TAG, "checkIfApplied: $application")
                 /* User has not applied this job*/
                 if (application == null) {
                     _appliedState.value = false
@@ -158,8 +199,16 @@ class CleaningViewModel @Inject constructor(
         }
     }
 
-    fun setNewAppliedState(state: Boolean){
+    fun setNewAppliedState(state: Boolean) {
         _appliedState.value = state
+    }
+
+    fun resetApplyState(){
+        _applyJobState.value = ApplyCleaningJobState.Idle
+    }
+
+    fun resetCancelState(){
+        _cancelJobState.value = CancelCleaningJobState.Idle
     }
 }
 
