@@ -1,6 +1,7 @@
 package com.example.workerapp.presentation.screens.bot
 
 import android.util.Log
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.workerapp.data.ChatbotRepository
@@ -24,8 +25,8 @@ class ChatbotViewModel @Inject constructor(
     private val _messageList = MutableStateFlow<List<MessageModel>>(emptyList())
     val messageList = _messageList.asStateFlow()
 
-    private val _chatbotResponse = MutableStateFlow<List<ChatbotResponseUiModel>>(emptyList())
-    val chatbotResponse = _chatbotResponse.asStateFlow()
+    private val _chatbotResponseList = MutableStateFlow<List<ChatbotResponseUiModel>>(emptyList())
+    val chatbotResponseList = _chatbotResponseList.asStateFlow()
 
     val addressName = MutableStateFlow<String>("")
     val addressLat = MutableStateFlow<Double>(0.0)
@@ -46,7 +47,7 @@ class ChatbotViewModel @Inject constructor(
                 text = "Xin chào! Tôi là trợ lý AI của GoodJob. Tôi có thể giúp bạn tìm công việc, tìm hiểu về dịch vụ hoặc thông tin về ứng dụng. Bạn cần hỗ trợ gì?"
             )
 
-            _chatbotResponse.update { oldList -> oldList + mockMessage }
+            _chatbotResponseList.update { oldList -> oldList + mockMessage }
         }
     }
 
@@ -74,7 +75,7 @@ class ChatbotViewModel @Inject constructor(
 
         // add user's message
         val userMessage = ChatbotResponseUiModel.TextResponse(currentUserUid, query)
-        _chatbotResponse.update { oldList -> oldList + userMessage }
+        _chatbotResponseList.update { oldList -> oldList + userMessage }
 
         viewModelScope.launch {
             val currentLocation = Location(
@@ -94,7 +95,7 @@ class ChatbotViewModel @Inject constructor(
 
             val result = chatbotRepository.sendMessage(request)
             result.onSuccess { data ->
-                _chatbotResponse.update { oldList -> oldList + data }
+                _chatbotResponseList.update { oldList -> oldList + data }
             }.onFailure { error ->
                 Log.e(TAG, error.message ?: "something wrong")
             }

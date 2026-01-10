@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -80,12 +81,19 @@ fun ChatBotScreen(
     var hasLocationPermission by rememberSaveable { mutableStateOf(false) }
 
     val message by viewModel.messageList.collectAsState()
-    val chatbotResponse by viewModel.chatbotResponse.collectAsState()
+    val chatbotResponseList by viewModel.chatbotResponseList.collectAsState()
+    val listState = rememberLazyListState()
 
     if (showPermissionDialog) {
         LocationPermissionHandler {
             showPermissionDialog = false
             hasLocationPermission = true
+        }
+    }
+
+    LaunchedEffect(chatbotResponseList.size) {
+        if (chatbotResponseList.isNotEmpty()) {
+            listState.animateScrollToItem(chatbotResponseList.lastIndex)
         }
     }
 
@@ -153,9 +161,10 @@ fun ChatBotScreen(
             Modifier
                 .fillMaxWidth()
                 .padding(innerPadding)
-                .padding(horizontal = 12.dp)
+                .padding(horizontal = 12.dp),
+            state = listState
         ) {
-            itemsIndexed(chatbotResponse) { index, message ->
+            itemsIndexed(chatbotResponseList) { index, message ->
 
                 when (message) {
                     is ChatbotResponseUiModel.JobResponse -> {
@@ -257,7 +266,7 @@ fun ChatbotJobCard(job: ChatbotJobResponse, onClicked: () -> Unit) {
             .padding(12.dp)
     ) {
         Text(
-            text = ServiceType.translateToVietnamese(job.serviceType),
+            text = ServiceType.translateToVietnamese(job.serviceType ?: ""),
             style = MaterialTheme.typography.bodyMedium.copy(
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
@@ -270,7 +279,7 @@ fun ChatbotJobCard(job: ChatbotJobResponse, onClicked: () -> Unit) {
         )
 
         Text(
-            text = job.location,
+            text = job.location ?: "",
             style = MaterialTheme.typography.bodyMedium
         )
 
@@ -282,7 +291,7 @@ fun ChatbotJobCard(job: ChatbotJobResponse, onClicked: () -> Unit) {
         )
 
         Text(
-            text = "📅 ${job.listDays.joinToString()}",
+            text = "📅 ${job.listDays?.joinToString()}",
             style = MaterialTheme.typography.bodySmall
         )
     }

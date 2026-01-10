@@ -37,7 +37,7 @@ class ChatbotRemoteImpl @Inject constructor(
                 }else {
                     NetworkResult.Error("Empty response body")
                 }
-            }else {
+            } else {
                 val errorMessage = response.errorBody()?.string()
                     ?.let { json -> errorAdapter.fromJson(json)?.error }
                     ?: response.message()
